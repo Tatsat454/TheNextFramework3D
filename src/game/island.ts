@@ -45,11 +45,12 @@ const inEllipse = (i: number, j: number, cx: number, cz: number, rx: number, rz:
 
 const CX = 32;
 const CZ = 28;
-// ~40×36 tiles of land (rx 20, rz 18).
+// ~44×36 tiles of land: extra width on the west so the house pond has a shore.
 for (let j = 0; j < H; j++) {
   for (let i = 0; i < W; i++) {
     const wobble = (noise(i * 0.18, j * 0.18) - 0.5) * 0.12;
-    const land = inEllipse(i, j, CX, CZ, 20 + wobble, 18 + wobble * 0.8);
+    const rx = (i + 0.5 < CX ? 24 : 20) + wobble;
+    const land = inEllipse(i, j, CX, CZ, rx, 18 + wobble * 0.8);
     const plateau = land && (inEllipse(i, j, 32, 14.5, 12.2, 8.2) || (i >= 31 && i <= 34 && j >= 16 && j <= 21));
     const bluff = land && (inEllipse(i, j, 46.5, 16.5, 5.4, 4.6) || (i >= 40 && i <= 47 && j >= 13 && j <= 18));
     grid.push({
@@ -87,8 +88,8 @@ for (let j = 0; j < H; j++) {
   }
 }
 
-/** House pond in tile space, with a walkable islet. */
-export const pond = { x: 16.5, z: 38, rx: 6.8, rz: 5.0, isletX: 16.2, isletZ: 37.1, isletRx: 3.6, isletRz: 2.75 };
+/** House pond in tile space, with a walkable islet and a south front yard. */
+export const pond = { x: 15.4, z: 38.2, rx: 7.6, rz: 4.6, isletX: 16.0, isletZ: 37.6, isletRx: 4.0, isletRz: 3.2 };
 for (const t of grid) {
   if (t.kind === "void") continue;
   if (!inEllipse(t.i, t.j, pond.x, pond.z, pond.rx, pond.rz)) continue;
@@ -176,12 +177,12 @@ for (const t of grid) {
 paint(32, 42, 33, 23); // beach → stairs
 paint(32, 20, 33, 13); // stairs top → museum door
 paint(30, 28, 35, 32); // plaza hub
-paint(20, 37, 31, 38); // house bridge → spine
+paint(16, 39, 31, 40); // house door → spine
 paint(24, 29, 31, 29); // town hall front
 paint(18, 33, 24, 33); // garden front
 paint(35, 28, 40, 28); // → market
 paint(36, 29, 39, 32); // → arcade
-bridge(20, 37, 24, 38); // across the house pond
+bridge(16, 39, 24, 40); // across the house pond, on the door line
 
 export const dock = { i0: 32, i1: 33, j0: 43, j1: 47 };
 for (let jj = dock.j0; jj <= dock.j1; jj++)
@@ -258,7 +259,7 @@ export const gardenGate = (() => {
 
 export const getPlacement = (id: LandmarkId) => landmarkPlacements.find((l) => l.id === id)!;
 
-export const mailboxTile = { i: 18, j: 38 };
+export const mailboxTile = { i: 18, j: 39 };
 export const boardTile = { i: 28, j: 29 };
 block(mailboxTile.i, mailboxTile.j, mailboxTile.i, mailboxTile.j);
 block(boardTile.i, boardTile.j, boardTile.i, boardTile.j);

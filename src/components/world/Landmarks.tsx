@@ -101,7 +101,9 @@ function House() {
         <Box p={[0.17, 0.9, -0.05]} s={[0.03, 0.22, 0.03]} c={palette.woodDeep} shadow={false} />
         <Box p={[0.17, 0.98, 0.03]} s={[0.03, 0.1, 0.14]} c={palette.coral} shadow={false} />
       </group>
-      <Fence from={[a.x - pl.center.x - 0.2, b.z - pl.center.z + 1.15]} to={[b.x - pl.center.x + 1.4, b.z - pl.center.z + 1.15]} y={y} />
+      {/* South fence with a gate on the door */}
+      <Fence from={[a.x - pl.center.x - 0.2, b.z - pl.center.z + 1.15]} to={[-0.5, b.z - pl.center.z + 1.15]} y={y} />
+      <Fence from={[0.5, b.z - pl.center.z + 1.15]} to={[b.x - pl.center.x + 1.4, b.z - pl.center.z + 1.15]} y={y} />
       <Fence from={[a.x - pl.center.x - 0.2, a.z - pl.center.z - 0.2]} to={[a.x - pl.center.x - 0.2, b.z - pl.center.z + 1.15]} y={y} />
     </group>
   );
