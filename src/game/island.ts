@@ -192,8 +192,8 @@ paint(30, 28, 35, 32); // plaza hub
 paint(16, 39, 31, 40); // house door → spine
 paint(24, 29, 31, 29); // town hall front
 paint(18, 33, 24, 33); // garden front
-paint(35, 28, 40, 28); // → market
-paint(36, 29, 39, 32); // → arcade
+paint(35, 28, 40, 28); // → arcade
+paint(36, 29, 39, 32); // → market
 bridge(16, 39, 24, 40); // across the house pond, on the door line
 
 export const dock = { i0: 32, i1: 33, j0: 43, j1: 47 };
@@ -243,8 +243,8 @@ export const landmarkPlacements: LandmarkPlacement[] = [
   place("house", [15, 36, 17, 38]),
   place("townhall", [24, 26, 27, 28], 1.3, 2.3),
   place("museum", [31, 10, 34, 12], 1.2, 1.8),
-  place("market", [38, 26, 40, 27], 1.15, 1.9),
-  place("arcade", [38, 31, 39, 32], 1.1, 1.6),
+  place("arcade", [38, 26, 40, 27], 1.1, 1.6),
+  place("market", [38, 31, 39, 32], 1.15, 1.9),
   place("garden", [18, 30, 23, 32], 1.2, 1.7),
 ];
 {
@@ -451,7 +451,7 @@ export const spawn = (() => {
 export const residentHomes: Record<ResidentId, Vec2[]> = {
   bramble: [tileCenter(34, 36), tileCenter(30, 34), tileCenter(35, 32)],
   drizzle: [tileCenter(32, 27), tileCenter(28, 30), tileCenter(25, 32)],
-  pip: [tileCenter(37, 34), tileCenter(39, 30), tileCenter(36, 32)],
+  pip: [tileCenter(37, 28), tileCenter(41, 28), tileCenter(39, 25)],
   sol: [tileCenter(32, 16), tileCenter(35, 14), tileCenter(30, 15)],
 };
 
