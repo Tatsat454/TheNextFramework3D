@@ -58,7 +58,7 @@ export function Terrain() {
       if (t.kind === "dock") continue;
       const top = t.h * LEVEL;
       const sy = top - 0.02 - BASE;
-      dirt.push({ x, y: BASE + sy / 2, z, sx: 1.14, sy, sz: 1.14, c: palette.dirt });
+      dirt.push({ x, y: BASE + sy / 2, z, sx: 1.42, sy, sz: 1.42, c: palette.dirt });
       if (t.kind === "ramp") continue;
       if (t.kind === "path" || t.kind === "sand") pushQuad(path, pathIdx, x, top + 0.03, z);
       else pushQuad(grass, grassIdx, x, top + 0.03, z);

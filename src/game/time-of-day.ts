@@ -25,14 +25,14 @@ export const presets: Record<TimePreset["id"], TimePreset> = {
   },
   afternoon: {
     id: "afternoon",
-    sky: ["#E4B4D8", "#F6C8BE", "#FFE6D0"],
+    sky: ["#E8A8D0", "#F2B8C6", "#F8D4C4"],
     hemiSky: "#FFE4D8",
     hemiGround: "#8BE07A",
     hemiIntensity: 1.22,
     sun: "#FFF6E4",
     sunIntensity: 1.5,
     sunDir: [-4, 28, 10],
-    fog: "#F4D6CC",
+    fog: "#F4C8C0",
   },
   golden: {
     id: "golden",

@@ -11,8 +11,8 @@ function makeSkyTexture(top: string, mid: string, horizon: string) {
   const g = c.getContext("2d")!;
   const grd = g.createLinearGradient(0, 0, 0, 512);
   grd.addColorStop(0, top);
-  grd.addColorStop(0.42, mid);
-  grd.addColorStop(0.72, horizon);
+  grd.addColorStop(0.28, mid);
+  grd.addColorStop(0.55, horizon);
   grd.addColorStop(1, horizon);
   g.fillStyle = grd;
   g.fillRect(0, 0, 8, 512);
