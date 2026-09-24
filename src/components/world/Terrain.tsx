@@ -4,7 +4,7 @@ import { useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import type { ThreeEvent } from "@react-three/fiber";
-import { dock, LEVEL, rampRuns, tileCenter, tiles, WATER_Y } from "@/game/island";
+import { dock, LEVEL, rampRuns, tileAt, tileCenter, tiles, WATER_Y } from "@/game/island";
 import { input } from "@/game/input";
 import { palette, toon } from "@/game/materials";
 import { isPaused, useGame } from "@/game/store";
@@ -45,11 +45,22 @@ export function Terrain() {
     const sandIdx: number[] = [];
     const water: number[] = [];
     const waterIdx: number[] = [];
+    const fall: number[] = [];
+    const fallIdx: number[] = [];
     const dirt: { x: number; y: number; z: number; sx: number; sy: number; sz: number; c: string }[] = [];
     const pushQuad = (arr: number[], idx: number[], x: number, y: number, z: number, s = 0.54) => {
       const b = arr.length / 3;
       arr.push(x - s, y, z - s, x + s, y, z - s, x + s, y, z + s, x - s, y, z + s);
       idx.push(b, b + 3, b + 2, b, b + 2, b + 1);
+    };
+    const pushFall = (x: number, z: number, w: number) => {
+      const b = fall.length / 3;
+      const y0 = WATER_Y + 0.04;
+      const y1 = BASE - 1.35;
+      const z0 = z + 0.5;
+      const z1 = z + 1.35;
+      fall.push(x - w, y0, z0, x + w, y0, z0, x + w, y1, z1, x - w, y1, z1);
+      fallIdx.push(b, b + 3, b + 2, b, b + 2, b + 1);
     };
     for (const t of tiles) {
       if (t.kind === "void") continue;
@@ -59,6 +70,8 @@ export function Terrain() {
         const sy = top - BASE;
         dirt.push({ x, y: BASE + sy / 2, z, sx: 1.42, sy, sz: 1.42, c: palette.dirt });
         pushQuad(water, waterIdx, x, WATER_Y, z, 0.56);
+        const south = tileAt(t.i, t.j + 1);
+        if ((!south || south.kind === "void") && t.j >= 40) pushFall(x, z, 0.58);
         continue;
       }
       const top = t.h * LEVEL;
@@ -127,6 +140,7 @@ export function Terrain() {
       pathGeo: geoOf(path, pathIdx),
       sandGeo: geoOf(sand, sandIdx),
       waterGeo: geoOf(water, waterIdx),
+      fallGeo: geoOf(fall, fallIdx),
       dirt,
       steps,
       planks,
@@ -178,6 +192,10 @@ export function Terrain() {
         geometry={data.waterGeo}
         material={toon(palette.water, { water: true, emissive: "#6FB9CF", transparent: true, opacity: 0.92, side: THREE.DoubleSide })}
         receiveShadow
+      />
+      <mesh
+        geometry={data.fallGeo}
+        material={toon(palette.shallow, { water: true, emissive: "#8FE4F4", transparent: true, opacity: 0.78, side: THREE.DoubleSide, noOcclude: true })}
       />
     </group>
   );

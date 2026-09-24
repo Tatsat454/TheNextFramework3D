@@ -99,6 +99,18 @@ for (const t of grid) {
   t.h = 1;
 }
 
+/** Pond spills south over the rim as a short river, then falls off the island. */
+export const stream = { i0: 15, i1: 18, j0: 41, j1: 45 };
+for (let j = stream.j0; j <= stream.j1; j++) {
+  for (let i = stream.i0; i <= stream.i1; i++) {
+    const t = tileAt(i, j);
+    if (!t) continue;
+    t.kind = "water";
+    t.blocked = true;
+    t.h = 1;
+  }
+}
+
 export const stairs: { i: number; j: number; h: number; dir: Dir }[] = [];
 function addRampTile(t: Tile, fromLevel: number, k0: number, k1: number) {
   t.kind = "ramp";
@@ -167,10 +179,10 @@ const bridge = (i0: number, j0: number, i1: number, j1: number) => {
     }
 };
 
-// Southern beach crescent, then paths overwrite the route through it.
+// Southern beach crescent — the whole south apron is sand, no leftover grass patches.
 for (const t of grid) {
   if (t.kind !== "grass" || t.h !== 1) continue;
-  if (t.j >= 41 && t.d <= 4) t.kind = "sand";
+  if (t.j >= 40) t.kind = "sand";
 }
 
 // Spine: spawn / plaza / stairs / museum. District spokes stay short.
