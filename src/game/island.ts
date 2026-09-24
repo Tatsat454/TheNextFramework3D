@@ -229,7 +229,7 @@ const place = (id: LandmarkId, rect: [number, number, number, number], interactO
 export const landmarkPlacements: LandmarkPlacement[] = [
   place("house", [15, 36, 17, 38]),
   place("townhall", [24, 26, 27, 28], 1.3, 2.3),
-  place("museum", [30, 10, 33, 12], 1.2, 1.8),
+  place("museum", [31, 10, 34, 12], 1.2, 1.8),
   place("market", [38, 26, 40, 27], 1.15, 1.9),
   place("arcade", [38, 31, 39, 32], 1.1, 1.6),
   place("garden", [18, 30, 23, 32], 1.2, 1.7),
