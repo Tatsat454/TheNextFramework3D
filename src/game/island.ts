@@ -431,7 +431,7 @@ export const pickups: PickupSpot[] = [
 ];
 
 export const spawn = (() => {
-  const c = tileCenter(32, 38);
+  const c = tileCenter(32, 40);
   return { x: c.x + 0.5, z: c.z };
 })();
 
