@@ -204,7 +204,7 @@ export function Player() {
     const ground = heightAt(player.x, player.z);
     player.y += (ground - player.y) * (1 - Math.pow(0.0001, dt));
     const tile = tileAt(worldToTile(player.x, player.z).i, worldToTile(player.x, player.z).j);
-    player.onSand = !!tile && (tile.kind === "sand" || (tile.kind === "path" && tile.h === 1));
+    player.onSand = !!tile && tile.kind === "sand";
 
     if (a.wasMoving && !moving) a.stopAt = t;
     a.wasMoving = moving;

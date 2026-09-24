@@ -34,6 +34,8 @@ Add `?hq` to the URL to force full quality (shadows, higher resolution) on machi
 
 ## The island
 
+A floating oval about 40×36 tiles across. You arrive on the southern beach, pass the House on its pond islet, and come into a central Plaza. Arcade, Town Hall, Market and Garden sit in cozy districts around the plaza; the main path runs north up the stairs to the Museum plateau. Pines ring the outer shore. A lighthouse bluff rises in the northeast and a secret grove of blossoms hides in the northwest.
+
 | Landmark | Section |
 |---|---|
 | My House | About me |
@@ -58,7 +60,7 @@ All copy lives in [`src/content/landmarks.ts`](src/content/landmarks.ts). Compon
 
 - **Next.js 16** (App Router, Turbopack) + TypeScript + Tailwind v4 + shadcn/ui primitives
 - **React Three Fiber + drei + three.js** for the world, **zustand** for game state, **motion** for UI springs
-- `src/game/island.ts`: the island grid (3 terraces, cliffs, slope ramps, paths, pond, dock), seeded prop scatter, collision and height queries
+- `src/game/island.ts`: the island grid (~40×36 tiles of land: beach and dock in the south, House on a pond islet, central Plaza, stairs up to the Museum plateau), seeded prop scatter, collision and height queries
 - `src/game/materials.ts`: one material style everywhere (`MeshToonMaterial`, 3-step gradient) plus a vertex patch for the rolling-horizon bend, tree sway and water shimmer
 - Terrain, trees, tufts and flowers are `InstancedMesh`es (≈110–160 draw calls, ≈220k triangles)
 - Lighting follows the visitor's local clock (morning / afternoon / golden hour)

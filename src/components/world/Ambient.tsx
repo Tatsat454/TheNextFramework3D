@@ -150,9 +150,10 @@ function FishShadows() {
   const fish = useMemo(() => {
     const p = tileCenter(Math.floor(pond.x), Math.floor(pond.z));
     return [
-      { cx: p.x, cz: p.z, r: 1.1 },
-      { cx: p.x + 0.35, cz: p.z - 0.15, r: 0.7 },
-    ].map((f, k) => ({ ...f, seed: k * 1.9, speed: 0.35 + k * 0.05 }));
+      { cx: p.x - 1.6, cz: p.z + 0.4, r: 3.6 },
+      { cx: p.x + 1.8, cz: p.z - 0.6, r: 3.1 },
+      { cx: p.x + 0.2, cz: p.z + 1.8, r: 2.6 },
+    ].map((f, k) => ({ ...f, seed: k * 1.9, speed: 0.28 + k * 0.05 }));
   }, []);
   const refs = useRef<(THREE.Mesh | null)[]>([]);
   useFrame((st) => {

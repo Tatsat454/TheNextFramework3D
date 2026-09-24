@@ -40,7 +40,7 @@ function SkyDome({ preset }: { preset: TimePreset }) {
   );
   return (
     <mesh material={mat} renderOrder={-20} frustumCulled={false}>
-      <sphereGeometry args={[80, 40, 24]} />
+      <sphereGeometry args={[110, 40, 24]} />
     </mesh>
   );
 }

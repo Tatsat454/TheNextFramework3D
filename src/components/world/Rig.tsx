@@ -10,7 +10,7 @@ import { player, reducedMotion } from "@/game/player-state";
 import { useGame } from "@/game/store";
 import type { TimePreset } from "@/game/time-of-day";
 
-const OFFSET = new THREE.Vector3(0, 14.8, 18.4);
+const OFFSET = new THREE.Vector3(0, 15.8, 20.6);
 
 export function CameraRig() {
   const { camera, size } = useThree();
@@ -32,8 +32,8 @@ export function CameraRig() {
       z = 0.85;
     }
     if (s.card || s.dialog) z = Math.min(z, 0.9);
-    target.x = THREE.MathUtils.clamp(target.x, -8, 8);
-    target.z = THREE.MathUtils.clamp(target.z, -8, 10);
+    target.x = THREE.MathUtils.clamp(target.x, -18, 18);
+    target.z = THREE.MathUtils.clamp(target.z, -20, 18);
 
     const k = reducedMotion.value ? 1 - Math.pow(1 - 0.2, dt * 60) : 1 - Math.pow(1 - 0.08, dt * 60);
     if (!init.current) {
@@ -61,14 +61,14 @@ export function Lights({ preset, shadows }: { preset: TimePreset; shadows: boole
     const l = sun.current;
     if (!l) return;
     // Keep a tight shadow frustum around the part of the island in view.
-    const fx = THREE.MathUtils.clamp(player.x, -16, 16);
-    const fz = THREE.MathUtils.clamp(player.z, -14, 19.5);
+    const fx = THREE.MathUtils.clamp(player.x, -22, 22);
+    const fz = THREE.MathUtils.clamp(player.z, -20, 22);
     l.position.set(fx + preset.sunDir[0], preset.sunDir[1], fz + preset.sunDir[2]);
     l.target.position.set(fx, 0, fz);
   });
   return (
     <>
-      <fog attach="fog" args={[preset.fog, 42, 88]} />
+      <fog attach="fog" args={[preset.fog, 62, 125]} />
       <hemisphereLight args={[preset.hemiSky, preset.hemiGround, preset.hemiIntensity]} />
       <ambientLight intensity={0.34} />
       <directionalLight
@@ -81,12 +81,12 @@ export function Lights({ preset, shadows }: { preset: TimePreset; shadows: boole
         shadow-bias={-0.0006}
         shadow-normalBias={0.04}
         shadow-radius={6}
-        shadow-camera-left={-16}
-        shadow-camera-right={16}
-        shadow-camera-top={16}
-        shadow-camera-bottom={-16}
+        shadow-camera-left={-22}
+        shadow-camera-right={22}
+        shadow-camera-top={22}
+        shadow-camera-bottom={-22}
         shadow-camera-near={1}
-        shadow-camera-far={70}
+        shadow-camera-far={90}
       />
       <directionalLight
         color="#FFE6D8"

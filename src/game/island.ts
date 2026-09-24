@@ -2,10 +2,12 @@ import type { ItemId, LandmarkId, ResidentId } from "@/content/landmarks";
 import { museumExhibits, skills } from "@/content/landmarks";
 import { mulberry32, valueNoise } from "./rng";
 
-export const W = 52;
-export const H = 44;
+/** Simulation grid. Land itself is a ~40×36 oval inside this, with void around it so the island floats. */
+export const W = 64;
+export const H = 56;
 export const LEVEL = 1.28;
-export const WATER_Y = LEVEL * 2 - 0.16;
+/** House-pond water sits just below the low terrace. */
+export const WATER_Y = LEVEL - 0.2;
 
 export type Dir = "N" | "S" | "E" | "W";
 export type TileKind = "void" | "water" | "grass" | "sand" | "path" | "ramp" | "dock";
@@ -35,20 +37,25 @@ const grid: Tile[] = [];
 export const tileAt = (i: number, j: number): Tile | undefined =>
   i < 0 || j < 0 || i >= W || j >= H ? undefined : grid[j * W + i];
 
-// Compact floating oval, matching the target diorama.
-const CX = 26;
-const CZ = 21;
+const inEllipse = (i: number, j: number, cx: number, cz: number, rx: number, rz: number) => {
+  const nx = (i + 0.5 - cx) / rx;
+  const nz = (j + 0.5 - cz) / rz;
+  return nx * nx + nz * nz < 1;
+};
+
+const CX = 32;
+const CZ = 28;
+// ~40×36 tiles of land (rx 20, rz 18).
 for (let j = 0; j < H; j++) {
   for (let i = 0; i < W; i++) {
-    const nx = (i + 0.5 - CX) / 10.4;
-    const nz = (j + 0.5 - CZ) / 9.2;
-    const wobble = (noise(i * 0.22, j * 0.22) - 0.5) * 0.16;
-    const land = nx * nx + nz * nz < 1 + wobble;
-    const upper = land && j <= 20;
+    const wobble = (noise(i * 0.18, j * 0.18) - 0.5) * 0.12;
+    const land = inEllipse(i, j, CX, CZ, 20 + wobble, 18 + wobble * 0.8);
+    const plateau = land && (inEllipse(i, j, 32, 14.5, 12.2, 8.2) || (i >= 31 && i <= 34 && j >= 16 && j <= 21));
+    const bluff = land && (inEllipse(i, j, 46.5, 16.5, 5.4, 4.6) || (i >= 40 && i <= 47 && j >= 13 && j <= 18));
     grid.push({
       i,
       j,
-      h: land ? (upper ? 2 : 1) : 0,
+      h: land ? (plateau || bluff ? 2 : 1) : 0,
       kind: land ? "grass" : "void",
       blocked: !land,
       shade: 0,
@@ -65,7 +72,12 @@ for (let j = 0; j < H; j++) {
   }
   for (let k = 0; k < q.length; k++) {
     const t = q[k];
-    for (const [di, dj] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+    for (const [di, dj] of [
+      [1, 0],
+      [-1, 0],
+      [0, 1],
+      [0, -1],
+    ]) {
       const n = tileAt(t.i + di, t.j + dj);
       if (n && n.d > t.d + 1) {
         n.d = t.d + 1;
@@ -75,16 +87,15 @@ for (let j = 0; j < H; j++) {
   }
 }
 
-// Pond on the upper terrace, right of the garden.
-export const pond = { x: 31.2, z: 17.6, rx: 2.3, rz: 1.7 };
+/** House pond in tile space, with a walkable islet. */
+export const pond = { x: 16.5, z: 38, rx: 6.8, rz: 5.0, isletX: 16.2, isletZ: 37.1, isletRx: 3.6, isletRz: 2.75 };
 for (const t of grid) {
   if (t.kind === "void") continue;
-  const nx = (t.i + 0.5 - pond.x) / pond.rx;
-  const nz = (t.j + 0.5 - pond.z) / pond.rz;
-  if (t.h === 2 && nx * nx + nz * nz < 1) {
-    t.kind = "water";
-    t.blocked = true;
-  }
+  if (!inEllipse(t.i, t.j, pond.x, pond.z, pond.rx, pond.rz)) continue;
+  if (inEllipse(t.i, t.j, pond.isletX, pond.isletZ, pond.isletRx, pond.isletRz)) continue;
+  t.kind = "water";
+  t.blocked = true;
+  t.h = 1;
 }
 
 export const stairs: { i: number; j: number; h: number; dir: Dir }[] = [];
@@ -97,9 +108,9 @@ function addRampTile(t: Tile, fromLevel: number, k0: number, k1: number) {
   t.blocked = false;
   stairs.push({ i: t.i, j: t.j, h: fromLevel, dir: "N" });
 }
-for (const i of [26, 27]) {
-  const upper = tileAt(i, 20);
-  const lower = tileAt(i, 21);
+for (const i of [32, 33]) {
+  const upper = tileAt(i, 21);
+  const lower = tileAt(i, 22);
   if (upper && lower && upper.kind !== "void" && lower.kind !== "void") {
     addRampTile(upper, 1, 1, 0.5);
     addRampTile(lower, 1, 0.5, 0);
@@ -143,19 +154,42 @@ const paint = (i0: number, j0: number, i1: number, j1: number) => {
       if (t && (t.kind === "grass" || t.kind === "sand")) t.kind = "path";
     }
 };
-paint(26, 28, 27, 22); // spawn → stairs
-paint(26, 19, 27, 16); // stairs top → town hall
-paint(19, 26, 26, 27); // house
-paint(27, 16, 31, 16); // → market
-paint(24, 17, 27, 17); // garden front
 
-export const dock = { i0: 30, i1: 31, j0: 19, j1: 20 };
+const bridge = (i0: number, j0: number, i1: number, j1: number) => {
+  for (let j = Math.min(j0, j1); j <= Math.max(j0, j1); j++)
+    for (let i = Math.min(i0, i1); i <= Math.max(i0, i1); i++) {
+      const t = tileAt(i, j);
+      if (!t || t.kind === "void") continue;
+      t.kind = "path";
+      t.blocked = false;
+      t.h = 1;
+    }
+};
+
+// Southern beach crescent, then paths overwrite the route through it.
+for (const t of grid) {
+  if (t.kind !== "grass" || t.h !== 1) continue;
+  if (t.j >= 41 && t.d <= 4) t.kind = "sand";
+}
+
+// Spine: spawn / plaza / stairs / museum. District spokes stay short.
+paint(32, 42, 33, 23); // beach → stairs
+paint(32, 20, 33, 13); // stairs top → museum door
+paint(30, 28, 35, 32); // plaza hub
+paint(20, 37, 31, 38); // house bridge → spine
+paint(24, 29, 31, 29); // town hall front
+paint(18, 33, 24, 33); // garden front
+paint(35, 28, 40, 28); // → market
+paint(36, 29, 39, 32); // → arcade
+bridge(20, 37, 24, 38); // across the house pond
+
+export const dock = { i0: 32, i1: 33, j0: 43, j1: 47 };
 for (let jj = dock.j0; jj <= dock.j1; jj++)
   for (let ii = dock.i0; ii <= dock.i1; ii++) {
     const t = tileAt(ii, jj);
     if (!t) continue;
     t.kind = "dock";
-    t.h = 2;
+    t.h = 1;
     t.blocked = false;
   }
 
@@ -169,10 +203,11 @@ export type LandmarkPlacement = {
 };
 
 const block = (i0: number, j0: number, i1: number, j1: number) => {
-  for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) {
-    const t = tileAt(i, j);
-    if (t) t.blocked = true;
-  }
+  for (let j = j0; j <= j1; j++)
+    for (let i = i0; i <= i1; i++) {
+      const t = tileAt(i, j);
+      if (t) t.blocked = true;
+    }
 };
 
 const place = (id: LandmarkId, rect: [number, number, number, number], interactOffset = 1.25, radius = 2.0): LandmarkPlacement => {
@@ -192,56 +227,63 @@ const place = (id: LandmarkId, rect: [number, number, number, number], interactO
 };
 
 export const landmarkPlacements: LandmarkPlacement[] = [
-  place("house", [18, 25, 20, 27]),
-  place("townhall", [21, 13, 24, 15], 1.3, 2.3),
-  place("museum", [18, 13, 20, 14], 1.2, 1.8),
-  place("market", [29, 13, 31, 14], 1.15, 1.9),
-  place("arcade", [32, 14, 33, 15], 1.1, 1.6),
-  place("garden", [23, 17, 28, 19], 1.2, 1.7),
+  place("house", [15, 36, 17, 38]),
+  place("townhall", [24, 26, 27, 28], 1.3, 2.3),
+  place("museum", [30, 10, 33, 12], 1.2, 1.8),
+  place("market", [38, 26, 40, 27], 1.15, 1.9),
+  place("arcade", [38, 31, 39, 32], 1.1, 1.6),
+  place("garden", [18, 30, 23, 32], 1.2, 1.7),
 ];
 {
-  const end = tileCenter(30, dock.j1);
+  const end = tileCenter(32, dock.j1);
   landmarkPlacements.push({
     id: "dock",
     rect: [dock.i0, dock.j0, dock.i1, dock.j1],
-    level: 2,
+    level: 1,
     center: { x: end.x + 0.4, z: end.z - 0.6 },
     interact: { x: end.x + 0.3, z: end.z + 0.4 },
     radius: 1.6,
   });
 }
+
+export const gardenGate = (() => {
+  const g = landmarkPlacements.find((l) => l.id === "garden")!;
+  const [i0, , i1, j1] = g.rect;
+  return tileCenter(Math.round((i0 + i1) / 2), j1);
+})();
 {
   const g = landmarkPlacements.find((l) => l.id === "garden")!;
-  const gate = tileCenter(25, 19);
-  g.interact = { x: gate.x, z: gate.z + 1.15 };
+  g.interact = { x: gardenGate.x, z: gardenGate.z + 1.15 };
 }
 
 export const getPlacement = (id: LandmarkId) => landmarkPlacements.find((l) => l.id === id)!;
 
-export const mailboxTile = { i: 21, j: 27 };
-export const boardTile = { i: 25, j: 16 };
+export const mailboxTile = { i: 18, j: 38 };
+export const boardTile = { i: 28, j: 29 };
 block(mailboxTile.i, mailboxTile.j, mailboxTile.i, mailboxTile.j);
 block(boardTile.i, boardTile.j, boardTile.i, boardTile.j);
 
 export const pedestals = museumExhibits.map((slug, k) => {
-  const i = 18 + (k % 3);
-  const j = 16 + Math.floor(k / 3);
+  const col = k % 3;
+  const row = Math.floor(k / 3);
+  const i = 28 + col;
+  const j = 14 + row;
   block(i, j, i, j);
   const c = tileCenter(i, j);
   return { slug, i, j, x: c.x, z: c.z, level: 2, interact: { x: c.x, z: c.z + 0.95 } };
 });
 
 export const gardenRows = skills.map((skill, k) => {
-  const i = 23 + k;
-  const top = tileCenter(i, 17);
-  const front = tileCenter(i, 19);
+  const i = 18 + k;
+  const top = tileCenter(i, 30);
+  const front = tileCenter(i, 32);
   return {
     skillId: skill.id,
     i,
     x: top.x,
     z0: top.z - 0.15,
     z1: front.z + 0.15,
-    level: 2,
+    level: 1,
     interact: { x: top.x, z: front.z + 1.2 },
   };
 });
@@ -253,63 +295,84 @@ const reserved = new Set<number>();
 const reserve = (i: number, j: number, r = 1) => {
   for (let dj = -r; dj <= r; dj++) for (let di = -r; di <= r; di++) reserved.add((j + dj) * W + (i + di));
 };
-for (const t of grid) if (t.kind === "path" || t.kind === "ramp" || t.kind === "dock") reserve(t.i, t.j, 1);
+for (const t of grid) if (t.kind === "path" || t.kind === "ramp" || t.kind === "dock" || t.kind === "sand") reserve(t.i, t.j, 1);
 for (const l of landmarkPlacements) {
   const [i0, j0, i1, j1] = l.rect;
   for (let j = j0 - 1; j <= j1 + 2; j++) for (let i = i0 - 1; i <= i1 + 1; i++) reserve(i, j, 0);
 }
 for (const p of pedestals) reserve(p.i, p.j, 1);
 
-const free = (t: Tile | undefined) =>
-  !!t && t.kind === "grass" && !t.blocked && !reserved.has(t.j * W + t.i);
+const free = (t: Tile | undefined) => !!t && t.kind === "grass" && !t.blocked && !reserved.has(t.j * W + t.i);
 
 export const trees: TreeSpot[] = [];
 const plant = (kind: TreeKind, i: number, j: number, s = 1, item?: ItemId) => {
   const t = tileAt(i, j);
-  if (!t || t.kind === "void") return;
+  if (!t || t.kind === "void" || t.kind === "water") return;
   t.blocked = true;
   const c = tileCenter(i, j);
   trees.push({ kind, x: c.x, z: c.z, y: t.h * LEVEL, s, seed: rand(), item });
   reserve(i, j, kind === "pine" ? 0 : 1);
 };
 
-plant("fruit", 17, 24, 1, "sunpeach");
-plant("fruit", 22, 24, 1, "honeypear");
-plant("fruit", 16, 22, 0.95, "cloudberry");
+plant("fruit", 14, 35, 1, "sunpeach");
+plant("fruit", 18, 35, 1, "honeypear");
+plant("fruit", 13, 37, 0.95, "cloudberry");
 
+// Secret Grove (northwest): a dense blossom thicket.
 for (const [i, j, s] of [
-  [16, 27, 1],
-  [34, 26, 1.05],
-  [15, 18, 1],
-  [35, 18, 1],
-  [33, 22, 0.95],
+  [13, 16, 1.05],
+  [15, 15, 1],
+  [17, 17, 0.95],
+  [14, 19, 1.1],
+  [16, 20, 0.9],
+  [12, 18, 1],
+  [18, 15, 0.95],
+  [19, 18, 1],
+  [13, 22, 0.9],
+  [15, 23, 1.05],
 ] as const) {
   if (free(tileAt(i, j))) plant("blossom", i, j, s);
 }
 
+// A few orchard blossoms near the house and plaza.
 for (const [i, j, s] of [
-  [19, 12, 1.1],
-  [23, 12, 1],
-  [27, 12, 1.15],
-  [16, 14, 0.95],
-  [34, 13, 1],
-  [15, 26, 1],
-  [35, 24, 0.9],
-  [17, 29, 1.05],
-  [33, 29, 1],
-  [21, 30, 0.85],
-  [30, 30, 0.9],
+  [21, 35, 1],
+  [22, 40, 0.95],
+  [36, 35, 1],
+  [28, 34, 0.9],
+  [40, 22, 1],
+] as const) {
+  if (free(tileAt(i, j))) plant("blossom", i, j, s);
+}
+
+// Lighthouse bluff (northeast): a tight pine stand on the high ground.
+for (const [i, j, s] of [
+  [45, 14, 1.15],
+  [48, 15, 1.05],
+  [46, 18, 1],
+  [49, 17, 0.95],
+  [44, 16, 1.1],
 ] as const) {
   if (free(tileAt(i, j))) plant("pine", i, j, s);
 }
 
+// Pine ring on the outer low ground, skipping the southern beach.
+for (const t of grid) {
+  if (t.h !== 1 || t.d > 2 || t.j >= 41) continue;
+  if (!free(t)) continue;
+  if ((t.i + t.j) % 2 !== 0) continue;
+  plant("pine", t.i, t.j, 0.88 + rand() * 0.28);
+}
+
 for (const [i, j, s] of [
-  [16, 21, 1],
-  [34, 21, 1],
-  [18, 29, 0.9],
-  [32, 28, 0.95],
-  [22, 12, 0.85],
-  [30, 12, 0.9],
+  [22, 24, 1],
+  [36, 24, 1],
+  [26, 34, 0.9],
+  [40, 34, 0.95],
+  [29, 16, 0.85],
+  [36, 12, 0.9],
+  [22, 12, 1],
+  [41, 20, 0.9],
 ] as const) {
   if (free(tileAt(i, j))) plant("round", i, j, s);
 }
@@ -322,16 +385,18 @@ for (const t of grid) {
   if (t.kind !== "grass" || t.blocked) continue;
   const c = tileCenter(t.i, t.j);
   const y = t.h * LEVEL;
-  const n = t.d <= 2 ? 1 + Math.floor(rand() * 2) : rand() < 0.45 ? 1 : 0;
+  const grove = t.i <= 20 && t.j <= 24 && t.h === 1;
+  const n = t.d <= 2 ? 1 + Math.floor(rand() * 2) : rand() < 0.4 ? 1 : 0;
   for (let k = 0; k < n; k++)
     tufts.push({ x: c.x + (rand() - 0.5) * 0.75, z: c.z + (rand() - 0.5) * 0.75, y, s: 0.7 + rand() * 0.5, r: rand() * Math.PI, c: 0 });
-  if (!reserved.has(t.j * W + t.i) && rand() < (t.d <= 2 ? 0.45 : 0.18)) {
+  const bloom = grove ? 0.55 : t.d <= 2 ? 0.4 : 0.14;
+  if (!reserved.has(t.j * W + t.i) && rand() < bloom) {
     const count = 1 + Math.floor(rand() * 3);
     const c0 = Math.floor(rand() * 4);
     for (let k = 0; k < count; k++)
       flowers.push({ x: c.x + (rand() - 0.5) * 0.65, z: c.z + (rand() - 0.5) * 0.65, y, s: 0.85 + rand() * 0.35, r: rand() * 6, c: (c0 + (k % 2)) % 4 });
   }
-  if (!reserved.has(t.j * W + t.i) && t.d <= 2 && rand() < 0.12) {
+  if (!reserved.has(t.j * W + t.i) && t.d <= 2 && rand() < 0.1) {
     rocks.push({ x: c.x + (rand() - 0.5) * 0.3, z: c.z + (rand() - 0.5) * 0.3, y, s: 0.4 + rand() * 0.35, r: rand() * 6, c: 0 });
   }
 }
@@ -355,27 +420,27 @@ const pickup = (item: ItemId, i: number, j: number): PickupSpot => {
   return { id: `ground-${item}`, item, x: c.x, z: c.z, y: t.h * LEVEL };
 };
 export const pickups: PickupSpot[] = [
-  pickup("spiral-shell", 24, 29),
-  pickup("sand-dollar", 32, 26),
-  pickup("pink-cowrie", 17, 28),
-  pickup("moon-snail", 34, 23),
-  pickup("taxi-token", 25, 16),
-  pickup("lightning-jar", 28, 14),
-  pickup("carbon-offcut", 33, 16),
-  pickup("tiny-cartridge", 16, 23),
-  pickup("pixel-petal", 34, 19),
+  pickup("spiral-shell", 30, 42),
+  pickup("sand-dollar", 36, 41),
+  pickup("pink-cowrie", 27, 42),
+  pickup("moon-snail", 22, 41),
+  pickup("taxi-token", 31, 29),
+  pickup("lightning-jar", 37, 25),
+  pickup("carbon-offcut", 40, 30),
+  pickup("tiny-cartridge", 14, 18),
+  pickup("pixel-petal", 46, 18),
 ];
 
 export const spawn = (() => {
-  const c = tileCenter(26, 28);
+  const c = tileCenter(32, 40);
   return { x: c.x + 0.5, z: c.z };
 })();
 
 export const residentHomes: Record<ResidentId, Vec2[]> = {
-  bramble: [tileCenter(28, 27), tileCenter(24, 26), tileCenter(29, 25)],
-  drizzle: [tileCenter(27, 18), tileCenter(25, 16), tileCenter(22, 18)],
-  pip: [tileCenter(31, 26), tileCenter(29, 24), tileCenter(32, 23)],
-  sol: [tileCenter(28, 16), tileCenter(30, 15), tileCenter(26, 15)],
+  bramble: [tileCenter(34, 36), tileCenter(30, 34), tileCenter(35, 32)],
+  drizzle: [tileCenter(32, 27), tileCenter(28, 30), tileCenter(25, 32)],
+  pip: [tileCenter(37, 34), tileCenter(39, 30), tileCenter(36, 32)],
+  sol: [tileCenter(32, 16), tileCenter(35, 14), tileCenter(30, 15)],
 };
 
 export const tiles = grid;
@@ -418,13 +483,16 @@ export function asciiMap() {
     for (let i = 0; i < W; i++) {
       const t = tileAt(i, j)!;
       const tree = trees.find((tr) => worldToTile(tr.x, tr.z).i === i && worldToTile(tr.x, tr.z).j === j);
+      const lm = landmarkPlacements.find((l) => i >= l.rect[0] && j >= l.rect[1] && i <= l.rect[2] && j <= l.rect[3]);
       if (t.kind === "void") row += " ";
       else if (t.kind === "water") row += "~";
       else if (t.kind === "dock") row += "=";
       else if (t.kind === "ramp") row += "^";
+      else if (lm) row += lm.id[0]!.toUpperCase();
       else if (tree) row += tree.kind === "pine" ? "A" : tree.kind === "fruit" ? "F" : tree.kind === "blossom" ? "B" : "T";
       else if (t.blocked) row += "#";
       else if (t.kind === "path") row += ":";
+      else if (t.kind === "sand") row += ".";
       else row += String(t.h);
     }
     rows.push(row);

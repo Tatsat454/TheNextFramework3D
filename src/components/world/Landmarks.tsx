@@ -4,7 +4,7 @@ import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
 import { skills } from "@/content/landmarks";
-import { boardTile, gardenRows, getPlacement, LEVEL, mailboxTile, pedestals, tileCenter } from "@/game/island";
+import { boardTile, gardenGate, gardenRows, getPlacement, LEVEL, mailboxTile, pedestals, tileCenter } from "@/game/island";
 import { palette, toon } from "@/game/materials";
 import { reducedMotion } from "@/game/player-state";
 import { useGame } from "@/game/store";
@@ -534,7 +534,7 @@ function Garden() {
   const x1 = b.x + 0.4;
   const z0 = a.z - 0.4;
   const z1 = b.z + 0.4;
-  const gate = tileCenter(25, 19);
+  const gate = gardenGate;
   const hasCan = useGame((s) => s.hasCan);
   return (
     <group>

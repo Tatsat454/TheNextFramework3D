@@ -4,7 +4,7 @@ import { useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import type { ThreeEvent } from "@react-three/fiber";
-import { dock, LEVEL, pond, rampRuns, tileCenter, tiles, WATER_Y } from "@/game/island";
+import { dock, LEVEL, rampRuns, tileCenter, tiles, WATER_Y } from "@/game/island";
 import { input } from "@/game/input";
 import { palette, toon } from "@/game/materials";
 import { isPaused, useGame } from "@/game/store";
@@ -41,8 +41,11 @@ export function Terrain() {
     const grassIdx: number[] = [];
     const path: number[] = [];
     const pathIdx: number[] = [];
+    const sand: number[] = [];
+    const sandIdx: number[] = [];
+    const water: number[] = [];
+    const waterIdx: number[] = [];
     const dirt: { x: number; y: number; z: number; sx: number; sy: number; sz: number; c: string }[] = [];
-    const pondTiles: { x: number; y: number; z: number }[] = [];
     const pushQuad = (arr: number[], idx: number[], x: number, y: number, z: number, s = 0.54) => {
       const b = arr.length / 3;
       arr.push(x - s, y, z - s, x + s, y, z - s, x + s, y, z + s, x - s, y, z + s);
@@ -52,15 +55,18 @@ export function Terrain() {
       if (t.kind === "void") continue;
       const { x, z } = tileCenter(t.i, t.j);
       if (t.kind === "water") {
-        pondTiles.push({ x, y: WATER_Y, z });
+        const top = LEVEL - 0.32;
+        const sy = top - BASE;
+        dirt.push({ x, y: BASE + sy / 2, z, sx: 1.42, sy, sz: 1.42, c: palette.dirt });
+        pushQuad(water, waterIdx, x, WATER_Y, z, 0.56);
         continue;
       }
-      if (t.kind === "dock") continue;
       const top = t.h * LEVEL;
       const sy = top - 0.02 - BASE;
-      dirt.push({ x, y: BASE + sy / 2, z, sx: 1.42, sy, sz: 1.42, c: palette.dirt });
-      if (t.kind === "ramp") continue;
-      if (t.kind === "path" || t.kind === "sand") pushQuad(path, pathIdx, x, top + 0.03, z);
+      dirt.push({ x, y: BASE + sy / 2, z, sx: 1.42, sy, sz: 1.42, c: t.kind === "sand" ? palette.sand : palette.dirt });
+      if (t.kind === "ramp" || t.kind === "dock") continue;
+      if (t.kind === "path") pushQuad(path, pathIdx, x, top + 0.03, z);
+      else if (t.kind === "sand") pushQuad(sand, sandIdx, x, top + 0.03, z);
       else pushQuad(grass, grassIdx, x, top + 0.03, z);
     }
 
@@ -103,16 +109,25 @@ export function Terrain() {
     const a = tileCenter(dock.i0, dock.j0);
     const b = tileCenter(dock.i1, dock.j1);
     const cx = (a.x + b.x) / 2;
-    const cz = (a.z + b.z) / 2;
-    for (let k = 0; k < 3; k++) planks.push({ x: cx, y: 2 * LEVEL + 0.04, z: cz - 0.35 + k * 0.35, c: k % 2 ? palette.wood : "#C4976B" });
-    posts.push({ x: a.x - 0.35, y: 2 * LEVEL - 0.35, z: a.z });
-    posts.push({ x: b.x + 0.35, y: 2 * LEVEL - 0.35, z: b.z });
+    const y = LEVEL + 0.04;
+    const south = b.z + 0.42;
+    const north = a.z - 0.42;
+    const span = south - north;
+    const n = Math.max(5, Math.round(span / 0.36));
+    for (let k = 0; k < n; k++) {
+      planks.push({ x: cx, y, z: south - (k + 0.5) * (span / n), c: k % 2 ? palette.wood : "#C4976B" });
+    }
+    posts.push({ x: a.x - 0.35, y: LEVEL - 0.35, z: a.z });
+    posts.push({ x: b.x + 0.35, y: LEVEL - 0.35, z: a.z });
+    posts.push({ x: a.x - 0.35, y: LEVEL - 0.35, z: b.z });
+    posts.push({ x: b.x + 0.35, y: LEVEL - 0.35, z: b.z });
 
     return {
       grassGeo: geoOf(grass, grassIdx),
       pathGeo: geoOf(path, pathIdx),
+      sandGeo: geoOf(sand, sandIdx),
+      waterGeo: geoOf(water, waterIdx),
       dirt,
-      pondTiles,
       steps,
       planks,
       posts,
@@ -132,7 +147,6 @@ export function Terrain() {
     return g;
   }, []);
   const plankGeo = useMemo(() => new RoundedBoxGeometry(2.05, 0.1, 0.32, 1, 0.03), []);
-  const pondGeo = useMemo(() => new THREE.CircleGeometry(pond.rx + 0.15, 24).rotateX(-Math.PI / 2), []);
   const postGeo = useMemo(() => new THREE.CylinderGeometry(0.07, 0.07, 0.85, 8), []);
 
   const dirtRef = useRef<THREE.InstancedMesh>(null);
@@ -151,21 +165,18 @@ export function Terrain() {
     input.tapTarget = { x: e.point.x, z: e.point.z };
   };
 
-  const pondC = tileCenter(Math.floor(pond.x), Math.floor(pond.z));
-
   return (
     <group>
       <mesh geometry={data.grassGeo} material={toon(palette.grass, { noOcclude: true, side: THREE.DoubleSide })} receiveShadow onClick={onTap} />
       <mesh geometry={data.pathGeo} material={toon(palette.earth, { noOcclude: true, side: THREE.DoubleSide })} receiveShadow onClick={onTap} />
+      <mesh geometry={data.sandGeo} material={toon(palette.sand, { noOcclude: true, side: THREE.DoubleSide })} receiveShadow onClick={onTap} />
       <instancedMesh ref={dirtRef} args={[dirtGeo, toon("#FFFFFF", { vertexColors: true, noOcclude: true }), data.dirt.length]} receiveShadow />
       <instancedMesh ref={stepRef} args={[box, toon("#FFFFFF", { noOcclude: true }), data.steps.length]} receiveShadow castShadow onClick={onTap} />
       <instancedMesh ref={plankRef} args={[plankGeo, toon("#FFFFFF", { noOcclude: true }), data.planks.length]} receiveShadow castShadow onClick={onTap} />
       <instancedMesh ref={postRef} args={[postGeo, toon(palette.woodDeep), data.posts.length]} />
       <mesh
-        geometry={pondGeo}
-        position={[pondC.x + 0.2, WATER_Y, pondC.z + 0.1]}
-        scale={[1, 1, pond.rz / pond.rx]}
-        material={toon(palette.water, { water: true, emissive: "#6FB9CF", transparent: true, opacity: 0.92 })}
+        geometry={data.waterGeo}
+        material={toon(palette.water, { water: true, emissive: "#6FB9CF", transparent: true, opacity: 0.92, side: THREE.DoubleSide })}
         receiveShadow
       />
     </group>

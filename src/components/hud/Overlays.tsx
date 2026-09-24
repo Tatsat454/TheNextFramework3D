@@ -137,7 +137,7 @@ export function IslandMap() {
       <p className="eyebrow">Island map</p>
       <h2 className="mt-1 font-serif text-[30px] leading-tight">Pocket Island</h2>
       <div className="mt-4 overflow-hidden rounded-[20px] border border-white bg-[#F6D5C8]">
-        <svg viewBox={`2 3 ${W - 4} ${H - 2}`} className="block h-auto w-full" role="img" aria-label="Map of the island with landmarks">
+        <svg viewBox={`10 7 44 42`} className="block h-auto w-full" role="img" aria-label="Map of the island with landmarks">
           <defs>
             <filter id="hand" x="-5%" y="-5%" width="110%" height="110%">
               <feTurbulence type="fractalNoise" baseFrequency="0.35" numOctaves="2" seed="4" />
