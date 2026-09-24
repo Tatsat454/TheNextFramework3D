@@ -69,9 +69,9 @@ export function Terrain() {
         const top = LEVEL - 0.32;
         const sy = top - BASE;
         dirt.push({ x, y: BASE + sy / 2, z, sx: 1.42, sy, sz: 1.42, c: palette.dirt });
-        pushQuad(water, waterIdx, x, WATER_Y, z, 0.56);
+        pushQuad(water, waterIdx, x, WATER_Y, z, 0.62);
         const south = tileAt(t.i, t.j + 1);
-        if ((!south || south.kind === "void") && t.j >= 40) pushFall(x, z, 0.58);
+        if ((!south || south.kind === "void") && t.j >= 40) pushFall(x, z, 0.72);
         continue;
       }
       const top = t.h * LEVEL;
