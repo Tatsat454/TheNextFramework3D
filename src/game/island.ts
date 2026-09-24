@@ -264,10 +264,9 @@ block(mailboxTile.i, mailboxTile.j, mailboxTile.i, mailboxTile.j);
 block(boardTile.i, boardTile.j, boardTile.i, boardTile.j);
 
 export const pedestals = museumExhibits.map((slug, k) => {
-  const col = k % 3;
-  const row = Math.floor(k / 3);
-  const i = 28 + col;
-  const j = 14 + row;
+  const left = k < 3;
+  const i = left ? 29 + k : 34 + (k - 3);
+  const j = 14;
   block(i, j, i, j);
   const c = tileCenter(i, j);
   return { slug, i, j, x: c.x, z: c.z, level: 2, interact: { x: c.x, z: c.z + 0.95 } };
@@ -432,7 +431,7 @@ export const pickups: PickupSpot[] = [
 ];
 
 export const spawn = (() => {
-  const c = tileCenter(32, 40);
+  const c = tileCenter(32, 38);
   return { x: c.x + 0.5, z: c.z };
 })();
 

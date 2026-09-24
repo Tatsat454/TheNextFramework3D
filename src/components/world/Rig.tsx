@@ -10,7 +10,7 @@ import { player, reducedMotion } from "@/game/player-state";
 import { useGame } from "@/game/store";
 import type { TimePreset } from "@/game/time-of-day";
 
-const OFFSET = new THREE.Vector3(0, 15.8, 20.6);
+const OFFSET = new THREE.Vector3(0, 18.6, 22.8);
 
 export function CameraRig() {
   const { camera, size } = useThree();
@@ -43,7 +43,7 @@ export function CameraRig() {
     focus.current.lerp(target, k);
     zoom.current += (z - zoom.current) * k * 0.6;
     camera.position.copy(focus.current).addScaledVector(OFFSET, zoom.current * portrait);
-    camera.lookAt(focus.current.x, focus.current.y + 0.6, focus.current.z - 1.6);
+    camera.lookAt(focus.current.x, focus.current.y + 0.6, focus.current.z - 2.8);
     bend.uBendCenter.value.copy(focus.current);
     bend.uPlayer.value.set(player.x, player.y + 0.55, player.z);
   });
