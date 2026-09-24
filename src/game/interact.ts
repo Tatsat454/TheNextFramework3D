@@ -100,7 +100,8 @@ export function findNearby(x: number, z: number): Interactable | null {
   for (const it of currentInteractables()) {
     const d = Math.hypot(it.x - x, it.z - z);
     if (d > it.r) continue;
-    const score = d / it.r;
+    // Anything you can pick up wins, so a fallen fruit isn't hidden behind its tree's prompt.
+    const score = it.kind === "pickup" ? d / it.r - 1 : (d / it.r) * (it.kind === "resident" ? 0.7 : 1);
     if (score < bestScore) {
       best = it;
       bestScore = score;

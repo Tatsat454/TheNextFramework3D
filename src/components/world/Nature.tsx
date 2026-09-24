@@ -61,7 +61,7 @@ function useTreeParts() {
       new THREE.ConeGeometry(0.58, 0.9, 8).translate(0, 1.4, 0),
       new THREE.ConeGeometry(0.4, 0.8, 8).translate(0, 1.9, 0),
     ]);
-    const roundFoliage = mergeGeometries([blob(0.62, 0, 1.35, 0), blob(0.48, 0.38, 1.12, 0.18), blob(0.44, -0.34, 1.18, -0.16), blob(0.4, 0.05, 1.78, -0.05)]);
+    const roundFoliage = mergeGeometries([blob(0.7, 0, 1.4, 0), blob(0.54, 0.42, 1.14, 0.2), blob(0.5, -0.38, 1.2, -0.18), blob(0.46, 0.05, 1.88, -0.05), blob(0.4, 0.1, 1.2, 0.45)]);
     const foliage = toon(palette.foliage, { flatShading: true, sway: true });
     const blossom = toon(palette.blossom, { flatShading: true, sway: true });
     const wood = toon(palette.wood);

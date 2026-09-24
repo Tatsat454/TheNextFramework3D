@@ -42,6 +42,7 @@ export function Terrain() {
     const sand: { x: number; y: number; z: number; c: string }[] = [];
     const dirt: { x: number; y: number; z: number; sy: number; c: string }[] = [];
     const shallow: { x: number; y: number; z: number }[] = [];
+    const strata: { x: number; y: number; z: number; c: string; sx?: number; sy?: number; sz?: number }[] = [];
     for (const t of tiles) {
       const { x, z } = tileCenter(t.i, t.j);
       if (t.kind === "water") {
@@ -61,7 +62,17 @@ export function Terrain() {
       if (t.kind === "sand") sand.push({ x, y: capY, z, c: palette.sand });
       else if (t.kind === "path") sand.push({ x, y: capY, z, c: t.h === 1 ? palette.sand : "#F1DFBF" });
       else if (t.kind === "ramp") sand.push({ x, y: capY, z, c: palette.earth });
-      else grass.push({ x, y: capY, z, c: t.shade ? palette.grassShade : palette.grass });
+      else {
+        const jitter = (((t.i * 928371 + t.j * 364479) % 7) - 3) / 100;
+        grass.push({ x, y: capY, z, c: `#${color.set(t.shade ? palette.grassShade : palette.grass).offsetHSL(0, 0.02, jitter * 0.9).getHexString()}` });
+      }
+      if (t.h >= 2) {
+        const exposed = [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([a, b]) => {
+          const n = tileAt(t.i + a, t.j + b);
+          return !n || n.kind === "water" || (n.h < t.h && n.kind !== "ramp");
+        });
+        if (exposed) for (let k = 1; k < t.h; k++) strata.push({ x, y: k * LEVEL + 0.46, z, c: "#C9AD8B" });
+      }
     }
 
     const steps: { x: number; y: number; z: number; sx: number; sy: number; sz: number; c: string }[] = [];
@@ -91,7 +102,12 @@ export function Terrain() {
         posts.push({ x: b.x + 0.42, y: LEVEL - 0.55, z: a.z });
       }
     }
-    return { grass, sand, dirt, shallow, steps, rails, planks, posts };
+    for (const s of strata) {
+      s.sx = 1.012;
+      s.sy = 0.07;
+      s.sz = 1.012;
+    }
+    return { grass, sand, dirt, shallow, strata, steps, rails, planks, posts };
   }, []);
 
   const capGeo = useMemo(() => new RoundedBoxGeometry(1, CAP, 1, 1, 0.035), []);
@@ -109,10 +125,12 @@ export function Terrain() {
   const railRef = useRef<THREE.InstancedMesh>(null);
   const plankRef = useRef<THREE.InstancedMesh>(null);
   const postRef = useRef<THREE.InstancedMesh>(null);
+  const strataRef = useRef<THREE.InstancedMesh>(null);
 
   useInstances(grassRef, data.grass);
   useInstances(sandRef, data.sand);
   useInstances(dirtRef, data.dirt);
+  useInstances(strataRef, data.strata);
   useInstances(shallowRef, data.shallow);
   useInstances(stepRef, data.steps);
   useInstances(railRef, data.rails);
@@ -131,6 +149,7 @@ export function Terrain() {
       <instancedMesh ref={grassRef} args={[capGeo, white, data.grass.length]} receiveShadow onClick={onTap} />
       <instancedMesh ref={sandRef} args={[capGeo, white, data.sand.length]} receiveShadow onClick={onTap} />
       <instancedMesh ref={dirtRef} args={[box, white, data.dirt.length]} receiveShadow />
+      <instancedMesh ref={strataRef} args={[box, white, data.strata.length]} />
       <instancedMesh ref={stepRef} args={[box, white, data.steps.length]} receiveShadow castShadow onClick={onTap} />
       <instancedMesh ref={railRef} args={[box, white, data.rails.length]} castShadow />
       <instancedMesh ref={plankRef} args={[plankGeo, white, data.planks.length]} receiveShadow castShadow onClick={onTap} />
