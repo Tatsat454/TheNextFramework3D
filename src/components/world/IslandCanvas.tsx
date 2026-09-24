@@ -2,9 +2,9 @@
 
 import { PerformanceMonitor } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
-import type { TimePreset } from "@/game/time-of-day";
+import { presetForHour } from "@/game/time-of-day";
 import { Ambient } from "./Ambient";
 import { Landmarks } from "./Landmarks";
 import { Nature } from "./Nature";
@@ -24,9 +24,50 @@ function FirstFrame({ onReady }: { onReady: () => void }) {
   return null;
 }
 
-export default function IslandCanvas({ preset, onReady, lowPower }: { preset: TimePreset; onReady: () => void; lowPower: boolean }) {
+function hasWebGL() {
+  try {
+    const c = document.createElement("canvas");
+    return !!(c.getContext("webgl2") || c.getContext("webgl"));
+  } catch {
+    return false;
+  }
+}
+
+function isLowPower() {
+  if (new URLSearchParams(window.location.search).has("hq")) return false;
+  const cores = navigator.hardwareConcurrency ?? 8;
+  const coarse = window.matchMedia("(pointer: coarse)").matches;
+  return cores <= 4 || (coarse && cores <= 6);
+}
+
+const hour = () => new Date().getHours();
+
+/** Client-only (loaded with ssr: false), so reading browser APIs in initializers is safe. */
+export default function IslandCanvas({ onReady, onNoWebGL }: { onReady: () => void; onNoWebGL: () => void }) {
+  const [supported] = useState(hasWebGL);
+  const [lowPower] = useState(isLowPower);
   const [shadows, setShadows] = useState(!lowPower);
   const [dpr, setDpr] = useState(lowPower ? 1.25 : 1.75);
+  const [h, setH] = useState(hour);
+  const preset = presetForHour(h);
+
+  useEffect(() => {
+    if (!supported) onNoWebGL();
+  }, [supported, onNoWebGL]);
+
+  useEffect(() => {
+    const root = document.documentElement.style;
+    root.setProperty("--sky-top", preset.sky[0]);
+    root.setProperty("--sky-mid", preset.sky[1]);
+    root.setProperty("--sky-bottom", preset.sky[2]);
+  }, [preset]);
+
+  useEffect(() => {
+    const id = setInterval(() => setH(hour()), 60_000);
+    return () => clearInterval(id);
+  }, []);
+
+  if (!supported) return null;
   return (
     <Canvas
       shadows={{ type: THREE.PCFSoftShadowMap, enabled: true }}

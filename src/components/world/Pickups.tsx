@@ -9,6 +9,12 @@ import { flat, palette, toon } from "@/game/materials";
 import { reducedMotion } from "@/game/player-state";
 import { useGame } from "@/game/store";
 
+const hashSeed = (s: string) => {
+  let h = 0;
+  for (let k = 0; k < s.length; k++) h = (h * 31 + s.charCodeAt(k)) | 0;
+  return (Math.abs(h) % 1000) / 100;
+};
+
 function ItemModel({ item }: { item: ItemId }) {
   const it = getItem(item);
   if (it.kind === "shell") {
@@ -48,7 +54,7 @@ function Pickup({ id, item, x, y, z, droppedAt, fromY }: { id: string; item: Ite
   const ref = useRef<THREE.Group>(null);
   const glint = useRef<THREE.Mesh>(null);
   const hidden = getItem(item).kind === "hidden";
-  const seed = useRef(Math.random() * 10);
+  const seed = useRef(hashSeed(id));
   useFrame((state) => {
     const g = ref.current;
     if (!g) return;

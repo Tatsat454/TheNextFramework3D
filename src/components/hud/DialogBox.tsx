@@ -12,39 +12,38 @@ export const dialogControl = { advance: () => {} };
 export function DialogBox() {
   const dialog = useGame((s) => s.dialog);
   const set = useGame((s) => s.set);
-  const [shown, setShown] = useState(0);
-  const timer = useRef<number | null>(null);
   const speaker = dialog ? residents.find((r) => r.id === dialog.speaker)! : null;
   const line = dialog ? dialog.lines[dialog.index] : "";
+  const lineKey = dialog ? `${dialog.speaker}:${dialog.index}:${line}` : "";
+  const [typed, setTyped] = useState({ key: "", n: 0 });
+  const timer = useRef<number | null>(null);
+  // Reset the typewriter whenever the line changes (derived-state reset during render).
+  if (typed.key !== lineKey) setTyped({ key: lineKey, n: 0 });
+  const shown = typed.key === lineKey ? typed.n : 0;
   const done = shown >= line.length;
   const last = dialog ? dialog.index === dialog.lines.length - 1 : false;
 
   useEffect(() => {
-    setShown(0);
-    if (!dialog || !speaker) return;
+    if (!lineKey || !speaker) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) {
-      setShown(line.length);
-      return;
-    }
-    let i = 0;
+    let i = reduce ? line.length - 1 : 0;
     timer.current = window.setInterval(() => {
       i++;
-      setShown(i);
-      if (i % 2 === 0) sfx.babble(line[i - 1] ?? "", speaker.voice);
+      setTyped({ key: lineKey, n: i });
+      if (!reduce && i % 2 === 0) sfx.babble(line[i - 1] ?? "", speaker.voice);
       if (i >= line.length && timer.current) window.clearInterval(timer.current);
     }, 26);
     return () => {
       if (timer.current) window.clearInterval(timer.current);
     };
-  }, [dialog, line, speaker]);
+  }, [lineKey, line, speaker]);
 
   const advance = () => {
     const d = useGame.getState().dialog;
     if (!d) return;
     if (!done) {
       if (timer.current) window.clearInterval(timer.current);
-      setShown(line.length);
+      setTyped({ key: lineKey, n: line.length });
       return;
     }
     if (d.index < d.lines.length - 1) {
@@ -54,7 +53,9 @@ export function DialogBox() {
       set({ dialog: null });
     }
   };
-  dialogControl.advance = advance;
+  useEffect(() => {
+    dialogControl.advance = advance;
+  });
 
   const openMuseum = () => {
     set({ dialog: null, card: { type: "landmark", id: "museum" } });

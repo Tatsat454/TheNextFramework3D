@@ -1,15 +1,22 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Star } from "lucide-react";
 import { patchSaved, readSaved } from "@/game/store";
+
+const noop = () => () => {};
 
 /** Reading an exhibit to the end donates it to the Museum (gold star on its pedestal). */
 export function DonateOnRead({ slug }: { slug: string }) {
   const ref = useRef<HTMLDivElement>(null);
-  const [donated, setDonated] = useState(false);
+  const saved = useSyncExternalStore(
+    noop,
+    () => !!readSaved().donated[slug],
+    () => false,
+  );
+  const [justDonated, setDonated] = useState(false);
+  const donated = saved || justDonated;
   useEffect(() => {
-    setDonated(!!readSaved().donated[slug]);
     const el = ref.current;
     if (!el) return;
     const io = new IntersectionObserver(

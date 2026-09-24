@@ -238,4 +238,10 @@ export function interact(it: Interactable, player: { x: number; z: number }) {
   }
 }
 
+/** Opens a resident's dialog directly (used for the first-visit greeting). */
+export function talkTo(id: ResidentId, from: { x: number; z: number }) {
+  const spot = residentSpots.get(id) ?? from;
+  interact({ id: `resident:${id}`, kind: "resident", label: id, verb: "Talk", x: spot.x, z: spot.z, y: 0, r: 1, ref: id }, from);
+}
+
 export const landmarkCenter = (id: LandmarkId) => getPlacement(id).center;

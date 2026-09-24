@@ -143,7 +143,7 @@ function Resident({ id }: { id: ResidentId }) {
   const homes = residentHomes[id];
   const group = useRef<THREE.Group>(null);
   const inner = useRef<THREE.Group>(null);
-  const st = useRef({ x: homes[0].x, z: homes[0].z, y: heightAt(homes[0].x, homes[0].z), target: 1, wait: 1.5, facing: 0, phase: Math.random() * 10, blinkAt: 2 });
+  const st = useRef({ x: homes[0].x, z: homes[0].z, y: heightAt(homes[0].x, homes[0].z), target: 1, wait: 1.5, facing: 0, phase: homes[0].x * 1.7 + homes[0].z, blinkAt: 2 + (homes[0].x % 2) });
   const arrivalAt = useGame((s) => s.arrivalAt[id] ?? 0);
   const talking = useGame((s) => s.dialog?.speaker === id);
   const Body = bodies[id];

@@ -6,10 +6,10 @@ import { MotionConfig } from "motion/react";
 import { useCallback, useEffect, useState } from "react";
 import { setAmbient } from "@/game/audio";
 import { input } from "@/game/input";
+import { talkTo } from "@/game/interact";
 import { heightAt, isWalkable } from "@/game/island";
 import { player, reducedMotion } from "@/game/player-state";
 import { hydrate, readPosition, savePosition, useGame } from "@/game/store";
-import { presetForHour, type TimePreset } from "@/game/time-of-day";
 import { cn } from "@/lib/utils";
 import { DialogBox, dialogControl } from "./hud/DialogBox";
 import { Hud } from "./hud/Hud";
@@ -20,32 +20,17 @@ import { triggerInteract } from "./world/Player";
 
 const IslandCanvas = dynamic(() => import("./world/IslandCanvas"), { ssr: false });
 
-function hasWebGL() {
-  try {
-    const c = document.createElement("canvas");
-    return !!(c.getContext("webgl2") || c.getContext("webgl"));
-  } catch {
-    return false;
-  }
-}
-
 const EMOTE_KEYS = ["wave", "cheer", "thinking", "clap"] as const;
 
 export default function IslandApp() {
   const router = useRouter();
-  const [preset, setPreset] = useState<TimePreset | null>(null);
   const [ready, setReady] = useState(false);
-  const [lowPower, setLowPower] = useState(false);
   const card = useGame((s) => s.card);
   const dialog = useGame((s) => s.dialog);
   const loaded = useGame((s) => s.loaded);
   const set = useGame((s) => s.set);
 
   useEffect(() => {
-    if (!hasWebGL()) {
-      router.replace("/work");
-      return;
-    }
     hydrate();
     if (process.env.NODE_ENV !== "production") Object.assign(window, { __pocket: { player, useGame } });
     const pos = readPosition();
@@ -59,29 +44,14 @@ export default function IslandApp() {
     reducedMotion.value = mq.matches;
     const onMq = () => (reducedMotion.value = mq.matches);
     mq.addEventListener("change", onMq);
-    const cores = navigator.hardwareConcurrency ?? 8;
-    const coarse = window.matchMedia("(pointer: coarse)").matches;
-    const forceHq = new URLSearchParams(window.location.search).has("hq");
-    setLowPower(!forceHq && (cores <= 4 || (coarse && cores <= 6)));
-    const apply = () => {
-      const p = presetForHour(new Date().getHours());
-      setPreset(p);
-      const root = document.documentElement.style;
-      root.setProperty("--sky-top", p.sky[0]);
-      root.setProperty("--sky-mid", p.sky[1]);
-      root.setProperty("--sky-bottom", p.sky[2]);
-    };
-    apply();
-    const clock = setInterval(apply, 60_000);
     const keep = setInterval(() => savePosition(player), 1000);
     return () => {
       mq.removeEventListener("change", onMq);
-      clearInterval(clock);
       clearInterval(keep);
       savePosition(player);
       setAmbient(false);
     };
-  }, [router]);
+  }, []);
 
   useEffect(() => {
     const typing = (e: KeyboardEvent) => {
@@ -144,7 +114,23 @@ export default function IslandApp() {
   }, [set]);
 
   const onReady = useCallback(() => setReady(true), []);
-  const onLoaded = useCallback(() => set({ loaded: true }), [set]);
+  const noWebGL = useCallback(() => router.replace("/work"), [router]);
+  const onLoaded = useCallback(() => {
+    set({ loaded: true });
+    const s = useGame.getState();
+    let greeted = false;
+    try {
+      greeted = window.sessionStorage.getItem("pocket-island:greeted") === "1";
+      window.sessionStorage.setItem("pocket-island:greeted", "1");
+    } catch {
+      /* ignore */
+    }
+    if (!greeted && Object.keys(s.visited).length === 0) {
+      setTimeout(() => {
+        if (!useGame.getState().card) talkTo("bramble", player);
+      }, 900);
+    }
+  }, [set]);
   const blurred = !!card;
 
   return (
@@ -155,7 +141,7 @@ export default function IslandApp() {
           className={cn("absolute inset-0 transition-[filter,transform] duration-300 ease-out", blurred && "scale-[1.01] blur-[6px]")}
           aria-hidden={blurred || !!dialog}
         >
-          {preset && <IslandCanvas preset={preset} onReady={onReady} lowPower={lowPower} />}
+          <IslandCanvas onReady={onReady} onNoWebGL={noWebGL} />
         </div>
         {loaded && (
           <>

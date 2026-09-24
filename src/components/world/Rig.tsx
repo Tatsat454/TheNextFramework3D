@@ -53,9 +53,6 @@ export function Lights({ preset, shadows }: { preset: TimePreset; shadows: boole
   const sun = useRef<THREE.DirectionalLight>(null);
   const { scene } = useThree();
   useEffect(() => {
-    scene.fog = new THREE.Fog(preset.fog, 34, 58);
-  }, [scene, preset]);
-  useEffect(() => {
     if (sun.current) scene.add(sun.current.target);
   }, [scene]);
   useFrame((st) => {
@@ -70,6 +67,7 @@ export function Lights({ preset, shadows }: { preset: TimePreset; shadows: boole
   });
   return (
     <>
+      <fog attach="fog" args={[preset.fog, 34, 58]} />
       <hemisphereLight args={[preset.hemiSky, preset.hemiGround, preset.hemiIntensity * 0.72]} />
       <directionalLight
         ref={sun}

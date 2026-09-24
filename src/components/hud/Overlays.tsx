@@ -121,10 +121,8 @@ export function IslandMap() {
   const open = useGame((s) => s.mapOpen);
   const visited = useGame((s) => s.visited);
   const set = useGame((s) => s.set);
-  const [pos, setPos] = useState({ x: player.x, z: player.z });
-  useEffect(() => {
-    if (open) setPos({ x: player.x, z: player.z });
-  }, [open]);
+  // The player is paused while the map is open, so a render-time snapshot is accurate.
+  const pos = { x: player.x, z: player.z };
   const toX = (x: number) => x + W / 2;
   const toY = (z: number) => z + H / 2;
   const fill = (t: (typeof tiles)[number]) => {
@@ -227,13 +225,13 @@ export function EmoteMenu() {
 /** Icon bubble that floats above the player while an emote plays. */
 export function EmoteBubble() {
   const emote = useGame((s) => s.emote);
-  const [visible, setVisible] = useState(false);
+  const [doneAt, setDoneAt] = useState(0);
   useEffect(() => {
     if (!emote) return;
-    setVisible(true);
-    const t = setTimeout(() => setVisible(false), 1700);
+    const t = setTimeout(() => setDoneAt(emote.at), 1700);
     return () => clearTimeout(t);
   }, [emote]);
+  const visible = !!emote && doneAt !== emote.at;
   const e = emotes.find((x) => x.id === emote?.type);
   return (
     <AnimatePresence>

@@ -131,7 +131,7 @@ function FruitTree({ tree, index }: { tree: TreeSpot; index: number }) {
 
 /** Tufts and flowers lean away from the player when brushed. */
 function useBrushable(ref: React.RefObject<THREE.InstancedMesh | null>, spots: typeof tufts, strength: number, lift = 0) {
-  const tilt = useMemo(() => new Float32Array(spots.length), [spots]);
+  const tiltRef = useRef<Float32Array>(new Float32Array(0));
   const compose = (mesh: THREE.InstancedMesh, k: number, amount: number, dx: number, dz: number) => {
     const s = spots[k];
     tmp.position.set(s.x, s.y + lift, s.z);
@@ -160,6 +160,8 @@ function useBrushable(ref: React.RefObject<THREE.InstancedMesh | null>, spots: t
   useFrame(() => {
     const mesh = ref.current;
     if (!mesh || reducedMotion.value) return;
+    if (tiltRef.current.length !== spots.length) tiltRef.current = new Float32Array(spots.length);
+    const tilt = tiltRef.current;
     let dirty = false;
     for (let k = 0; k < spots.length; k++) {
       const s = spots[k];
