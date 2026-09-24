@@ -135,8 +135,8 @@ export function Terrain() {
       <instancedMesh ref={railRef} args={[box, white, data.rails.length]} castShadow />
       <instancedMesh ref={plankRef} args={[plankGeo, white, data.planks.length]} receiveShadow castShadow onClick={onTap} />
       <instancedMesh ref={postRef} args={[postGeo, toon(palette.woodDeep), data.posts.length]} />
-      <instancedMesh ref={shallowRef} args={[shallowGeo, toon(palette.shallow, { transparent: true, opacity: 0.75, water: true }), data.shallow.length]} />
-      <mesh geometry={waterGeo} position={[0, WATER_Y, 0]} material={toon(palette.water, { water: true })} receiveShadow />
+      <instancedMesh ref={shallowRef} args={[shallowGeo, toon(palette.shallow, { transparent: true, opacity: 0.8, water: true, emissive: "#6FB9CF" }), data.shallow.length]} />
+      <mesh geometry={waterGeo} position={[0, WATER_Y, 0]} material={toon(palette.water, { water: true, emissive: "#2F8FB0" })} receiveShadow />
     </group>
   );
 }

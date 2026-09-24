@@ -19,7 +19,7 @@ export const presets: Record<TimePreset["id"], TimePreset> = {
     hemiIntensity: 0.95,
     sun: "#FFF1DC",
     sunIntensity: 1.4,
-    sunDir: [-14, 22, 10],
+    sunDir: [-9, 26, 7],
     fog: "#D9CBFA",
   },
   afternoon: {
@@ -30,7 +30,7 @@ export const presets: Record<TimePreset["id"], TimePreset> = {
     hemiIntensity: 1.0,
     sun: "#FFF6EA",
     sunIntensity: 1.5,
-    sunDir: [-6, 26, 8],
+    sunDir: [-4, 28, 6],
     fog: "#DCD2FB",
   },
   golden: {
@@ -41,7 +41,7 @@ export const presets: Record<TimePreset["id"], TimePreset> = {
     hemiIntensity: 0.85,
     sun: "#FFD2A6",
     sunIntensity: 1.3,
-    sunDir: [16, 14, 8],
+    sunDir: [12, 20, 7],
     fog: "#D6C2F2",
   },
 };

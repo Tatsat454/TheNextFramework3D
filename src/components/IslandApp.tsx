@@ -47,6 +47,7 @@ export default function IslandApp() {
       return;
     }
     hydrate();
+    if (process.env.NODE_ENV !== "production") Object.assign(window, { __pocket: { player, useGame } });
     const pos = readPosition();
     if (pos && isWalkable(pos.x, pos.z)) {
       player.x = pos.x;

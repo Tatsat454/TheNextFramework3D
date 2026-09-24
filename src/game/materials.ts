@@ -77,7 +77,7 @@ export function toon(color: string, opts: ToonOpts = {}) {
     transparent: opts.transparent ?? false,
     opacity: opts.opacity ?? 1,
     emissive: opts.emissive ? new THREE.Color(opts.emissive) : new THREE.Color(0, 0, 0),
-    emissiveIntensity: opts.emissive ? 0.9 : 0,
+    emissiveIntensity: opts.emissive ? (opts.water ? 0.45 : 0.9) : 0,
     vertexColors: opts.vertexColors ?? false,
     side: opts.side ?? THREE.FrontSide,
   });

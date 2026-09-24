@@ -13,7 +13,9 @@ import type { TimePreset } from "@/game/time-of-day";
 const OFFSET = new THREE.Vector3(0, 16.5, 17.5);
 
 export function CameraRig() {
-  const { camera } = useThree();
+  const { camera, size } = useThree();
+  const aspect = size.width / Math.max(1, size.height);
+  const portrait = aspect < 0.85 ? 1.28 : aspect < 1.2 ? 1.12 : 1;
   const focus = useRef(new THREE.Vector3(player.x, player.y, player.z));
   const zoom = useRef(1);
   const init = useRef(false);
@@ -30,8 +32,8 @@ export function CameraRig() {
       z = 0.85;
     }
     if (s.card || s.dialog) z = Math.min(z, 0.9);
-    target.x = THREE.MathUtils.clamp(target.x, -15, 15);
-    target.z = THREE.MathUtils.clamp(target.z, -13, 15);
+    target.x = THREE.MathUtils.clamp(target.x, -16, 16);
+    target.z = THREE.MathUtils.clamp(target.z, -14, 19.5);
 
     const k = reducedMotion.value ? 1 - Math.pow(1 - 0.2, dt * 60) : 1 - Math.pow(1 - 0.08, dt * 60);
     if (!init.current) {
@@ -40,7 +42,7 @@ export function CameraRig() {
     }
     focus.current.lerp(target, k);
     zoom.current += (z - zoom.current) * k * 0.6;
-    camera.position.copy(focus.current).addScaledVector(OFFSET, zoom.current);
+    camera.position.copy(focus.current).addScaledVector(OFFSET, zoom.current * portrait);
     camera.lookAt(focus.current.x, focus.current.y + 0.5, focus.current.z);
     bend.uBendCenter.value.copy(focus.current);
   });
@@ -61,8 +63,8 @@ export function Lights({ preset, shadows }: { preset: TimePreset; shadows: boole
     const l = sun.current;
     if (!l) return;
     // Keep a tight shadow frustum around the part of the island in view.
-    const fx = THREE.MathUtils.clamp(player.x, -15, 15);
-    const fz = THREE.MathUtils.clamp(player.z, -13, 15);
+    const fx = THREE.MathUtils.clamp(player.x, -16, 16);
+    const fz = THREE.MathUtils.clamp(player.z, -14, 19.5);
     l.position.set(fx + preset.sunDir[0], preset.sunDir[1], fz + preset.sunDir[2]);
     l.target.position.set(fx, 0, fz);
   });
@@ -75,6 +77,7 @@ export function Lights({ preset, shadows }: { preset: TimePreset; shadows: boole
         intensity={preset.sunIntensity}
         castShadow={shadows}
         shadow-mapSize={[2048, 2048]}
+        shadow-intensity={0.62}
         shadow-bias={-0.0006}
         shadow-normalBias={0.03}
         shadow-radius={4}

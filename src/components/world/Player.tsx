@@ -91,10 +91,10 @@ function Chibi({ parts }: { parts: React.RefObject<Record<string, THREE.Object3D
           <sphereGeometry args={[0.27, 24, 18]} />
         </mesh>
         <mesh position={[0, 0.06, -0.02]} scale={[1.06, 0.92, 1.06]} material={hair} castShadow>
-          <sphereGeometry args={[0.28, 24, 14, 0, Math.PI * 2, 0, Math.PI * 0.55]} />
+          <sphereGeometry args={[0.28, 24, 14, 0, Math.PI * 2, 0, Math.PI * 0.44]} />
         </mesh>
         <mesh position={[0, 0.03, -0.06]} scale={[1.02, 1.05, 0.95]} material={hair}>
-          <sphereGeometry args={[0.28, 20, 14, Math.PI * 0.62, Math.PI * 1.76, 0, Math.PI * 0.75]} />
+          <sphereGeometry args={[0.28, 20, 14, Math.PI * 0.95, Math.PI * 1.1, 0, Math.PI * 0.72]} />
         </mesh>
         <mesh position={[-0.07, 0.16, 0.2]} rotation={[0.5, 0, 0.5]} scale={[1.4, 0.55, 0.8]} material={hair}>
           <sphereGeometry args={[0.1, 10, 8]} />
