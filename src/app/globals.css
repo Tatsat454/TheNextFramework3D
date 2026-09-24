@@ -44,9 +44,9 @@
   --color-peach: #ffd9cc;
   --color-lilac: #ebd0ee;
   --color-lavender: #c7b9ff;
-  --color-mint: #9adbb0;
-  --color-mint-deep: #88cfa0;
-  --color-leaf: #7cc49a;
+  --color-mint: #7edc7a;
+  --color-mint-deep: #6bc96c;
+  --color-leaf: #6ec86a;
   --color-blossom: #ffc4d6;
   --color-sand: #efd9b4;
   --color-earth: #f2e6d8;
@@ -78,9 +78,9 @@
   --ring: #7b6cf6;
   --radius: 1rem;
 
-  --sky-top: #ffd9cc;
-  --sky-mid: #ebd0ee;
-  --sky-bottom: #c7b9ff;
+  --sky-top: #3daae8;
+  --sky-mid: #8ed6f5;
+  --sky-bottom: #eaf6ce;
   --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 

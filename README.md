@@ -58,7 +58,7 @@ All copy lives in [`src/content/landmarks.ts`](src/content/landmarks.ts). Compon
 
 - **Next.js 16** (App Router, Turbopack) + TypeScript + Tailwind v4 + shadcn/ui primitives
 - **React Three Fiber + drei + three.js** for the world, **zustand** for game state, **motion** for UI springs
-- `src/game/island.ts`: the tile grid (3 height levels, cliffs, stairs, paths, pond, dock), seeded prop scatter, collision and height queries
+- `src/game/island.ts`: the island grid (3 terraces, cliffs, slope ramps, paths, pond, dock), seeded prop scatter, collision and height queries
 - `src/game/materials.ts`: one material style everywhere (`MeshToonMaterial`, 3-step gradient) plus a vertex patch for the rolling-horizon bend, tree sway and water shimmer
 - Terrain, trees, tufts and flowers are `InstancedMesh`es (≈110–160 draw calls, ≈220k triangles)
 - Lighting follows the visitor's local clock (morning / afternoon / golden hour)

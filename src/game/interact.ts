@@ -3,7 +3,7 @@
 import type { ItemId, LandmarkId, ResidentId } from "@/content/landmarks";
 import { copy, getItem, getLandmark, landmarks, museumExhibits, residents, skills } from "@/content/landmarks";
 import { sfx } from "./audio";
-import { gardenRows, getPlacement, landmarkPlacements, pedestals, pickups, trees } from "./island";
+import { gardenRows, getPlacement, landmarkPlacements, LEVEL, pedestals, pickups, trees } from "./island";
 import { checkArrivals, toast, useGame } from "./store";
 
 export type InteractKind = "landmark" | "exhibit" | "row" | "tree" | "pickup" | "resident";
@@ -29,7 +29,7 @@ const staticList: Interactable[] = [
     verb: "Open",
     x: p.interact.x,
     z: p.interact.z,
-    y: p.level + (p.id === "townhall" || p.id === "museum" ? 4.4 : p.id === "dock" ? 1.8 : 3.4),
+    y: p.level * LEVEL + (p.id === "townhall" || p.id === "museum" ? 4.4 : p.id === "dock" ? 1.8 : 3.4),
     r: p.radius,
     ref: p.id,
   })),
@@ -40,7 +40,7 @@ const staticList: Interactable[] = [
     verb: "Look",
     x: p.interact.x,
     z: p.interact.z,
-    y: p.level + 2.1,
+    y: p.level * LEVEL + 2.1,
     r: 0.95,
     ref: p.slug,
   })),
@@ -51,7 +51,7 @@ const staticList: Interactable[] = [
     verb: "Water",
     x: row.interact.x,
     z: row.interact.z,
-    y: row.level + 1.9,
+    y: row.level * LEVEL + 1.9,
     r: 0.62,
     ref: row.skillId,
   })),
@@ -164,7 +164,7 @@ function fillTemplate(line: string, px: number, pz: number): string {
     const ew = dx > 2 ? "east" : dx < -2 ? "west" : "";
     const dir = ns && ew ? `${ns}-${ew}` : ns || ew || "right around here";
     const lm = getLandmark(target.id);
-    const up = target.level > 1 ? " Take the stairs up." : "";
+    const up = target.level > 1 ? " Take the slope up." : "";
     return `Have you seen the ${lm.name}? It's ${dir === "right around here" ? dir : `to the ${dir}`}. That's where you'll find his ${lm.section.toLowerCase()}.${up}`;
   }
   if (line === "{museum}") {

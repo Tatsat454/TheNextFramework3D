@@ -9,6 +9,7 @@ export const bend = {
   uBend: { value: 0.0115 },
   uBendCenter: { value: new THREE.Vector3() },
   uTime: { value: 0 },
+  uPlayer: { value: new THREE.Vector3() },
 };
 
 const BEND_VERTEX = /* glsl */ `
@@ -31,8 +32,27 @@ vec4 bendWorld = modelMatrix * mvPosition;
 float bendDz = bendWorld.z - uBendCenter.z;
 float bendDx = bendWorld.x - uBendCenter.x;
 bendWorld.y -= bendDz * bendDz * uBend + bendDx * bendDx * uBend * 0.25;
+vOccWorld = bendWorld.xyz;
 mvPosition = viewMatrix * bendWorld;
 gl_Position = projectionMatrix * mvPosition;
+`;
+
+/** Dithers away anything standing between the camera and the player so they're never hidden. */
+const OCCLUDE_FRAGMENT = /* glsl */ `
+#ifndef NO_OCCLUDE
+{
+  vec3 camToPlayer = uPlayer - cameraPosition;
+  float camLen = length(camToPlayer);
+  vec3 camDir = camToPlayer / camLen;
+  vec3 camToFrag = vOccWorld - cameraPosition;
+  float along = dot(camToFrag, camDir);
+  if (along > 0.0 && along < camLen - 0.9 && vOccWorld.y > uPlayer.y - 0.35) {
+    float off = length(camToFrag - camDir * along);
+    float radius = 1.05 * smoothstep(0.0, 5.0, camLen - along);
+    if (off < radius && mod(floor(gl_FragCoord.x) + floor(gl_FragCoord.y), 2.0) < 1.0) discard;
+  }
+}
+#endif
 `;
 
 function patch(material: THREE.Material, defines: string[] = []) {
@@ -41,10 +61,16 @@ function patch(material: THREE.Material, defines: string[] = []) {
     shader.uniforms.uBend = bend.uBend;
     shader.uniforms.uBendCenter = bend.uBendCenter;
     shader.uniforms.uTime = bend.uTime;
+    shader.uniforms.uPlayer = bend.uPlayer;
+    const head = defines.map((d) => `#define ${d}`).join("\n");
     shader.vertexShader =
-      defines.map((d) => `#define ${d}`).join("\n") +
-      "\nuniform float uBend;\nuniform vec3 uBendCenter;\nuniform float uTime;\n" +
+      head +
+      "\nuniform float uBend;\nuniform vec3 uBendCenter;\nuniform float uTime;\nvarying vec3 vOccWorld;\n" +
       shader.vertexShader.replace("#include <project_vertex>", BEND_VERTEX);
+    shader.fragmentShader =
+      head +
+      "\nuniform vec3 uPlayer;\nvarying vec3 vOccWorld;\n" +
+      shader.fragmentShader.replace("void main() {", "void main() {\n" + OCCLUDE_FRAGMENT);
   };
   material.customProgramCacheKey = () => key;
   return material;
@@ -53,7 +79,7 @@ function patch(material: THREE.Material, defines: string[] = []) {
 let gradient: THREE.DataTexture | null = null;
 export function toonGradient() {
   if (gradient) return gradient;
-  const data = new Uint8Array([118, 118, 118, 255, 196, 196, 196, 255, 255, 255, 255, 255]);
+  const data = new Uint8Array([158, 158, 158, 255, 214, 214, 214, 255, 255, 255, 255, 255]);
   gradient = new THREE.DataTexture(data, 3, 1, THREE.RGBAFormat);
   gradient.minFilter = THREE.NearestFilter;
   gradient.magFilter = THREE.NearestFilter;
@@ -62,7 +88,7 @@ export function toonGradient() {
   return gradient;
 }
 
-type ToonOpts = { flatShading?: boolean; sway?: boolean; water?: boolean; transparent?: boolean; opacity?: number; emissive?: string; vertexColors?: boolean; side?: THREE.Side };
+type ToonOpts = { noOcclude?: boolean; flatShading?: boolean; sway?: boolean; water?: boolean; transparent?: boolean; opacity?: number; emissive?: string; vertexColors?: boolean; side?: THREE.Side };
 
 const cache = new Map<string, THREE.MeshToonMaterial>();
 
@@ -85,6 +111,7 @@ export function toon(color: string, opts: ToonOpts = {}) {
   if (opts.transparent) m.depthWrite = false;
   const defines: string[] = [];
   if (opts.sway) defines.push("SWAY");
+  if (opts.noOcclude) defines.push("NO_OCCLUDE");
   if (opts.water) defines.push("WATER");
   patch(m, defines);
   cache.set(key, m);
@@ -109,20 +136,20 @@ export function flat(color: string, opacity = 1, additive = false) {
 }
 
 export const palette = {
-  grass: "#9ADBB0",
-  grassShade: "#88CFA0",
-  dirt: "#D9C2A5",
-  sand: "#EFD9B4",
-  earth: "#F2E6D8",
-  water: "#8FD3E8",
-  shallow: "#B8E6F2",
-  foliage: "#7CC49A",
-  foliageDeep: "#5FAE82",
-  pine: "#4F9C78",
+  grass: "#7EDC7A",
+  grassShade: "#6BC96C",
+  dirt: "#E6C98A",
+  sand: "#F4E2B0",
+  earth: "#EED9A8",
+  water: "#5EC8E0",
+  shallow: "#9FE4F0",
+  foliage: "#6EC86A",
+  foliageDeep: "#4EAE5C",
+  pine: "#3F9A5C",
   blossom: "#FFC4D6",
   blossomDeep: "#F5A9C1",
-  wood: "#B98A5E",
-  woodDeep: "#9C7049",
+  wood: "#C49662",
+  woodDeep: "#A37848",
   orange: "#FF8A65",
   sun: "#FFC857",
   violet: "#7B6CF6",

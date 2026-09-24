@@ -10,7 +10,7 @@ import { player, reducedMotion } from "@/game/player-state";
 import { useGame } from "@/game/store";
 import type { TimePreset } from "@/game/time-of-day";
 
-const OFFSET = new THREE.Vector3(0, 16.5, 17.5);
+const OFFSET = new THREE.Vector3(0, 11.2, 13.6);
 
 export function CameraRig() {
   const { camera, size } = useThree();
@@ -32,8 +32,8 @@ export function CameraRig() {
       z = 0.85;
     }
     if (s.card || s.dialog) z = Math.min(z, 0.9);
-    target.x = THREE.MathUtils.clamp(target.x, -16, 16);
-    target.z = THREE.MathUtils.clamp(target.z, -14, 19.5);
+    target.x = THREE.MathUtils.clamp(target.x, -17, 17);
+    target.z = THREE.MathUtils.clamp(target.z, -15, 20.5);
 
     const k = reducedMotion.value ? 1 - Math.pow(1 - 0.2, dt * 60) : 1 - Math.pow(1 - 0.08, dt * 60);
     if (!init.current) {
@@ -43,8 +43,9 @@ export function CameraRig() {
     focus.current.lerp(target, k);
     zoom.current += (z - zoom.current) * k * 0.6;
     camera.position.copy(focus.current).addScaledVector(OFFSET, zoom.current * portrait);
-    camera.lookAt(focus.current.x, focus.current.y + 0.5, focus.current.z);
+    camera.lookAt(focus.current.x, focus.current.y + 0.6, focus.current.z - 1.6);
     bend.uBendCenter.value.copy(focus.current);
+    bend.uPlayer.value.set(player.x, player.y + 0.55, player.z);
   });
   return null;
 }
@@ -67,24 +68,30 @@ export function Lights({ preset, shadows }: { preset: TimePreset; shadows: boole
   });
   return (
     <>
-      <fog attach="fog" args={[preset.fog, 34, 58]} />
-      <hemisphereLight args={[preset.hemiSky, preset.hemiGround, preset.hemiIntensity * 0.72]} />
+      <fog attach="fog" args={[preset.fog, 56, 130]} />
+      <hemisphereLight args={[preset.hemiSky, preset.hemiGround, preset.hemiIntensity]} />
+      <ambientLight intensity={0.34} />
       <directionalLight
         ref={sun}
         color={preset.sun}
         intensity={preset.sunIntensity}
         castShadow={shadows}
         shadow-mapSize={[2048, 2048]}
-        shadow-intensity={0.62}
+        shadow-intensity={0.42}
         shadow-bias={-0.0006}
-        shadow-normalBias={0.03}
-        shadow-radius={4}
-        shadow-camera-left={-22}
-        shadow-camera-right={22}
-        shadow-camera-top={22}
-        shadow-camera-bottom={-22}
+        shadow-normalBias={0.04}
+        shadow-radius={6}
+        shadow-camera-left={-16}
+        shadow-camera-right={16}
+        shadow-camera-top={16}
+        shadow-camera-bottom={-16}
         shadow-camera-near={1}
         shadow-camera-far={70}
+      />
+      <directionalLight
+        color="#C8ECFF"
+        intensity={0.32}
+        position={[-preset.sunDir[0] * 0.6, 18, -preset.sunDir[2] * 0.4]}
       />
     </>
   );

@@ -13,6 +13,7 @@ import { Player } from "./Player";
 import { Prompt } from "./Prompt";
 import { Residents } from "./Residents";
 import { CameraRig, Lights } from "./Rig";
+import { Sky } from "./Sky";
 import { Terrain } from "./Terrain";
 
 function FirstFrame({ onReady }: { onReady: () => void }) {
@@ -70,12 +71,13 @@ export default function IslandCanvas({ onReady, onNoWebGL }: { onReady: () => vo
   if (!supported) return null;
   return (
     <Canvas
+      flat
       shadows={{ type: THREE.PCFSoftShadowMap, enabled: true }}
       dpr={[1, dpr]}
       gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}
       camera={{ fov: 30, near: 0.5, far: 140, position: [0, 18, 16] }}
       onCreated={({ gl }) => {
-        gl.setClearColor(0x000000, 0);
+        gl.setClearColor(preset.fog, 1);
         if (process.env.NODE_ENV !== "production") (window as unknown as { __gl: THREE.WebGLRenderer }).__gl = gl;
       }}
     >
@@ -85,6 +87,7 @@ export default function IslandCanvas({ onReady, onNoWebGL }: { onReady: () => vo
           setDpr(1);
         }}
       />
+      <Sky preset={preset} />
       <Lights preset={preset} shadows={shadows} />
       <CameraRig />
       <Terrain />

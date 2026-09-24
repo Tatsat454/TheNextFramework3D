@@ -32,7 +32,7 @@ export function LoadingScreen({ ready, onDone }: { ready: boolean; onDone: () =>
       {!gone && (
         <motion.div
           key="loader"
-          className="fixed inset-0 z-[100] grid place-items-center bg-peach"
+          className="fixed inset-0 z-[100] grid place-items-center sky"
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}

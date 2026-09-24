@@ -4,8 +4,8 @@ import { mulberry32, valueNoise } from "./rng";
 
 export const W = 52;
 export const H = 44;
-export const LEVEL = 1;
-export const WATER_Y = 0.72;
+export const LEVEL = 1.35;
+export const WATER_Y = LEVEL - 0.4;
 
 export type Dir = "N" | "S" | "E" | "W";
 export type TileKind = "water" | "grass" | "sand" | "path" | "ramp" | "dock";
@@ -16,6 +16,10 @@ export type Tile = {
   h: number;
   kind: TileKind;
   ramp?: Dir;
+  /** Height mix at fz=0 / fx=0 (north or west edge), 0–1 above `h`. */
+  rampK0?: number;
+  /** Height mix at fz=1 / fx=1 (south or east edge), 0–1 above `h`. */
+  rampK1?: number;
   blocked: boolean;
   shade: number;
   /** Distance to open sea, in tiles. */
@@ -95,22 +99,66 @@ for (const t of grid) {
   }
 }
 
-// ── 5. Stairs ──────────────────────────────────────────────────
+// ── 5. Slopes (Animal Crossing ramps, two tiles deep) ──────────
 export const stairs: { i: number; j: number; h: number; dir: Dir }[] = [];
+function addRampTile(t: Tile, fromLevel: number, k0: number, k1: number) {
+  t.kind = "ramp";
+  t.ramp = "N";
+  t.h = fromLevel;
+  t.rampK0 = k0;
+  t.rampK1 = k1;
+  t.blocked = false;
+  stairs.push({ i: t.i, j: t.j, h: fromLevel, dir: "N" });
+}
 function addStairsNorth(cols: number[], fromLevel: number) {
   for (const i of cols) {
     let edge = -1;
-    for (let j = 0; j < H; j++) if (tileAt(i, j)!.h === fromLevel + 1) edge = j;
-    const t = tileAt(i, edge + 1)!;
-    t.kind = "ramp";
-    t.ramp = "N";
-    t.h = fromLevel;
-    stairs.push({ i, j: t.j, h: fromLevel, dir: "N" });
+    for (let j = 0; j < H; j++) if (tileAt(i, j)?.h === fromLevel + 1) edge = j;
+    if (edge < 0) continue;
+    const upper = tileAt(i, edge + 1);
+    const lower = tileAt(i, edge + 2);
+    const usable = (t: Tile | undefined): t is Tile => !!t && t.kind !== "water" && t.kind !== "dock" && t.h <= fromLevel + 1;
+    if (usable(upper) && usable(lower)) {
+      addRampTile(upper, fromLevel, 1, 0.5);
+      addRampTile(lower, fromLevel, 0.5, 0);
+    } else if (usable(upper)) {
+      addRampTile(upper, fromLevel, 1, 0);
+    }
   }
 }
-addStairsNorth([25, 26], 1);
+addStairsNorth([24, 25, 26, 27], 1);
 addStairsNorth([15, 16], 1);
-addStairsNorth([34, 35], 2);
+addStairsNorth([33, 34, 35], 2);
+
+export type RampRun = { i0: number; i1: number; j0: number; j1: number; h: number; dir: Dir };
+export const rampRuns: RampRun[] = [];
+{
+  const seen = new Set<string>();
+  const isRamp = (i: number, j: number, h: number, dir: Dir) =>
+    stairs.some((s) => s.i === i && s.j === j && s.h === h && s.dir === dir);
+  for (const s of stairs) {
+    const start = `${s.i},${s.j}`;
+    if (seen.has(start)) continue;
+    const stack = [[s.i, s.j]];
+    const cells: [number, number][] = [];
+    while (stack.length) {
+      const [ci, cj] = stack.pop()!;
+      const key = `${ci},${cj}`;
+      if (seen.has(key) || !isRamp(ci, cj, s.h, s.dir)) continue;
+      seen.add(key);
+      cells.push([ci, cj]);
+      stack.push([ci + 1, cj], [ci - 1, cj], [ci, cj + 1], [ci, cj - 1]);
+    }
+    rampRuns.push({
+      i0: Math.min(...cells.map((c) => c[0])),
+      i1: Math.max(...cells.map((c) => c[0])),
+      j0: Math.min(...cells.map((c) => c[1])),
+      j1: Math.max(...cells.map((c) => c[1])),
+      h: s.h,
+      dir: s.dir,
+    });
+  }
+}
 
 // ── 6. Paths ───────────────────────────────────────────────────
 const paint = (i0: number, j0: number, i1: number, j1: number) => {
@@ -120,17 +168,18 @@ const paint = (i0: number, j0: number, i1: number, j1: number) => {
       if (t && (t.kind === "grass" || t.kind === "sand")) t.kind = "path";
     }
 };
-paint(25, 34, 26, 24); // spawn → main stairs
+paint(25, 34, 26, 24); // spawn → main slope
+paint(24, 33, 27, 27); // wide approach onto the main slope
 paint(18, 31, 26, 32); // → house
 paint(26, 34, 32, 35); // → dock
 paint(31, 34, 32, 37);
 paint(26, 29, 37, 30); // → market
-paint(15, 24, 16, 30); // west stairs → house path
+paint(15, 24, 16, 30); // west slope → house path
 paint(15, 31, 18, 32);
 paint(25, 14, 26, 23); // lvl2 trunk → town hall
 paint(15, 19, 40, 20); // lvl2 avenue
-paint(15, 20, 16, 23); // → west stairs top
-paint(34, 16, 35, 20); // → plateau stairs
+paint(15, 20, 16, 23); // → west slope top
+paint(33, 16, 35, 20); // → plateau slope
 paint(30, 15, 38, 16); // plateau walkway
 paint(34, 13, 35, 14);
 
@@ -383,8 +432,10 @@ export function heightAt(x: number, z: number): number {
   if (t.kind !== "ramp") return t.h * LEVEL;
   const fx = x + W / 2 - i;
   const fz = z + H / 2 - j;
-  const k = t.ramp === "N" ? 1 - fz : t.ramp === "S" ? fz : t.ramp === "E" ? fx : 1 - fx;
-  return (t.h + Math.min(1, Math.max(0, k))) * LEVEL;
+  const u = t.ramp === "E" || t.ramp === "W" ? Math.min(1, Math.max(0, fx)) : Math.min(1, Math.max(0, fz));
+  const k0 = t.rampK0 ?? (t.ramp === "N" || t.ramp === "W" ? 1 : 0);
+  const k1 = t.rampK1 ?? (t.ramp === "N" || t.ramp === "W" ? 0 : 1);
+  return (t.h + k0 + (k1 - k0) * u) * LEVEL;
 }
 
 export function isWalkable(x: number, z: number): boolean {
@@ -395,7 +446,14 @@ export function isWalkable(x: number, z: number): boolean {
 
 export function canStep(fromX: number, fromZ: number, toX: number, toZ: number): boolean {
   if (!isWalkable(toX, toZ)) return false;
-  return Math.abs(heightAt(toX, toZ) - heightAt(fromX, fromZ)) < 0.34;
+  const from = tileAt(worldToTile(fromX, fromZ).i, worldToTile(fromX, fromZ).j);
+  const to = tileAt(worldToTile(toX, toZ).i, worldToTile(toX, toZ).j);
+  if (!from || !to) return false;
+  const dh = Math.abs(heightAt(toX, toZ) - heightAt(fromX, fromZ));
+  // Slopes connect two terraces; a leading-edge probe samples partway up, so allow a full level.
+  if (from.kind === "ramp" || to.kind === "ramp") return dh <= LEVEL + 0.25;
+  if (from.h === to.h) return true;
+  return dh < 0.5;
 }
 
 export const bounds = { minX: -W / 2, maxX: W / 2, minZ: -H / 2, maxZ: H / 2 };

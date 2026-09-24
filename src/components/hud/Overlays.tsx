@@ -129,8 +129,8 @@ export function IslandMap() {
     if (t.kind === "water") return null;
     if (t.kind === "dock") return "#B98A5E";
     if (t.kind === "sand" || t.kind === "path") return "#EFD9B4";
-    if (t.kind === "ramp") return "#F2E6D8";
-    return t.h === 3 ? "#6FBF8C" : t.h === 2 ? "#86CE9E" : "#9ADBB0";
+    if (t.kind === "ramp") return "#EED9A8";
+    return t.h === 3 ? "#4EAE5C" : t.h === 2 ? "#6BC96C" : "#7EDC7A";
   };
   return (
     <Sheet open={open} onClose={() => set({ mapOpen: false })} label="Island map" wide>

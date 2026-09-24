@@ -209,7 +209,7 @@ function CloudShadows() {
       {clouds.map((c, k) => (
         <mesh key={k} ref={(m) => { refs.current[k] = m; }} rotation={[-Math.PI / 2, 0, 0]} renderOrder={2}>
           <planeGeometry args={[c.s, c.s * 0.6]} />
-          <meshBasicMaterial map={tex} transparent opacity={0.28} depthWrite={false} />
+          <meshBasicMaterial map={tex} transparent opacity={0.14} depthWrite={false} />
         </mesh>
       ))}
     </group>

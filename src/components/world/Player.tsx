@@ -27,18 +27,16 @@ export function triggerInteract() {
 }
 
 function tryStep(x: number, z: number, dx: number, dz: number) {
-  const probe = (px: number, pz: number) => canStep(x, z, px, pz);
-  let nx = x;
-  let nz = z;
-  if (dx !== 0) {
-    const edge = x + dx + Math.sign(dx) * RADIUS;
-    if (probe(edge, z + RADIUS * 0.6) && probe(edge, z - RADIUS * 0.6)) nx = x + dx;
-  }
-  if (dz !== 0) {
-    const edge = z + dz + Math.sign(dz) * RADIUS;
-    if (probe(nx + RADIUS * 0.6, edge) && probe(nx - RADIUS * 0.6, edge)) nz = z + dz;
-  }
-  return { nx, nz };
+  const ok = (px: number, pz: number) => canStep(x, z, px, pz);
+  const blocked = (nx: number, nz: number) => {
+    const sx = nx !== x ? Math.sign(nx - x) : 0;
+    const sz = nz !== z ? Math.sign(nz - z) : 0;
+    return !ok(nx, nz) || !ok(nx + sx * RADIUS, nz + sz * RADIUS);
+  };
+  if (!blocked(x + dx, z + dz)) return { nx: x + dx, nz: z + dz };
+  if (dx !== 0 && !blocked(x + dx, z)) return { nx: x + dx, nz: z };
+  if (dz !== 0 && !blocked(x, z + dz)) return { nx: x, nz: z + dz };
+  return { nx: x, nz: z };
 }
 
 const angleLerp = (a: number, b: number, t: number) => {
@@ -384,11 +382,11 @@ export function Player() {
 
   return (
     <group>
-      <group ref={root}>
+      <group ref={root} scale={1.28}>
         <Chibi parts={parts} />
       </group>
-      <mesh ref={shadow} rotation={[-Math.PI / 2, 0, 0]} material={flat("#3B3470", 0.18)}>
-        <circleGeometry args={[0.28, 20]} />
+      <mesh ref={shadow} rotation={[-Math.PI / 2, 0, 0]} material={flat("#3B3470", 0.26)}>
+        <circleGeometry args={[0.36, 20]} />
       </mesh>
       <group ref={puffGroup} />
       <group ref={printGroup} />

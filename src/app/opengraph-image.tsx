@@ -7,9 +7,9 @@ export const contentType = "image/png";
 
 export default function OpengraphImage() {
   const tiles = [
-    { x: 700, y: 330, w: 380, h: 190, c: "#9ADBB0" },
-    { x: 760, y: 250, w: 250, h: 110, c: "#88CFA0" },
-    { x: 830, y: 190, w: 130, h: 70, c: "#7CC49A" },
+    { x: 700, y: 330, w: 380, h: 190, c: "#7EDC7A" },
+    { x: 760, y: 250, w: 250, h: 110, c: "#6BC96C" },
+    { x: 830, y: 190, w: 130, h: 70, c: "#4EAE5C" },
   ];
   return new ImageResponse(
     (
@@ -18,7 +18,7 @@ export default function OpengraphImage() {
           width: "100%",
           height: "100%",
           display: "flex",
-          background: "linear-gradient(180deg, #FFD9CC 0%, #EBD0EE 50%, #C7B9FF 100%)",
+          background: "linear-gradient(180deg, #3DAAE8 0%, #8ED6F5 50%, #EAF6CE 100%)",
           padding: 72,
           position: "relative",
           fontFamily: "sans-serif",
