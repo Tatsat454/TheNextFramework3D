@@ -10,7 +10,7 @@ import { player, reducedMotion } from "@/game/player-state";
 import { useGame } from "@/game/store";
 import type { TimePreset } from "@/game/time-of-day";
 
-const OFFSET = new THREE.Vector3(0, 11.2, 13.6);
+const OFFSET = new THREE.Vector3(0, 14.8, 18.4);
 
 export function CameraRig() {
   const { camera, size } = useThree();
@@ -32,8 +32,8 @@ export function CameraRig() {
       z = 0.85;
     }
     if (s.card || s.dialog) z = Math.min(z, 0.9);
-    target.x = THREE.MathUtils.clamp(target.x, -17, 17);
-    target.z = THREE.MathUtils.clamp(target.z, -15, 20.5);
+    target.x = THREE.MathUtils.clamp(target.x, -8, 8);
+    target.z = THREE.MathUtils.clamp(target.z, -8, 10);
 
     const k = reducedMotion.value ? 1 - Math.pow(1 - 0.2, dt * 60) : 1 - Math.pow(1 - 0.08, dt * 60);
     if (!init.current) {
@@ -68,7 +68,7 @@ export function Lights({ preset, shadows }: { preset: TimePreset; shadows: boole
   });
   return (
     <>
-      <fog attach="fog" args={[preset.fog, 56, 130]} />
+      <fog attach="fog" args={[preset.fog, 42, 88]} />
       <hemisphereLight args={[preset.hemiSky, preset.hemiGround, preset.hemiIntensity]} />
       <ambientLight intensity={0.34} />
       <directionalLight
@@ -89,8 +89,8 @@ export function Lights({ preset, shadows }: { preset: TimePreset; shadows: boole
         shadow-camera-far={70}
       />
       <directionalLight
-        color="#C8ECFF"
-        intensity={0.32}
+        color="#FFE6D8"
+        intensity={0.38}
         position={[-preset.sunDir[0] * 0.6, 18, -preset.sunDir[2] * 0.4]}
       />
     </>

@@ -4,7 +4,7 @@ import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
 import { skills } from "@/content/landmarks";
-import { gardenRows, getPlacement, LEVEL, pedestals, tileCenter } from "@/game/island";
+import { boardTile, gardenRows, getPlacement, LEVEL, mailboxTile, pedestals, tileCenter } from "@/game/island";
 import { palette, toon } from "@/game/materials";
 import { reducedMotion } from "@/game/player-state";
 import { useGame } from "@/game/store";
@@ -54,11 +54,15 @@ function Window({ p, rotY = 0, s = 0.42 }: { p: V3; rotY?: number; s?: number })
 
 function House() {
   const pl = getPlacement("house");
-  const mail = tileCenter(20, 30);
+  const mail = tileCenter(mailboxTile.i, mailboxTile.j);
+  const [i0, j0, i1, j1] = pl.rect;
+  const a = tileCenter(i0, j0);
+  const b = tileCenter(i1, j1);
+  const y = 0;
   return (
     <group position={[pl.center.x, pl.level * LEVEL, pl.center.z]}>
-      <Box p={[0, 0.08, 0]} s={[2.7, 0.16, 2.5]} c={palette.woodDeep} />
-      <Box p={[0, 0.9, 0]} s={[2.4, 1.5, 2.2]} c={palette.earth} />
+      <Box p={[0, 0.08, 0]} s={[2.7, 0.16, 2.5]} c={palette.stone} />
+      <Box p={[0, 0.9, 0]} s={[2.4, 1.5, 2.2]} c={palette.stone} />
       <Box p={[0, 0.2, 1.12]} s={[2.42, 0.22, 0.04]} c={palette.wood} shadow={false} />
       <Roof p={[0, 1.62, 0]} w={3.1} h={1.35} d={2.6} c={palette.orange} />
       <Box p={[0.75, 2.55, -0.3]} s={[0.36, 0.7, 0.36]} c={palette.earth} />
@@ -93,10 +97,12 @@ function House() {
       {/* Mailbox with a little flag */}
       <group position={[mail.x - pl.center.x, 0, mail.z - pl.center.z]}>
         <Cyl p={[0, 0.35, 0]} r={0.05} h={0.7} c={palette.woodDeep} />
-        <Box p={[0, 0.78, 0]} s={[0.3, 0.26, 0.42]} c={palette.violet} />
+        <Box p={[0, 0.78, 0]} s={[0.3, 0.26, 0.42]} c={palette.coral} />
         <Box p={[0.17, 0.9, -0.05]} s={[0.03, 0.22, 0.03]} c={palette.woodDeep} shadow={false} />
         <Box p={[0.17, 0.98, 0.03]} s={[0.03, 0.1, 0.14]} c={palette.coral} shadow={false} />
       </group>
+      <Fence from={[a.x - pl.center.x - 0.2, b.z - pl.center.z + 1.15]} to={[b.x - pl.center.x + 1.4, b.z - pl.center.z + 1.15]} y={y} />
+      <Fence from={[a.x - pl.center.x - 0.2, a.z - pl.center.z - 0.2]} to={[a.x - pl.center.x - 0.2, b.z - pl.center.z + 1.15]} y={y} />
     </group>
   );
 }
@@ -120,17 +126,16 @@ function Flag({ p, color }: { p: V3; color: string }) {
 
 function TownHall() {
   const pl = getPlacement("townhall");
-  const board = tileCenter(28, 13);
+  const board = tileCenter(boardTile.i, boardTile.j);
   return (
     <group position={[pl.center.x, pl.level * LEVEL, pl.center.z]}>
-      <Box p={[0, 0.1, 0.1]} s={[4.7, 0.2, 3.6]} c={palette.earth} />
-      <Box p={[0, 1.2, 0]} s={[4.2, 2.0, 3.0]} c={palette.cream} />
-      <Box p={[0, 0.28, 1.51]} s={[4.22, 0.3, 0.04]} c={palette.dirt} shadow={false} />
-      <Roof p={[0, 2.18, 0]} w={3.9} h={1.3} d={4.9} c={palette.coral} rotY={Math.PI / 2} />
-      <Box p={[0, 2.26, 0]} s={[4.8, 0.16, 3.7]} c={"#B02F34"} />
+      <Box p={[0, 0.1, 0.1]} s={[4.2, 0.2, 3.2]} c={palette.stone} />
+      <Box p={[0, 1.1, 0]} s={[3.6, 1.85, 2.6]} c={palette.stone} />
+      <Roof p={[0, 2.0, 0]} w={3.4} h={1.25} d={4.2} c={"#9B6AD4"} rotY={Math.PI / 2} />
+      <Box p={[0, 2.08, 0]} s={[4.2, 0.14, 3.2]} c={"#7A4CB8"} />
       {/* Portico */}
-      <Box p={[0, 2.35, 1.95]} s={[2.0, 0.22, 0.9]} c={palette.cream} />
-      <Roof p={[0, 2.44, 1.95]} w={2.2} h={0.6} d={1.0} c={palette.coral} />
+      <Box p={[0, 2.2, 1.7]} s={[1.8, 0.18, 0.8]} c={palette.stone} />
+      <Roof p={[0, 2.28, 1.7]} w={2.0} h={0.55} d={0.9} c={"#9B6AD4"} />
       {[-0.8, 0.8].map((x) => (
         <Cyl key={x} p={[x, 1.22, 2.25]} r={0.12} h={2.1} c={palette.cream} seg={10} />
       ))}
@@ -521,14 +526,15 @@ function Fence({ from, to, y }: { from: [number, number]; to: [number, number]; 
 
 function Garden() {
   const pl = getPlacement("garden");
-  const a = tileCenter(11, 13);
-  const b = tileCenter(18, 17);
+  const [i0, j0, i1, j1] = pl.rect;
+  const a = tileCenter(i0, j0);
+  const b = tileCenter(i1, j1);
   const y = pl.level * LEVEL;
-  const x0 = a.x - 0.45;
-  const x1 = b.x + 0.45;
-  const z0 = a.z - 0.45;
-  const z1 = b.z + 0.45;
-  const gate = tileCenter(12, 17);
+  const x0 = a.x - 0.4;
+  const x1 = b.x + 0.4;
+  const z0 = a.z - 0.4;
+  const z1 = b.z + 0.4;
+  const gate = tileCenter(25, 19);
   const hasCan = useGame((s) => s.hasCan);
   return (
     <group>
@@ -571,12 +577,13 @@ function Dock() {
   useFrame((s) => {
     if (!bottle.current || reducedMotion.value) return;
     const t = s.clock.elapsedTime;
-    bottle.current.position.y = LEVEL + 0.05 + Math.sin(t * 2) * 0.03;
+    bottle.current.position.y = pl.level * LEVEL + 0.05 + Math.sin(t * 2) * 0.03;
     bottle.current.rotation.z = Math.PI / 2 + Math.sin(t * 1.6) * 0.08;
   });
+  const y = pl.level * LEVEL;
   return (
     <group>
-      <group ref={bottle} position={[pl.interact.x + 0.2, LEVEL + 0.05, pl.interact.z - 0.4]} rotation={[0, 0.5, Math.PI / 2]}>
+      <group ref={bottle} position={[pl.interact.x + 0.2, y + 0.05, pl.interact.z - 0.35]} rotation={[0, 0.5, Math.PI / 2]}>
         <mesh material={toon("#B8E6F2", { transparent: true, opacity: 0.7 })} castShadow>
           <capsuleGeometry args={[0.1, 0.22, 4, 10]} />
         </mesh>
@@ -586,7 +593,7 @@ function Dock() {
           <cylinderGeometry args={[0.05, 0.05, 0.18, 8]} />
         </mesh>
       </group>
-      <group position={[pl.interact.x - 0.75, LEVEL, pl.interact.z - 0.2]}>
+      <group position={[pl.interact.x - 0.55, y, pl.interact.z - 0.15]}>
         <Cyl p={[0, 0.35, 0]} r={0.04} h={0.7} c={palette.woodDeep} />
         <Box p={[0, 0.78, 0]} s={[0.18, 0.22, 0.18]} c={palette.sun} glow />
         <Box p={[0, 0.92, 0]} s={[0.24, 0.06, 0.24]} c={palette.woodDeep} />

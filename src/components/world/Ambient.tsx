@@ -148,13 +148,11 @@ function Bees() {
 
 function FishShadows() {
   const fish = useMemo(() => {
-    const sea = [
-      { cx: 2, cz: 20.5, r: 2.5 },
-      { cx: -10, cz: 17, r: 2 },
-      { cx: 15, cz: 15.5, r: 2.2 },
-    ];
     const p = tileCenter(Math.floor(pond.x), Math.floor(pond.z));
-    return [{ cx: p.x, cz: p.z, r: 1.3 }, { cx: p.x + 0.4, cz: p.z - 0.2, r: 0.8 }, ...sea].map((f, k) => ({ ...f, seed: k * 1.9, speed: 0.35 + k * 0.05 }));
+    return [
+      { cx: p.x, cz: p.z, r: 1.1 },
+      { cx: p.x + 0.35, cz: p.z - 0.15, r: 0.7 },
+    ].map((f, k) => ({ ...f, seed: k * 1.9, speed: 0.35 + k * 0.05 }));
   }, []);
   const refs = useRef<(THREE.Mesh | null)[]>([]);
   useFrame((st) => {
@@ -201,7 +199,7 @@ function CloudShadows() {
       if (!m) return;
       const span = W + 20;
       const x = ((t * c.speed + c.off) % span) - span / 2;
-      m.position.set(x, 3.35 * LEVEL, c.z + Math.sin(t * 0.05 + k) * 2);
+      m.position.set(x, 2.2 * LEVEL, c.z + Math.sin(t * 0.05 + k) * 2);
     });
   });
   return (

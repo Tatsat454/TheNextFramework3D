@@ -18,7 +18,7 @@ export default function OpengraphImage() {
           width: "100%",
           height: "100%",
           display: "flex",
-          background: "linear-gradient(180deg, #3DAAE8 0%, #8ED6F5 50%, #EAF6CE 100%)",
+          background: "linear-gradient(180deg, #E4B4D8 0%, #F6C8BE 50%, #FFE6D0 100%)",
           padding: 72,
           position: "relative",
           fontFamily: "sans-serif",

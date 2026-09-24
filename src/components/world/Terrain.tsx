@@ -4,12 +4,12 @@ import { useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import type { ThreeEvent } from "@react-three/fiber";
-import { dock, LEVEL, rampRuns, tileAt, tileCenter, tiles, WATER_Y } from "@/game/island";
+import { dock, LEVEL, pond, rampRuns, tileCenter, tiles, WATER_Y } from "@/game/island";
 import { input } from "@/game/input";
 import { palette, toon } from "@/game/materials";
 import { isPaused, useGame } from "@/game/store";
 
-const BASE = -0.6;
+const BASE = -0.85;
 
 const tmp = new THREE.Object3D();
 const color = new THREE.Color();
@@ -35,79 +35,33 @@ function useInstances(
   }, [ref, items]);
 }
 
-/** Dirt wedge: south (+z) is the lip, north (−z) meets the upper terrace. */
-function makeWedge(width: number, length: number, rise: number, lip = 0.16) {
-  const hw = width / 2;
-  const hl = length / 2;
-  const v = [
-    -hw, 0, hl, hw, 0, hl, -hw, lip, hl, hw, lip, hl, -hw, 0, -hl, hw, 0, -hl, -hw, rise, -hl, hw, rise, -hl,
-  ];
-  const idx = [
-    0, 1, 3, 0, 3, 2, 5, 4, 6, 5, 6, 7, 4, 5, 1, 4, 1, 0, 2, 3, 7, 2, 7, 6, 4, 0, 2, 4, 2, 6, 1, 5, 7, 1, 7, 3,
-  ];
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute("position", new THREE.Float32BufferAttribute(v, 3));
-  geo.setIndex(idx);
-  geo.computeVertexNormals();
-  return geo;
-}
-
 export function Terrain() {
   const data = useMemo(() => {
     const grass: number[] = [];
     const grassIdx: number[] = [];
-    const sand: number[] = [];
-    const sandIdx: number[] = [];
     const path: number[] = [];
     const pathIdx: number[] = [];
     const dirt: { x: number; y: number; z: number; sx: number; sy: number; sz: number; c: string }[] = [];
-    const shallow: { x: number; y: number; z: number }[] = [];
-    const strata: { x: number; y: number; z: number; c: string; sx?: number; sy?: number; sz?: number }[] = [];
-    const pushQuad = (arr: number[], idx: number[], x: number, y: number, z: number) => {
-      const s = 0.52;
+    const pondTiles: { x: number; y: number; z: number }[] = [];
+    const pushQuad = (arr: number[], idx: number[], x: number, y: number, z: number, s = 0.54) => {
       const b = arr.length / 3;
       arr.push(x - s, y, z - s, x + s, y, z - s, x + s, y, z + s, x - s, y, z + s);
       idx.push(b, b + 3, b + 2, b, b + 2, b + 1);
     };
     for (const t of tiles) {
+      if (t.kind === "void") continue;
       const { x, z } = tileCenter(t.i, t.j);
       if (t.kind === "water") {
-        const nearLand = [
-          [1, 0],
-          [-1, 0],
-          [0, 1],
-          [0, -1],
-          [1, 1],
-          [-1, -1],
-          [1, -1],
-          [-1, 1],
-        ].some(([a, b]) => {
-          const n = tileAt(t.i + a, t.j + b);
-          return n && n.kind !== "water" && n.kind !== "dock";
-        });
-        if (nearLand) shallow.push({ x, y: WATER_Y + 0.012, z });
+        pondTiles.push({ x, y: WATER_Y, z });
         continue;
       }
       if (t.kind === "dock") continue;
       const top = t.h * LEVEL;
-      const sy = top - 0.04 - BASE;
-      dirt.push({ x, y: BASE + sy / 2, z, sx: 1.12, sy, sz: 1.12, c: palette.dirt });
+      const sy = top - 0.02 - BASE;
+      dirt.push({ x, y: BASE + sy / 2, z, sx: 1.14, sy, sz: 1.14, c: palette.dirt });
       if (t.kind === "ramp") continue;
-      if (t.kind === "sand") pushQuad(sand, sandIdx, x, top + 0.03, z);
-      else if (t.kind === "path") pushQuad(path, pathIdx, x, top + 0.032, z);
+      if (t.kind === "path" || t.kind === "sand") pushQuad(path, pathIdx, x, top + 0.03, z);
       else pushQuad(grass, grassIdx, x, top + 0.03, z);
-      if (t.h >= 2) {
-        const exposed = [
-          [1, 0],
-          [-1, 0],
-          [0, 1],
-          [0, -1],
-        ].some(([a, b]) => {
-          const n = tileAt(t.i + a, t.j + b);
-          return !n || n.kind === "water" || (n.h < t.h && n.kind !== "ramp");
-        });
-        if (exposed) for (let k = 1; k < t.h; k++) strata.push({ x, y: k * LEVEL + LEVEL * 0.42, z, c: "#D2B07A", sx: 1.12, sy: 0.1, sz: 1.12 });
-      }
     }
 
     const geoOf = (pos: number[], idx: number[]) => {
@@ -119,51 +73,50 @@ export function Terrain() {
       return g;
     };
 
-    const planks: { x: number; y: number; z: number; c: string }[] = [];
-    const posts: { x: number; y: number; z: number }[] = [];
-    for (let j = dock.j0 - 1; j <= dock.j1; j++) {
-      const a = tileCenter(dock.i0, j);
-      const b = tileCenter(dock.i1, j);
+    const steps: { x: number; y: number; z: number; sx: number; sy: number; sz: number; c: string }[] = [];
+    for (const run of rampRuns) {
+      const a = tileCenter(run.i0, run.j0);
+      const b = tileCenter(run.i1, run.j1);
       const cx = (a.x + b.x) / 2;
-      for (let k = 0; k < 3; k++) planks.push({ x: cx, y: LEVEL - 0.015, z: a.z - 0.33 + k * 0.33, c: k % 2 ? palette.wood : "#C4976B" });
-      if (j >= dock.j0 && (j - dock.j0) % 2 === 0) {
-        posts.push({ x: a.x - 0.42, y: LEVEL - 0.55, z: a.z });
-        posts.push({ x: b.x + 0.42, y: LEVEL - 0.55, z: a.z });
+      const width = run.i1 - run.i0 + 1 - 0.18;
+      const south = tileCenter(run.i0, run.j1).z + 0.5;
+      const north = tileCenter(run.i0, run.j0).z - 0.5;
+      const length = south - north;
+      const n = 5;
+      const base = run.h * LEVEL;
+      for (let k = 0; k < n; k++) {
+        const t = (k + 0.55) / n;
+        steps.push({
+          x: cx,
+          y: base + t * LEVEL - 0.05,
+          z: south - t * length,
+          sx: width,
+          sy: 0.11,
+          sz: length / n + 0.06,
+          c: k % 2 ? "#E8D5A8" : "#D7C08A",
+        });
       }
     }
+
+    const planks: { x: number; y: number; z: number; c: string }[] = [];
+    const posts: { x: number; y: number; z: number }[] = [];
+    const a = tileCenter(dock.i0, dock.j0);
+    const b = tileCenter(dock.i1, dock.j1);
+    const cx = (a.x + b.x) / 2;
+    const cz = (a.z + b.z) / 2;
+    for (let k = 0; k < 3; k++) planks.push({ x: cx, y: 2 * LEVEL + 0.04, z: cz - 0.35 + k * 0.35, c: k % 2 ? palette.wood : "#C4976B" });
+    posts.push({ x: a.x - 0.35, y: 2 * LEVEL - 0.35, z: a.z });
+    posts.push({ x: b.x + 0.35, y: 2 * LEVEL - 0.35, z: b.z });
+
     return {
       grassGeo: geoOf(grass, grassIdx),
-      sandGeo: geoOf(sand, sandIdx),
       pathGeo: geoOf(path, pathIdx),
       dirt,
-      shallow,
-      strata,
+      pondTiles,
+      steps,
       planks,
       posts,
     };
-  }, []);
-
-  const ramps = useMemo(() => {
-    return rampRuns.map((run) => {
-      const a = tileCenter(run.i0, run.j0);
-      const b = tileCenter(run.i1, run.j1);
-      const width = run.i1 - run.i0 + 1 + 0.12;
-      const length = run.j1 - run.j0 + 1 + 0.1;
-      const rise = LEVEL;
-      const lip = 0.15;
-      return {
-        x: (a.x + b.x) / 2,
-        y: run.h * LEVEL,
-        z: (a.z + b.z) / 2,
-        width,
-        length,
-        rise,
-        lip,
-        wedge: makeWedge(width, length, rise, lip),
-        angle: -Math.atan2(rise - lip, length),
-        surfaceLen: Math.hypot(length, rise - lip),
-      };
-    });
   }, []);
 
   const box = useMemo(() => new THREE.BoxGeometry(1, 1, 1), []);
@@ -172,25 +125,23 @@ export function Terrain() {
     const pos = g.attributes.position;
     const cols = new Float32Array(pos.count * 3);
     for (let k = 0; k < pos.count; k++) {
-      const v = pos.getY(k) > 0 ? 1 : 0.78;
-      cols.set([v, v, v * 0.97], k * 3);
+      const v = pos.getY(k) > 0 ? 1 : 0.72;
+      cols.set([v, v * 0.98, v * 0.9], k * 3);
     }
     g.setAttribute("color", new THREE.BufferAttribute(cols, 3));
     return g;
   }, []);
-  const plankGeo = useMemo(() => new RoundedBoxGeometry(2.1, 0.12, 0.3, 1, 0.03), []);
-  const shallowGeo = useMemo(() => new THREE.PlaneGeometry(1.12, 1.12).rotateX(-Math.PI / 2), []);
-  const postGeo = useMemo(() => new THREE.CylinderGeometry(0.09, 0.09, 1.1, 8), []);
-  const waterGeo = useMemo(() => new THREE.PlaneGeometry(240, 240, 120, 120).rotateX(-Math.PI / 2), []);
+  const plankGeo = useMemo(() => new RoundedBoxGeometry(2.05, 0.1, 0.32, 1, 0.03), []);
+  const pondGeo = useMemo(() => new THREE.CircleGeometry(pond.rx + 0.15, 24).rotateX(-Math.PI / 2), []);
+  const postGeo = useMemo(() => new THREE.CylinderGeometry(0.07, 0.07, 0.85, 8), []);
+
   const dirtRef = useRef<THREE.InstancedMesh>(null);
-  const shallowRef = useRef<THREE.InstancedMesh>(null);
+  const stepRef = useRef<THREE.InstancedMesh>(null);
   const plankRef = useRef<THREE.InstancedMesh>(null);
   const postRef = useRef<THREE.InstancedMesh>(null);
-  const strataRef = useRef<THREE.InstancedMesh>(null);
 
   useInstances(dirtRef, data.dirt);
-  useInstances(strataRef, data.strata);
-  useInstances(shallowRef, data.shallow);
+  useInstances(stepRef, data.steps);
   useInstances(plankRef, data.planks);
   useInstances(postRef, data.posts);
 
@@ -200,46 +151,23 @@ export function Terrain() {
     input.tapTarget = { x: e.point.x, z: e.point.z };
   };
 
-  const white = toon("#FFFFFF", { noOcclude: true });
-  const dirtMat = toon(palette.dirt, { noOcclude: true });
-  const earthMat = toon(palette.earth, { noOcclude: true });
-  const woodMat = toon(palette.wood, { noOcclude: true });
+  const pondC = tileCenter(Math.floor(pond.x), Math.floor(pond.z));
 
   return (
     <group>
       <mesh geometry={data.grassGeo} material={toon(palette.grass, { noOcclude: true, side: THREE.DoubleSide })} receiveShadow onClick={onTap} />
-      <mesh geometry={data.sandGeo} material={toon(palette.sand, { noOcclude: true, side: THREE.DoubleSide })} receiveShadow onClick={onTap} />
       <mesh geometry={data.pathGeo} material={toon(palette.earth, { noOcclude: true, side: THREE.DoubleSide })} receiveShadow onClick={onTap} />
       <instancedMesh ref={dirtRef} args={[dirtGeo, toon("#FFFFFF", { vertexColors: true, noOcclude: true }), data.dirt.length]} receiveShadow />
-      <instancedMesh ref={strataRef} args={[box, white, data.strata.length]} />
-      {ramps.map((r, k) => (
-        <group key={k} position={[r.x, r.y, r.z]} onClick={onTap}>
-          <mesh geometry={r.wedge} material={dirtMat} receiveShadow castShadow />
-          <mesh
-            position={[0, (r.lip + r.rise) / 2 + 0.02, 0]}
-            rotation={[r.angle, 0, 0]}
-            material={earthMat}
-            receiveShadow
-          >
-            <boxGeometry args={[r.width - 0.08, 0.08, r.surfaceLen]} />
-          </mesh>
-          {[-1, 1].map((side) => (
-            <mesh
-              key={side}
-              position={[side * (r.width / 2 - 0.07), (r.lip + r.rise) / 2 + 0.12, 0]}
-              rotation={[r.angle, 0, 0]}
-              material={woodMat}
-              castShadow
-            >
-              <boxGeometry args={[0.1, 0.2, r.surfaceLen + 0.04]} />
-            </mesh>
-          ))}
-        </group>
-      ))}
-      <instancedMesh ref={plankRef} args={[plankGeo, white, data.planks.length]} receiveShadow castShadow onClick={onTap} />
+      <instancedMesh ref={stepRef} args={[box, toon("#FFFFFF", { noOcclude: true }), data.steps.length]} receiveShadow castShadow onClick={onTap} />
+      <instancedMesh ref={plankRef} args={[plankGeo, toon("#FFFFFF", { noOcclude: true }), data.planks.length]} receiveShadow castShadow onClick={onTap} />
       <instancedMesh ref={postRef} args={[postGeo, toon(palette.woodDeep), data.posts.length]} />
-      <instancedMesh ref={shallowRef} args={[shallowGeo, toon(palette.shallow, { transparent: true, opacity: 0.8, water: true, emissive: "#6FB9CF" }), data.shallow.length]} />
-      <mesh geometry={waterGeo} position={[0, WATER_Y, 0]} material={toon(palette.water, { water: true, emissive: "#2F8FB0" })} receiveShadow />
+      <mesh
+        geometry={pondGeo}
+        position={[pondC.x + 0.2, WATER_Y, pondC.z + 0.1]}
+        scale={[1, 1, pond.rz / pond.rx]}
+        material={toon(palette.water, { water: true, emissive: "#6FB9CF", transparent: true, opacity: 0.92 })}
+        receiveShadow
+      />
     </group>
   );
 }

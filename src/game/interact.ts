@@ -164,7 +164,7 @@ function fillTemplate(line: string, px: number, pz: number): string {
     const ew = dx > 2 ? "east" : dx < -2 ? "west" : "";
     const dir = ns && ew ? `${ns}-${ew}` : ns || ew || "right around here";
     const lm = getLandmark(target.id);
-    const up = target.level > 1 ? " Take the slope up." : "";
+    const up = target.level > 1 ? " Take the stairs up." : "";
     return `Have you seen the ${lm.name}? It's ${dir === "right around here" ? dir : `to the ${dir}`}. That's where you'll find his ${lm.section.toLowerCase()}.${up}`;
   }
   if (line === "{museum}") {

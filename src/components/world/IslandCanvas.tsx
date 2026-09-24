@@ -81,7 +81,7 @@ export default function IslandCanvas({ onReady, onNoWebGL }: { onReady: () => vo
       shadows={{ type: THREE.PCFSoftShadowMap, enabled: true }}
       dpr={[1, dpr]}
       gl={{ alpha: false, antialias: true, powerPreference: "high-performance" }}
-      camera={{ fov: 30, near: 0.5, far: 140, position: [0, 18, 16] }}
+      camera={{ fov: 32, near: 0.5, far: 140, position: [0, 16, 18] }}
       onCreated={({ gl }) => {
         gl.setClearColor(preset.fog, 1);
         if (process.env.NODE_ENV !== "production") (window as unknown as { __gl: THREE.WebGLRenderer }).__gl = gl;
