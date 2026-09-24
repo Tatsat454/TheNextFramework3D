@@ -9,9 +9,7 @@ import { input } from "@/game/input";
 import { palette, toon } from "@/game/materials";
 import { isPaused, useGame } from "@/game/store";
 
-const CAP = 0.1;
 const BASE = -0.6;
-const TILE = 1.08;
 
 const tmp = new THREE.Object3D();
 const color = new THREE.Color();
@@ -56,11 +54,21 @@ function makeWedge(width: number, length: number, rise: number, lip = 0.16) {
 
 export function Terrain() {
   const data = useMemo(() => {
-    const grass: { x: number; y: number; z: number; sx: number; sz: number; c: string }[] = [];
-    const sand: { x: number; y: number; z: number; sx: number; sz: number; c: string }[] = [];
+    const grass: number[] = [];
+    const grassIdx: number[] = [];
+    const sand: number[] = [];
+    const sandIdx: number[] = [];
+    const path: number[] = [];
+    const pathIdx: number[] = [];
     const dirt: { x: number; y: number; z: number; sx: number; sy: number; sz: number; c: string }[] = [];
     const shallow: { x: number; y: number; z: number }[] = [];
     const strata: { x: number; y: number; z: number; c: string; sx?: number; sy?: number; sz?: number }[] = [];
+    const pushQuad = (arr: number[], idx: number[], x: number, y: number, z: number) => {
+      const s = 0.52;
+      const b = arr.length / 3;
+      arr.push(x - s, y, z - s, x + s, y, z - s, x + s, y, z + s, x - s, y, z + s);
+      idx.push(b, b + 3, b + 2, b, b + 2, b + 1);
+    };
     for (const t of tiles) {
       const { x, z } = tileCenter(t.i, t.j);
       if (t.kind === "water") {
@@ -82,13 +90,12 @@ export function Terrain() {
       }
       if (t.kind === "dock") continue;
       const top = t.h * LEVEL;
-      const sy = top - CAP * 0.4 - BASE;
-      dirt.push({ x, y: BASE + sy / 2, z, sx: TILE, sy, sz: TILE, c: palette.dirt });
+      const sy = top - 0.04 - BASE;
+      dirt.push({ x, y: BASE + sy / 2, z, sx: 1.12, sy, sz: 1.12, c: palette.dirt });
       if (t.kind === "ramp") continue;
-      const capY = top - CAP / 2;
-      if (t.kind === "sand") sand.push({ x, y: capY, z, sx: TILE, sz: TILE, c: palette.sand });
-      else if (t.kind === "path") sand.push({ x, y: capY, z, sx: TILE, sz: TILE, c: t.h === 1 ? palette.sand : palette.earth });
-      else grass.push({ x, y: capY, z, sx: TILE, sz: TILE, c: t.shade ? palette.grassShade : palette.grass });
+      if (t.kind === "sand") pushQuad(sand, sandIdx, x, top + 0.03, z);
+      else if (t.kind === "path") pushQuad(path, pathIdx, x, top + 0.032, z);
+      else pushQuad(grass, grassIdx, x, top + 0.03, z);
       if (t.h >= 2) {
         const exposed = [
           [1, 0],
@@ -99,9 +106,18 @@ export function Terrain() {
           const n = tileAt(t.i + a, t.j + b);
           return !n || n.kind === "water" || (n.h < t.h && n.kind !== "ramp");
         });
-        if (exposed) for (let k = 1; k < t.h; k++) strata.push({ x, y: k * LEVEL + LEVEL * 0.42, z, c: "#D2B07A", sx: TILE, sy: 0.1, sz: TILE });
+        if (exposed) for (let k = 1; k < t.h; k++) strata.push({ x, y: k * LEVEL + LEVEL * 0.42, z, c: "#D2B07A", sx: 1.12, sy: 0.1, sz: 1.12 });
       }
     }
+
+    const geoOf = (pos: number[], idx: number[]) => {
+      const g = new THREE.BufferGeometry();
+      g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
+      g.setIndex(idx);
+      g.computeVertexNormals();
+      g.computeBoundingSphere();
+      return g;
+    };
 
     const planks: { x: number; y: number; z: number; c: string }[] = [];
     const posts: { x: number; y: number; z: number }[] = [];
@@ -115,7 +131,16 @@ export function Terrain() {
         posts.push({ x: b.x + 0.42, y: LEVEL - 0.55, z: a.z });
       }
     }
-    return { grass, sand, dirt, shallow, strata, planks, posts };
+    return {
+      grassGeo: geoOf(grass, grassIdx),
+      sandGeo: geoOf(sand, sandIdx),
+      pathGeo: geoOf(path, pathIdx),
+      dirt,
+      shallow,
+      strata,
+      planks,
+      posts,
+    };
   }, []);
 
   const ramps = useMemo(() => {
@@ -141,7 +166,6 @@ export function Terrain() {
     });
   }, []);
 
-  const capGeo = useMemo(() => new THREE.BoxGeometry(1, CAP, 1), []);
   const box = useMemo(() => new THREE.BoxGeometry(1, 1, 1), []);
   const dirtGeo = useMemo(() => {
     const g = new THREE.BoxGeometry(1, 1, 1);
@@ -155,19 +179,15 @@ export function Terrain() {
     return g;
   }, []);
   const plankGeo = useMemo(() => new RoundedBoxGeometry(2.1, 0.12, 0.3, 1, 0.03), []);
-  const shallowGeo = useMemo(() => new THREE.PlaneGeometry(1.08, 1.08).rotateX(-Math.PI / 2), []);
+  const shallowGeo = useMemo(() => new THREE.PlaneGeometry(1.12, 1.12).rotateX(-Math.PI / 2), []);
   const postGeo = useMemo(() => new THREE.CylinderGeometry(0.09, 0.09, 1.1, 8), []);
   const waterGeo = useMemo(() => new THREE.PlaneGeometry(240, 240, 120, 120).rotateX(-Math.PI / 2), []);
-  const grassRef = useRef<THREE.InstancedMesh>(null);
-  const sandRef = useRef<THREE.InstancedMesh>(null);
   const dirtRef = useRef<THREE.InstancedMesh>(null);
   const shallowRef = useRef<THREE.InstancedMesh>(null);
   const plankRef = useRef<THREE.InstancedMesh>(null);
   const postRef = useRef<THREE.InstancedMesh>(null);
   const strataRef = useRef<THREE.InstancedMesh>(null);
 
-  useInstances(grassRef, data.grass);
-  useInstances(sandRef, data.sand);
   useInstances(dirtRef, data.dirt);
   useInstances(strataRef, data.strata);
   useInstances(shallowRef, data.shallow);
@@ -187,8 +207,9 @@ export function Terrain() {
 
   return (
     <group>
-      <instancedMesh ref={grassRef} args={[capGeo, white, data.grass.length]} receiveShadow onClick={onTap} />
-      <instancedMesh ref={sandRef} args={[capGeo, white, data.sand.length]} receiveShadow onClick={onTap} />
+      <mesh geometry={data.grassGeo} material={toon(palette.grass, { noOcclude: true, side: THREE.DoubleSide })} receiveShadow onClick={onTap} />
+      <mesh geometry={data.sandGeo} material={toon(palette.sand, { noOcclude: true, side: THREE.DoubleSide })} receiveShadow onClick={onTap} />
+      <mesh geometry={data.pathGeo} material={toon(palette.earth, { noOcclude: true, side: THREE.DoubleSide })} receiveShadow onClick={onTap} />
       <instancedMesh ref={dirtRef} args={[dirtGeo, toon("#FFFFFF", { vertexColors: true, noOcclude: true }), data.dirt.length]} receiveShadow />
       <instancedMesh ref={strataRef} args={[box, white, data.strata.length]} />
       {ramps.map((r, k) => (

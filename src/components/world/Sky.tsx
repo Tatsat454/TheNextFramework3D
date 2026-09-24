@@ -6,52 +6,43 @@ import * as THREE from "three";
 import { mulberry32 } from "@/game/rng";
 import type { TimePreset } from "@/game/time-of-day";
 
+function makeSkyTexture(top: string, mid: string, horizon: string) {
+  const c = document.createElement("canvas");
+  c.width = 8;
+  c.height = 512;
+  const g = c.getContext("2d")!;
+  const grd = g.createLinearGradient(0, 0, 0, 512);
+  grd.addColorStop(0, top);
+  grd.addColorStop(0.38, mid);
+  grd.addColorStop(0.62, horizon);
+  grd.addColorStop(1, horizon);
+  g.fillStyle = grd;
+  g.fillRect(0, 0, 8, 512);
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.needsUpdate = true;
+  return tex;
+}
+
 function SkyDome({ preset }: { preset: TimePreset }) {
+  const tex = useMemo(
+    () => makeSkyTexture(preset.sky[0], preset.sky[1], preset.sky[2]),
+    [preset.sky],
+  );
   const mat = useMemo(
     () =>
-      new THREE.ShaderMaterial({
+      new THREE.MeshBasicMaterial({
+        map: tex,
         side: THREE.BackSide,
-        depthWrite: false,
         fog: false,
-        uniforms: {
-          uTop: { value: new THREE.Color(preset.sky[0]) },
-          uMid: { value: new THREE.Color(preset.sky[1]) },
-          uHorizon: { value: new THREE.Color(preset.sky[2]) },
-        },
-        vertexShader: /* glsl */ `
-          varying vec3 vDir;
-          void main() {
-            vDir = normalize(position);
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-          }
-        `,
-        fragmentShader: /* glsl */ `
-          #include <common>
-          uniform vec3 uTop;
-          uniform vec3 uMid;
-          uniform vec3 uHorizon;
-          varying vec3 vDir;
-          void main() {
-            float h = clamp(vDir.y * 0.5 + 0.5, 0.0, 1.0);
-            float up = clamp(vDir.y, 0.0, 1.0);
-            vec3 col = mix(uHorizon, uMid, smoothstep(0.42, 0.58, h));
-            col = mix(col, uTop, smoothstep(0.55, 0.92, h));
-            col += vec3(0.07, 0.05, 0.0) * (1.0 - smoothstep(0.0, 0.18, up));
-            gl_FragColor = vec4(col, 1.0);
-            #include <colorspace_fragment>
-          }
-        `,
+        depthWrite: false,
+        toneMapped: false,
       }),
-    // uniforms are mutated below when the preset changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+    [tex],
   );
-  mat.uniforms.uTop.value.set(preset.sky[0]);
-  mat.uniforms.uMid.value.set(preset.sky[1]);
-  mat.uniforms.uHorizon.value.set(preset.sky[2]);
   return (
     <mesh material={mat} renderOrder={-20} frustumCulled={false}>
-      <sphereGeometry args={[92, 48, 28]} />
+      <sphereGeometry args={[90, 40, 24]} />
     </mesh>
   );
 }
@@ -61,13 +52,13 @@ function SunGlow({ preset }: { preset: TimePreset }) {
   useFrame(() => {
     const m = ref.current;
     if (!m) return;
-    m.position.set(preset.sunDir[0] * 3.4, preset.sunDir[1] * 1.8, preset.sunDir[2] * 3.4);
+    m.position.set(preset.sunDir[0] * 3.2, preset.sunDir[1] * 1.7, preset.sunDir[2] * 3.2);
     m.lookAt(0, 8, 0);
   });
   return (
     <mesh ref={ref} renderOrder={-18} frustumCulled={false}>
-      <circleGeometry args={[6.5, 28]} />
-      <meshBasicMaterial color={preset.sun} transparent opacity={0.85} depthWrite={false} fog={false} />
+      <circleGeometry args={[7.2, 28]} />
+      <meshBasicMaterial color={preset.sun} transparent opacity={0.9} depthWrite={false} fog={false} toneMapped={false} />
     </mesh>
   );
 }
@@ -76,19 +67,22 @@ function SkyClouds() {
   const group = useRef<THREE.Group>(null);
   const clouds = useMemo(() => {
     const r = mulberry32(42);
-    return Array.from({ length: 16 }, () => ({
-      x: (r() - 0.5) * 86,
-      y: 18 + r() * 16,
-      z: -4 - r() * 52,
-      s: 1.6 + r() * 2.6,
-      speed: 0.1 + r() * 0.16,
-      puffs: Array.from({ length: 5 + Math.floor(r() * 3) }, () => ({
-        ox: (r() - 0.5) * 3.4,
-        oy: (r() - 0.5) * 0.7,
-        oz: (r() - 0.5) * 1.7,
-        rs: 0.75 + r() * 0.95,
-      })),
-    }));
+    return Array.from({ length: 10 }, (_, i) => {
+      const band = i < 6;
+      return {
+        x: (r() - 0.5) * (band ? 64 : 80),
+        y: band ? 13 + r() * 7 : 18 + r() * 12,
+        z: band ? -4 - r() * 18 : -20 - r() * 30,
+        s: (band ? 2.6 : 2.0) + r() * 2.4,
+        speed: 0.08 + r() * 0.12,
+        puffs: Array.from({ length: 4 }, () => ({
+          ox: (r() - 0.5) * 3.4,
+          oy: (r() - 0.5) * 0.6,
+          oz: (r() - 0.5) * 1.6,
+          rs: 0.85 + r() * 0.9,
+        })),
+      };
+    });
   }, []);
   useFrame((_, rawDt) => {
     const g = group.current;
@@ -101,7 +95,27 @@ function SkyClouds() {
     });
   });
   const puffMat = useMemo(
-    () => new THREE.MeshBasicMaterial({ color: "#F7FCFF", fog: false, depthWrite: false, transparent: true, opacity: 0.94 }),
+    () =>
+      new THREE.MeshBasicMaterial({
+        color: "#FFFFFF",
+        fog: false,
+        depthWrite: false,
+        transparent: true,
+        opacity: 0.92,
+        toneMapped: false,
+      }),
+    [],
+  );
+  const shadeMat = useMemo(
+    () =>
+      new THREE.MeshBasicMaterial({
+        color: "#D4E6F4",
+        fog: false,
+        depthWrite: false,
+        transparent: true,
+        opacity: 0.88,
+        toneMapped: false,
+      }),
     [],
   );
   const puffGeo = useMemo(() => new THREE.SphereGeometry(1, 10, 8), []);
@@ -110,7 +124,13 @@ function SkyClouds() {
       {clouds.map((c, i) => (
         <group key={i} position={[c.x, c.y, c.z]} scale={c.s}>
           {c.puffs.map((p, k) => (
-            <mesh key={k} position={[p.ox, p.oy, p.oz]} scale={[p.rs * 1.35, p.rs * 0.72, p.rs]} geometry={puffGeo} material={puffMat} />
+            <mesh
+              key={k}
+              position={[p.ox, p.oy - (k % 2 ? 0.15 : 0), p.oz]}
+              scale={[p.rs * 1.45, p.rs * 0.78, p.rs * 1.1]}
+              geometry={puffGeo}
+              material={k % 2 ? shadeMat : puffMat}
+            />
           ))}
         </group>
       ))}

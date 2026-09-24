@@ -4,7 +4,7 @@ import { PerformanceMonitor } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
-import { presetForHour } from "@/game/time-of-day";
+import { presetFromSearch } from "@/game/time-of-day";
 import { Ambient } from "./Ambient";
 import { Landmarks } from "./Landmarks";
 import { Nature } from "./Nature";
@@ -50,7 +50,8 @@ export default function IslandCanvas({ onReady, onNoWebGL }: { onReady: () => vo
   const [shadows, setShadows] = useState(!lowPower);
   const [dpr, setDpr] = useState(lowPower ? 1.25 : 1.75);
   const [h, setH] = useState(hour);
-  const preset = presetForHour(h);
+  const [search, setSearch] = useState(() => window.location.search);
+  const preset = presetFromSearch(search, h);
 
   useEffect(() => {
     if (!supported) onNoWebGL();
@@ -65,7 +66,12 @@ export default function IslandCanvas({ onReady, onNoWebGL }: { onReady: () => vo
 
   useEffect(() => {
     const id = setInterval(() => setH(hour()), 60_000);
-    return () => clearInterval(id);
+    const onPop = () => setSearch(window.location.search);
+    window.addEventListener("popstate", onPop);
+    return () => {
+      clearInterval(id);
+      window.removeEventListener("popstate", onPop);
+    };
   }, []);
 
   if (!supported) return null;
@@ -74,7 +80,7 @@ export default function IslandCanvas({ onReady, onNoWebGL }: { onReady: () => vo
       flat
       shadows={{ type: THREE.PCFSoftShadowMap, enabled: true }}
       dpr={[1, dpr]}
-      gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}
+      gl={{ alpha: false, antialias: true, powerPreference: "high-performance" }}
       camera={{ fov: 30, near: 0.5, far: 140, position: [0, 18, 16] }}
       onCreated={({ gl }) => {
         gl.setClearColor(preset.fog, 1);

@@ -10,29 +10,29 @@ export type TimePreset = {
   fog: string;
 };
 
-/** Animal Crossing / Pokopia daylight: cyan zenith, warm cream horizon, even fill. */
+/** Animal Crossing / Pokopia daylight: cyan sky, even fill, lime grass. */
 export const presets: Record<TimePreset["id"], TimePreset> = {
   morning: {
     id: "morning",
-    sky: ["#4FB6EA", "#A6E2F6", "#F3F6C8"],
+    sky: ["#1B88D0", "#5AB6EA", "#8AD4F0"],
     hemiSky: "#D6F2FF",
     hemiGround: "#7EDC7A",
     hemiIntensity: 1.18,
     sun: "#FFF6D8",
     sunIntensity: 1.55,
     sunDir: [-8, 28, 10],
-    fog: "#B8E6F4",
+    fog: "#9ED4EC",
   },
   afternoon: {
     id: "afternoon",
-    sky: ["#3DAAE8", "#8ED6F5", "#EAF6CE"],
+    sky: ["#1680CC", "#4AACE6", "#8AD4F0"],
     hemiSky: "#C8ECFF",
     hemiGround: "#7EDC7A",
     hemiIntensity: 1.22,
     sun: "#FFF8E4",
     sunIntensity: 1.65,
     sunDir: [-5, 32, 8],
-    fog: "#A8DFF2",
+    fog: "#9ED4EC",
   },
   golden: {
     id: "golden",
@@ -47,9 +47,14 @@ export const presets: Record<TimePreset["id"], TimePreset> = {
   },
 };
 
-/** Follows the visitor's local clock. Night arrives in Phase 5; until then late hours use golden hour. */
+/** Daylight stays on the Animal Crossing cyan look. Golden hour is opt-in (`?tod=golden`) until night ships. */
 export function presetForHour(hour: number): TimePreset {
   if (hour >= 5 && hour < 11) return presets.morning;
-  if (hour >= 11 && hour < 16) return presets.afternoon;
-  return presets.golden;
+  return presets.afternoon;
+}
+
+export function presetFromSearch(search: string, hour = new Date().getHours()): TimePreset {
+  const id = new URLSearchParams(search).get("tod");
+  if (id === "morning" || id === "afternoon" || id === "golden") return presets[id];
+  return presetForHour(hour);
 }
