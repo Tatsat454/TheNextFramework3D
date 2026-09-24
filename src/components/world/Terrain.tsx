@@ -4,7 +4,7 @@ import { useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import type { ThreeEvent } from "@react-three/fiber";
-import { dock, LEVEL, rampRuns, tileAt, tileCenter, tiles, WATER_Y } from "@/game/island";
+import { dock, H, LEVEL, rampRuns, tileAt, tileCenter, tiles, W, WATER_Y } from "@/game/island";
 import { input } from "@/game/input";
 import { palette, toon } from "@/game/materials";
 import { isPaused, useGame } from "@/game/store";
@@ -37,22 +37,33 @@ function useInstances(
 
 export function Terrain() {
   const data = useMemo(() => {
-    const grass: number[] = [];
-    const grassIdx: number[] = [];
-    const path: number[] = [];
-    const pathIdx: number[] = [];
-    const sand: number[] = [];
-    const sandIdx: number[] = [];
-    const water: number[] = [];
-    const waterIdx: number[] = [];
+    const dirt: { x: number; y: number; z: number; sx: number; sy: number; sz: number; c: string }[] = [];
     const fall: number[] = [];
     const fallIdx: number[] = [];
-    const dirt: { x: number; y: number; z: number; sx: number; sy: number; sz: number; c: string }[] = [];
-    const pushQuad = (arr: number[], idx: number[], x: number, y: number, z: number, s = 0.54) => {
-      const b = arr.length / 3;
-      arr.push(x - s, y, z - s, x + s, y, z - s, x + s, y, z + s, x - s, y, z + s);
-      idx.push(b, b + 3, b + 2, b, b + 2, b + 1);
+
+    type Bucket = { pos: number[]; idx: number[]; corner: Map<string, number> };
+    const grass: Bucket = { pos: [], idx: [], corner: new Map() };
+    const path: Bucket = { pos: [], idx: [], corner: new Map() };
+    const sand: Bucket = { pos: [], idx: [], corner: new Map() };
+    const water: Bucket = { pos: [], idx: [], corner: new Map() };
+
+    const weld = (b: Bucket, i0: number, j0: number, i1: number, j1: number, y: number) => {
+      const corner = (i: number, j: number) => {
+        const key = `${i},${j},${y.toFixed(3)}`;
+        const hit = b.corner.get(key);
+        if (hit !== undefined) return hit;
+        const n = b.pos.length / 3;
+        b.pos.push(i - W / 2, y, j - H / 2);
+        b.corner.set(key, n);
+        return n;
+      };
+      const a = corner(i0, j0);
+      const c = corner(i1, j0);
+      const d = corner(i1, j1);
+      const e = corner(i0, j1);
+      b.idx.push(a, e, d, a, d, c);
     };
+
     const pushFall = (x: number, z: number, w: number) => {
       const b = fall.length / 3;
       const y0 = WATER_Y + 0.04;
@@ -62,6 +73,7 @@ export function Terrain() {
       fall.push(x - w, y0, z0, x + w, y0, z0, x + w, y1, z1, x - w, y1, z1);
       fallIdx.push(b, b + 3, b + 2, b, b + 2, b + 1);
     };
+
     for (const t of tiles) {
       if (t.kind === "void") continue;
       const { x, z } = tileCenter(t.i, t.j);
@@ -69,7 +81,7 @@ export function Terrain() {
         const top = LEVEL - 0.32;
         const sy = top - BASE;
         dirt.push({ x, y: BASE + sy / 2, z, sx: 1.42, sy, sz: 1.42, c: palette.dirt });
-        pushQuad(water, waterIdx, x, WATER_Y, z, 0.62);
+        weld(water, t.i, t.j, t.i + 1, t.j + 1, WATER_Y);
         const south = tileAt(t.i, t.j + 1);
         if ((!south || south.kind === "void") && t.j >= 40) pushFall(x, z, 0.72);
         continue;
@@ -78,9 +90,9 @@ export function Terrain() {
       const sy = top - 0.02 - BASE;
       dirt.push({ x, y: BASE + sy / 2, z, sx: 1.42, sy, sz: 1.42, c: t.kind === "sand" ? palette.sand : palette.dirt });
       if (t.kind === "ramp" || t.kind === "dock") continue;
-      if (t.kind === "path") pushQuad(path, pathIdx, x, top + 0.03, z);
-      else if (t.kind === "sand") pushQuad(sand, sandIdx, x, top + 0.03, z);
-      else pushQuad(grass, grassIdx, x, top + 0.03, z);
+      if (t.kind === "path") weld(path, t.i, t.j, t.i + 1, t.j + 1, top + 0.04);
+      else if (t.kind === "sand") weld(sand, t.i, t.j, t.i + 1, t.j + 1, top + 0.02);
+      else weld(grass, t.i, t.j, t.i + 1, t.j + 1, top + 0.02);
     }
 
     const geoOf = (pos: number[], idx: number[]) => {
@@ -136,10 +148,10 @@ export function Terrain() {
     posts.push({ x: b.x + 0.35, y: LEVEL - 0.35, z: b.z });
 
     return {
-      grassGeo: geoOf(grass, grassIdx),
-      pathGeo: geoOf(path, pathIdx),
-      sandGeo: geoOf(sand, sandIdx),
-      waterGeo: geoOf(water, waterIdx),
+      grassGeo: geoOf(grass.pos, grass.idx),
+      pathGeo: geoOf(path.pos, path.idx),
+      sandGeo: geoOf(sand.pos, sand.idx),
+      waterGeo: geoOf(water.pos, water.idx),
       fallGeo: geoOf(fall, fallIdx),
       dirt,
       steps,
@@ -181,17 +193,16 @@ export function Terrain() {
 
   return (
     <group>
-      <mesh geometry={data.grassGeo} material={toon(palette.grass, { noOcclude: true, side: THREE.DoubleSide })} receiveShadow onClick={onTap} />
-      <mesh geometry={data.pathGeo} material={toon(palette.earth, { noOcclude: true, side: THREE.DoubleSide })} receiveShadow onClick={onTap} />
-      <mesh geometry={data.sandGeo} material={toon(palette.sand, { noOcclude: true, side: THREE.DoubleSide })} receiveShadow onClick={onTap} />
+      <mesh geometry={data.grassGeo} material={toon(palette.grass, { noOcclude: true })} onClick={onTap} />
+      <mesh geometry={data.pathGeo} material={toon(palette.earth, { noOcclude: true })} onClick={onTap} />
+      <mesh geometry={data.sandGeo} material={toon(palette.sand, { noOcclude: true })} onClick={onTap} />
       <instancedMesh ref={dirtRef} args={[dirtGeo, toon("#FFFFFF", { vertexColors: true, noOcclude: true }), data.dirt.length]} receiveShadow />
       <instancedMesh ref={stepRef} args={[box, toon("#FFFFFF", { noOcclude: true }), data.steps.length]} receiveShadow castShadow onClick={onTap} />
       <instancedMesh ref={plankRef} args={[plankGeo, toon("#FFFFFF", { noOcclude: true }), data.planks.length]} receiveShadow castShadow onClick={onTap} />
       <instancedMesh ref={postRef} args={[postGeo, toon(palette.woodDeep), data.posts.length]} />
       <mesh
         geometry={data.waterGeo}
-        material={toon(palette.water, { water: true, emissive: "#6FB9CF", transparent: true, opacity: 0.92, side: THREE.DoubleSide })}
-        receiveShadow
+        material={toon(palette.water, { water: true, emissive: "#6FB9CF", transparent: true, opacity: 0.92 })}
       />
       <mesh
         geometry={data.fallGeo}

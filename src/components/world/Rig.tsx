@@ -77,10 +77,10 @@ export function Lights({ preset, shadows }: { preset: TimePreset; shadows: boole
         intensity={preset.sunIntensity}
         castShadow={shadows}
         shadow-mapSize={[2048, 2048]}
-        shadow-intensity={0.42}
+        shadow-intensity={0.28}
         shadow-bias={-0.0006}
-        shadow-normalBias={0.04}
-        shadow-radius={6}
+        shadow-normalBias={0.05}
+        shadow-radius={8}
         shadow-camera-left={-22}
         shadow-camera-right={22}
         shadow-camera-top={22}
