@@ -36,6 +36,7 @@ function tryStep(x: number, z: number, dx: number, dz: number) {
   const interior = useGame.getState().interior;
   const ok = (px: number, pz: number) => (interior ? canStepInterior(interior, px, pz) : canStep(x, z, px, pz));
   const blocked = (nx: number, nz: number) => {
+    if (interior) return !ok(nx, nz);
     const sx = nx !== x ? Math.sign(nx - x) : 0;
     const sz = nz !== z ? Math.sign(nz - z) : 0;
     return !ok(nx, nz) || !ok(nx + sx * RADIUS, nz + sz * RADIUS);
