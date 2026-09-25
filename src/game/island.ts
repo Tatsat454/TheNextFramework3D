@@ -268,6 +268,12 @@ export const gardenGate = (() => {
   const g = landmarkPlacements.find((l) => l.id === "garden")!;
   g.interact = { x: gardenGate.x, z: gardenGate.z + 1.15 };
 }
+{
+  const m = landmarkPlacements.find((l) => l.id === "market")!;
+  const [i0] = m.rect;
+  const west = tileCenter(i0, m.rect[1]);
+  m.interact = { x: west.x - 1.2, z: m.center.z };
+}
 
 export const getPlacement = (id: LandmarkId) => landmarkPlacements.find((l) => l.id === id)!;
 

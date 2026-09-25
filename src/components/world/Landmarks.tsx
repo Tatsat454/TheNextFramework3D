@@ -304,7 +304,7 @@ function MarketStall() {
   const pl = getPlacement("market");
   const stripes = 7;
   return (
-    <group position={[pl.center.x, pl.level * LEVEL, pl.center.z]}>
+    <group position={[pl.center.x, pl.level * LEVEL, pl.center.z]} rotation={[0, -Math.PI / 2, 0]}>
       <Box p={[0, 0.45, 0.35]} s={[2.6, 0.9, 0.7]} c={palette.wood} />
       <Box p={[0, 0.93, 0.38]} s={[2.75, 0.08, 0.85]} c={palette.woodDeep} />
       {[-1.25, 1.25].map((x) => [-0.55, 0.75].map((z) => <Cyl key={`${x}${z}`} p={[x, 1.1, z]} r={0.06} h={2.2} c={palette.woodDeep} seg={8} />))}
