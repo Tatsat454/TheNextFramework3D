@@ -166,15 +166,24 @@ function Picture() {
   );
 }
 
+function RoomWindow({ p, rotY = 0 }: { p: V3; rotY?: number }) {
+  return (
+    <group position={p} rotation={[0, rotY, 0]}>
+      <Box p={[0, 0, 0]} s={[1.35, 1.35, 0.1]} c="#C48A55" shadow={false} />
+      <Box p={[0, 0, 0.04]} s={[1.12, 1.12, 0.06]} c="#FFE7A8" glow shadow={false} />
+      <Box p={[0, 0, 0.08]} s={[0.06, 1.12, 0.02]} c="#C48A55" shadow={false} />
+      <Box p={[0, 0, 0.08]} s={[1.12, 0.06, 0.02]} c="#C48A55" shadow={false} />
+    </group>
+  );
+}
+
 function WindowAndBeam() {
   return (
     <group>
-      <group position={[2.55, 1.85, -3.86]}>
-        <Box p={[0, 0, 0]} s={[1.35, 1.35, 0.1]} c="#C48A55" shadow={false} />
-        <Box p={[0, 0, 0.04]} s={[1.12, 1.12, 0.06]} c="#FFE7A8" glow shadow={false} />
-        <Box p={[0, 0, 0.08]} s={[0.06, 1.12, 0.02]} c="#C48A55" shadow={false} />
-        <Box p={[0, 0, 0.08]} s={[1.12, 0.06, 0.02]} c="#C48A55" shadow={false} />
-      </group>
+      <RoomWindow p={[2.55, 1.85, -3.86]} />
+      {/* South wall: same window, twice, flanking the door. */}
+      <RoomWindow p={[-2.45, 1.85, 3.86]} rotY={Math.PI} />
+      <RoomWindow p={[2.45, 1.85, 3.86]} rotY={Math.PI} />
       <mesh rotation={[-Math.PI / 2, 0, 0.55]} position={[1.25, 0.04, -0.85]} scale={[1.9, 1, 0.85]} material={flat("#F7D98A", 0.38, true)}>
         <circleGeometry args={[1.15, 28]} />
       </mesh>
