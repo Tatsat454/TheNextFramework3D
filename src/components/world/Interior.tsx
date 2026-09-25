@@ -53,28 +53,26 @@ function Bed() {
 }
 
 function Bookshelf() {
-  const paletteBooks = ["#C8373C", "#4B3FB5", "#FFC857", "#2F7A4B", "#E8513F", "#7B6CF6", "#FF8A65", "#FFF6E6", "#8FD3E8", "#C48A55"];
-  const row = (y: number, count: number, seed: number) =>
-    Array.from({ length: count }, (_, k) => {
-      const w = 0.14 + ((k * 17 + seed) % 5) * 0.02;
-      const h = 0.42 + ((k * 11 + seed) % 6) * 0.03;
-      const x = -0.62 + k * 0.2;
-      return <Box key={`${y}-${k}`} p={[x, y + h / 2, 0.14]} s={[w, h, 0.26]} c={paletteBooks[(k + seed) % paletteBooks.length]!} />;
-    });
+  const colors = ["#C8373C", "#4B3FB5", "#FFC857", "#2F7A4B", "#E8513F", "#7B6CF6", "#FF8A65", "#8FD3E8", "#C48A55", "#FFF6E6"];
+  const shelves = [0.16, 0.68, 1.2, 1.72];
   return (
-    <group position={[-0.95, 0, -3.48]}>
-      <Box p={[0, 1.15, -0.18]} s={[1.78, 2.3, 0.1]} c="#8B5A32" />
-      <Box p={[-0.84, 1.15, 0.05]} s={[0.1, 2.3, 0.46]} c="#8B5A32" />
-      <Box p={[0.84, 1.15, 0.05]} s={[0.1, 2.3, 0.46]} c="#8B5A32" />
-      <Box p={[0, 0.06, 0.05]} s={[1.78, 0.12, 0.46]} c="#8B5A32" />
-      <Box p={[0, 2.28, 0.05]} s={[1.78, 0.12, 0.46]} c="#A56B3C" />
-      {[0.72, 1.32, 1.92].map((y) => (
-        <Box key={y} p={[0, y, 0.05]} s={[1.58, 0.08, 0.44]} c="#A56B3C" shadow={false} />
+    <group position={[-0.95, 0, -3.52]}>
+      <Box p={[0, 1.12, -0.16]} s={[1.62, 2.24, 0.08]} c="#6E4526" />
+      <Box p={[-0.78, 1.12, 0.06]} s={[0.1, 2.24, 0.44]} c="#8B5A32" />
+      <Box p={[0.78, 1.12, 0.06]} s={[0.1, 2.24, 0.44]} c="#8B5A32" />
+      <Box p={[0, 0.06, 0.06]} s={[1.66, 0.12, 0.44]} c="#8B5A32" />
+      <Box p={[0, 2.22, 0.06]} s={[1.66, 0.12, 0.44]} c="#A56B3C" />
+      {shelves.map((y) => (
+        <Box key={y} p={[0, y, 0.06]} s={[1.46, 0.07, 0.42]} c="#A56B3C" shadow={false} />
       ))}
-      {row(0.14, 7, 1)}
-      {row(0.8, 7, 4)}
-      {row(1.4, 7, 8)}
-      {row(2.0, 6, 2)}
+      {shelves.map((shelfY, row) =>
+        Array.from({ length: 6 }, (_, k) => {
+          const h = 0.32 + ((k * 13 + row * 7) % 4) * 0.03;
+          const w = 0.12 + (k % 3) * 0.02;
+          const x = -0.58 + k * 0.2;
+          return <Box key={`${row}-${k}`} p={[x, shelfY + 0.04 + h / 2, 0.1]} s={[w, h, 0.22]} c={colors[(k + row * 3) % colors.length]!} />;
+        }),
+      )}
     </group>
   );
 }
