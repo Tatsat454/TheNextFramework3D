@@ -2,19 +2,30 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
-import { isPlaceholderText } from "@/content/landmarks";
+import { isPlaceholderText, residents } from "@/content/landmarks";
 import { sfx } from "@/game/audio";
-import { toast, useGame } from "@/game/store";
+import { toast, useGame, type DialogState } from "@/game/store";
 import { cn } from "@/lib/utils";
 
 export const dialogControl = { advance: () => {} };
 
+const FALLBACK_VOICE: [number, number] = [240, 340];
+
+function speakerOf(dialog: DialogState) {
+  const resident = residents.find((r) => r.id === dialog.speaker);
+  if (resident) return resident;
+  return {
+    name: dialog.name,
+    role: dialog.role ?? "",
+    tagColor: dialog.tagColor,
+    voice: dialog.voice ?? FALLBACK_VOICE,
+  };
+}
+
 export function DialogBox() {
   const dialog = useGame((s) => s.dialog);
   const set = useGame((s) => s.set);
-  const speaker = dialog
-    ? { name: dialog.name, role: dialog.role, tagColor: dialog.tagColor, voice: dialog.voice }
-    : null;
+  const speaker = dialog ? speakerOf(dialog) : null;
   const line = dialog ? dialog.lines[dialog.index] : "";
   const lineKey = dialog ? `${dialog.speaker}:${dialog.index}:${line}` : "";
   const [typed, setTyped] = useState({ key: "", n: 0 });
@@ -26,19 +37,22 @@ export function DialogBox() {
   const last = dialog ? dialog.index === dialog.lines.length - 1 : false;
 
   useEffect(() => {
-    if (!lineKey || !speaker) return;
+    if (!lineKey) return;
+    const voice = speaker?.voice ?? FALLBACK_VOICE;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let i = reduce ? line.length - 1 : 0;
     timer.current = window.setInterval(() => {
       i++;
       setTyped({ key: lineKey, n: i });
-      if (!reduce && i % 2 === 0) sfx.babble(line[i - 1] ?? "", speaker.voice);
+      if (!reduce && i % 2 === 0) sfx.babble(line[i - 1] ?? "", voice);
       if (i >= line.length && timer.current) window.clearInterval(timer.current);
     }, 26);
     return () => {
       if (timer.current) window.clearInterval(timer.current);
     };
-  }, [lineKey, line, speaker]);
+    // Speaker identity is in lineKey. Do not depend on a freshly allocated speaker object —
+    // that retriggered this effect every render and the line never finished typing.
+  }, [lineKey, line]);
 
   const advance = () => {
     const d = useGame.getState().dialog;
