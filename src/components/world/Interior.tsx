@@ -181,9 +181,9 @@ function WindowAndBeam() {
   return (
     <group>
       <RoomWindow p={[2.55, 1.85, -3.86]} />
-      {/* South wall: same window, twice, flanking the door. */}
-      <RoomWindow p={[-2.45, 1.85, 3.86]} rotY={Math.PI} />
-      <RoomWindow p={[2.45, 1.85, 3.86]} rotY={Math.PI} />
+      {/* South wall: same window, twice, flanking the door, panes facing the camera. */}
+      <RoomWindow p={[-2.45, 1.85, 3.78]} />
+      <RoomWindow p={[2.45, 1.85, 3.78]} />
       <mesh rotation={[-Math.PI / 2, 0, 0.55]} position={[1.25, 0.04, -0.85]} scale={[1.9, 1, 0.85]} material={flat("#F7D98A", 0.38, true)}>
         <circleGeometry args={[1.15, 28]} />
       </mesh>
