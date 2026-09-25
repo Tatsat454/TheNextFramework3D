@@ -47,7 +47,7 @@ export const interiors: Record<InteriorId, InteriorDef> = {
     objects: [
       { id: "bed", x: -3.1, z: -1.35, y: 1.15, r: 1.25 },
       { id: "bookshelf", x: -0.95, z: -3.35, y: 2.1, r: 1.05 },
-      { id: "picture", x: 1.45, z: -3.25, y: 2.15, r: 0.95 },
+      { id: "picture", x: 0.62, z: -3.25, y: 2.15, r: 0.95 },
       { id: "computer", x: 3.45, z: -1.65, y: 1.55, r: 1.15 },
       { id: "tv", x: 3.45, z: 1.55, y: 1.35, r: 1.2 },
     ],

@@ -153,7 +153,7 @@ function Television() {
 
 function Picture() {
   return (
-    <group position={[1.35, 1.92, -3.82]}>
+    <group position={[0.62, 1.92, -3.82]}>
       <Box p={[0, 0, 0]} s={[1.05, 1.22, 0.1]} c="#C48A55" shadow={false} />
       <Box p={[0, 0, 0.05]} s={[0.86, 1.02, 0.06]} c="#7ED4EA" glow shadow={false} />
       <mesh position={[-0.14, 0.06, 0.1]} material={toon("#7B6CF6")} castShadow>
@@ -175,8 +175,11 @@ function WindowAndBeam() {
         <Box p={[0, 0, 0.08]} s={[0.06, 1.12, 0.02]} c="#C48A55" shadow={false} />
         <Box p={[0, 0, 0.08]} s={[1.12, 0.06, 0.02]} c="#C48A55" shadow={false} />
       </group>
-      <mesh position={[1.1, 1.05, -1.4]} rotation={[1.05, 0, -0.38]} material={flat("#FFE7A8", 0.32, true)}>
-        <planeGeometry args={[3.2, 5.2]} />
+      <mesh rotation={[-Math.PI / 2, 0, 0.55]} position={[1.25, 0.04, -0.85]} scale={[1.9, 1, 0.85]} material={flat("#F7D98A", 0.38, true)}>
+        <circleGeometry args={[1.15, 28]} />
+      </mesh>
+      <mesh position={[1.7, 1.55, -2.4]} rotation={[0.72, 0, -0.32]} material={flat("#FFE7A8", 0.18, true)}>
+        <planeGeometry args={[1.6, 2.4]} />
       </mesh>
     </group>
   );
