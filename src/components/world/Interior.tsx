@@ -77,7 +77,25 @@ function Bookshelf() {
   );
 }
 
-function Desk() {
+function Kitchen() {
+  return (
+    <group position={[4.12, 0, -3.38]}>
+      <Box p={[0, 0.4, 0]} s={[1.5, 0.8, 0.68]} c="#6E4526" />
+      <Box p={[0, 0.82, 0]} s={[1.52, 0.06, 0.7]} c="#8B5A32" />
+      <Box p={[-0.32, 0.94, 0.04]} s={[0.72, 0.14, 0.52]} c="#3B3470" />
+      {[-0.5, -0.14].map((x) =>
+        [-0.08, 0.14].map((z) => (
+          <mesh key={`${x}:${z}`} position={[x, 1.03, z]} material={toon("#1E1B3A")}>
+            <cylinderGeometry args={[0.08, 0.08, 0.04, 10]} />
+          </mesh>
+        )),
+      )}
+      <Box p={[0.42, 0.9, 0.18]} s={[0.08, 0.06, 0.08]} c="#C8B79A" shadow={false} />
+      <Box p={[0.42, 0.9, 0.02]} s={[0.08, 0.06, 0.08]} c="#C8B79A" shadow={false} />
+      <Box p={[0.1, 2.02, -0.04]} s={[1.25, 0.72, 0.4]} c="#6E4526" />
+    </group>
+  );
+}
   return (
     <group position={[3.5, 0, -1.65]}>
       <Box p={[0, 0.42, 0]} s={[1.7, 0.12, 0.95]} c="#C48A55" />
@@ -294,12 +312,12 @@ export function InteriorWorld() {
       <Bed />
       <Bookshelf />
       <Desk />
+      <Kitchen />
       <Television />
       <Couch />
       <Picture />
       <WindowAndBeam />
       <Plant p={[-4.45, 0, -3.55]} />
-      <Plant p={[4.45, 0, -3.55]} />
       <Plant p={[-4.45, 0, 3.4]} />
       <Plant p={[4.45, 0, 3.4]} />
     </group>
