@@ -168,17 +168,9 @@ function RoomWindow({ p, rotX = 0, rotY = 0 }: { p: V3; rotX?: number; rotY?: nu
   );
 }
 
-/**
- * South wall is edge-on to the default camera, so a vertical pane disappears.
- * Same window as the north wall, laid on the wall top, facing up.
- */
+/** South wall is edge-on from above, so these sit on the wall top facing the camera. */
 function SouthWindow({ x }: { x: number }) {
-  return (
-    <group>
-      <Box p={[x, 2.16, 4]} s={[1.22, 1.9, 0.24]} c="#FFE7A8" glow />
-      <RoomWindow p={[x, 3.22, 3.48]} rotX={-Math.PI / 2} />
-    </group>
-  );
+  return <RoomWindow p={[x, 3.22, 3.48]} rotX={-Math.PI / 2} />;
 }
 
 function WindowAndBeam() {
@@ -194,29 +186,6 @@ function WindowAndBeam() {
   );
 }
 
-function SouthWallSegment({ cx, span }: { cx: number; span: number }) {
-  const t = 0.22;
-  const z = 4;
-  const h = 3.15;
-  const wx = Math.sign(cx) * 2.45;
-  const winW = 1.35;
-  const sill = 1.18;
-  const x0 = cx - span / 2;
-  const x1 = cx + span / 2;
-  const leftW = wx - winW / 2 - x0;
-  const rightW = x1 - (wx + winW / 2);
-  const aboveH = h - sill;
-  const aboveY = sill + aboveH / 2;
-  return (
-    <group>
-      <Box p={[cx, sill / 2, z]} s={[span, sill, t]} c={HOUSE_COLORS.wall} />
-      <Box p={[x0 + leftW / 2, aboveY, z]} s={[leftW, aboveH, t]} c={HOUSE_COLORS.wall} />
-      <Box p={[x1 - rightW / 2, aboveY, z]} s={[rightW, aboveH, t]} c={HOUSE_COLORS.wall} />
-      <Box p={[cx, 0.92, 3.88]} s={[span, 0.18, 0.06]} c={HOUSE_COLORS.wainscot} shadow={false} />
-    </group>
-  );
-}
-
 function Walls() {
   const h = 3.15;
   const y = h / 2;
@@ -227,9 +196,11 @@ function Walls() {
       {/* North */}
       <Box p={[0, y, -4]} s={[10, h, t]} c={HOUSE_COLORS.wall} shadow={false} />
       <Box p={[0, stripe, -3.88]} s={[10, 0.18, 0.06]} c={HOUSE_COLORS.wainscot} shadow={false} />
-      {/* South, door gap plus two window openings */}
-      <SouthWallSegment cx={-2.85} span={4.3} />
-      <SouthWallSegment cx={2.85} span={4.3} />
+      {/* South, with a door gap */}
+      <Box p={[-2.85, y, 4]} s={[4.3, h, t]} c={HOUSE_COLORS.wall} />
+      <Box p={[2.85, y, 4]} s={[4.3, h, t]} c={HOUSE_COLORS.wall} />
+      <Box p={[-2.85, stripe, 3.88]} s={[4.3, 0.18, 0.06]} c={HOUSE_COLORS.wainscot} shadow={false} />
+      <Box p={[2.85, stripe, 3.88]} s={[4.3, 0.18, 0.06]} c={HOUSE_COLORS.wainscot} shadow={false} />
       {/* Door frame */}
       <Box p={[-0.78, 1.15, 4]} s={[0.16, 2.3, 0.28]} c="#8B5A32" />
       <Box p={[0.78, 1.15, 4]} s={[0.16, 2.3, 0.28]} c="#8B5A32" />
