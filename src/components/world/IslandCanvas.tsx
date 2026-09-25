@@ -8,6 +8,7 @@ import { presetFromSearch } from "@/game/time-of-day";
 import { useGame } from "@/game/store";
 import { Ambient } from "./Ambient";
 import { ClearColor, InteriorWorld } from "./Interior";
+import { ArcadeWorld } from "./ArcadeInterior";
 import { Landmarks } from "./Landmarks";
 import { Nature } from "./Nature";
 import { Pickups } from "./Pickups";
@@ -96,7 +97,9 @@ export default function IslandCanvas({ onReady, onNoWebGL }: { onReady: () => vo
           setDpr(1);
         }}
       />
-      {interior ? (
+      {interior === "arcade" ? (
+        <ArcadeWorld />
+      ) : interior ? (
         <InteriorWorld />
       ) : (
         <>

@@ -1,17 +1,17 @@
 import type { LandmarkId } from "@/content/landmarks";
-import { houseInteriorCopy } from "@/content/landmarks";
+import { arcadeInteriorCopy, houseInteriorCopy } from "@/content/landmarks";
 import { getPlacement, heightAt, LEVEL } from "./island";
 import { player } from "./player-state";
 import { useGame } from "./store";
 
-export type InteriorId = "house";
+export type InteriorId = "house" | "arcade";
 
-export type InteriorObjectId = keyof typeof houseInteriorCopy;
+export type InteriorObjectId = keyof typeof houseInteriorCopy | keyof typeof arcadeInteriorCopy;
 
 type Rect = { x0: number; z0: number; x1: number; z1: number };
 
 export type InteriorObject = {
-  id: InteriorObjectId;
+  id: string;
   x: number;
   z: number;
   y: number;
@@ -25,9 +25,13 @@ export type InteriorDef = {
   /** Player spawn just inside the south door, facing the room. */
   spawn: { x: number; z: number; facing: number };
   doormat: { x: number; z: number; w: number; d: number };
+  /** Island door-mat, relative to the landmark center in z. */
+  outsidePad: { z: number; w: number; d: number };
   objects: InteriorObject[];
   blocked: Rect[];
 };
+
+export type DoorZone = { kind: "enter"; id: InteriorId } | { kind: "exit" };
 
 export const HOUSE_COLORS = {
   floor: "#D9A066",
@@ -35,6 +39,14 @@ export const HOUSE_COLORS = {
   wainscot: "#C48A55",
   rug: "#E8513F",
 };
+
+export const ARCADE_COLORS = {
+  floor: "#2B2350",
+  floorAlt: "#3A2F6B",
+  wall: "#1E1B3A",
+};
+
+const CABINET_X = [-4.5, -1.5, 1.5, 4.5] as const;
 
 /** 10×8 tile bedroom, origin at the room center. +z is south (toward the door / camera). */
 export const interiors: Record<InteriorId, InteriorDef> = {
@@ -44,6 +56,7 @@ export const interiors: Record<InteriorId, InteriorDef> = {
     name: "My House",
     spawn: { x: 0, z: 2.45, facing: Math.PI },
     doormat: { x: 0, z: 3.32, w: 1.55, d: 0.82 },
+    outsidePad: { z: 1.58, w: 1.2, d: 0.78 },
     objects: [
       { id: "bed", x: -2.05, z: -1.7, y: 1.15, r: 1.15 },
       { id: "bookshelf", x: -0.95, z: -2.55, y: 2.1, r: 1.1 },
@@ -67,12 +80,36 @@ export const interiors: Record<InteriorId, InteriorDef> = {
       { x0: -6.3, z0: 2.45, x1: -5.5, z1: 3.05 }, // sink
     ],
   },
+  arcade: {
+    id: "arcade",
+    landmarkId: "arcade",
+    name: "The Inspiration Arcade",
+    spawn: { x: 0, z: 2.7, facing: Math.PI },
+    doormat: { x: 0, z: 3.85, w: 1.6, d: 0.85 },
+    outsidePad: { z: 0.98, w: 1.05, d: 0.72 },
+    objects: CABINET_X.map((x, i) => ({
+      id: `cabinet${i + 1}`,
+      x,
+      z: -2.45,
+      y: 1.55,
+      r: 1.15,
+    })),
+    blocked: [
+      ...CABINET_X.map((x) => ({ x0: x - 0.62, z0: -4.35, x1: x + 0.62, z1: -2.92 })),
+      { x0: -5.35, z0: 2.15, x1: -3.55, z1: 3.55 }, // beanbag corner
+    ],
+  },
 };
 
 export const interiorByLandmark = (id: LandmarkId): InteriorDef | undefined =>
   Object.values(interiors).find((room) => room.landmarkId === id);
 
 export const getInterior = (id: InteriorId) => interiors[id];
+
+export function propCopy(interior: InteriorId, id: string) {
+  if (interior === "arcade") return arcadeInteriorCopy[id as keyof typeof arcadeInteriorCopy];
+  return houseInteriorCopy[id as keyof typeof houseInteriorCopy];
+}
 
 const RADIUS = 0.28;
 
@@ -81,12 +118,18 @@ function overlaps(x: number, z: number, b: Rect) {
 }
 
 export function canStepInterior(id: InteriorId, x: number, z: number) {
+  if (id === "arcade") {
+    const inRoom = x > -5.72 && x < 5.72 && z > -4.12 && z < 4.12;
+    const inAlcove = Math.abs(x) < 0.88 && z >= 4.12 && z < 4.38;
+    if (!inRoom && !inAlcove) return false;
+    return !interiors.arcade.blocked.some((b) => overlaps(x, z, b));
+  }
   const inRoom = x > -4.62 + RADIUS && x < 4.62 - RADIUS && z > -3.62 + RADIUS && z < 3.52;
   const inAlcove = Math.abs(x) < 0.82 && z >= 3.52 && z < 3.78;
   const inBath = x <= -4.62 && x > -8.05 && z > -0.25 && z < 3.1;
   const inArch = x > -5.2 && x < -4.5 && z > 0.45 && z < 1.95;
   if (!inRoom && !inAlcove && !inBath && !inArch) return false;
-  return !interiors[id].blocked.some((b) => overlaps(x, z, b));
+  return !interiors.house.blocked.some((b) => overlaps(x, z, b));
 }
 
 function inPad(x: number, z: number, cx: number, cz: number, w: number, d: number) {
@@ -94,8 +137,10 @@ function inPad(x: number, z: number, cx: number, cz: number, w: number, d: numbe
 }
 
 export function outsideDoor(id: InteriorId) {
-  const pl = getPlacement(interiors[id].landmarkId);
-  return { x: pl.center.x, z: pl.center.z + 1.58, w: 1.2, d: 0.78, y: pl.level * LEVEL };
+  const room = interiors[id];
+  const pl = getPlacement(room.landmarkId);
+  const pad = room.outsidePad;
+  return { x: pl.center.x, z: pl.center.z + pad.z, w: pad.w, d: pad.d, y: pl.level * LEVEL };
 }
 
 export function outsideExitSpawn(id: InteriorId) {
@@ -109,15 +154,18 @@ export function armDoorLatch(ms = 640) {
 }
 
 /** Walk-on trigger: enter from the island door mat, or exit from the interior doormat. */
-export function doorZoneAt(x: number, z: number): "enter" | "exit" | null {
+export function doorZoneAt(x: number, z: number): DoorZone | null {
   if (performance.now() < doorLatch) return null;
   const id = useGame.getState().interior;
   if (id) {
     const m = interiors[id].doormat;
-    return inPad(x, z, m.x, m.z, m.w, m.d) ? "exit" : null;
+    return inPad(x, z, m.x, m.z, m.w, m.d) ? { kind: "exit" } : null;
   }
-  const door = outsideDoor("house");
-  return inPad(x, z, door.x, door.z, door.w, door.d) ? "enter" : null;
+  for (const room of Object.values(interiors)) {
+    const door = outsideDoor(room.id);
+    if (inPad(x, z, door.x, door.z, door.w, door.d)) return { kind: "enter", id: room.id };
+  }
+  return null;
 }
 
 export function placePlayerInside(id: InteriorId) {

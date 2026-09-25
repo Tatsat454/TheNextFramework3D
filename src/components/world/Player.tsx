@@ -219,8 +219,8 @@ export function Player() {
 
     if (!paused) {
       const zone = doorZoneAt(player.x, player.z);
-      if (zone === "enter") requestEnter("house");
-      else if (zone === "exit") requestExit();
+      if (zone?.kind === "enter") requestEnter(zone.id);
+      else if (zone?.kind === "exit") requestExit();
     }
 
     if (a.wasMoving && !moving) a.stopAt = t;

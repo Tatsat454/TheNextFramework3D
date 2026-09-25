@@ -12,6 +12,9 @@ import type { TimePreset } from "@/game/time-of-day";
 
 const OFFSET = new THREE.Vector3(0, 14.8, 18.4);
 const INTERIOR_OFFSET = new THREE.Vector3(-1.4, 18.4, 8.6);
+const ARCADE_OFFSET = new THREE.Vector3(0, 19.6, 10.4);
+const HOUSE_LOOK = new THREE.Vector3(-1.45, 0.25, -0.1);
+const ARCADE_LOOK = new THREE.Vector3(0, 0.22, 0.15);
 const tmp = new THREE.Vector3();
 
 export function CameraRig() {
@@ -31,7 +34,12 @@ export function CameraRig() {
       init.current = false;
     }
     const inside = !!s.interior;
-    const target = inside ? new THREE.Vector3(-1.45, 0.25, -0.1) : new THREE.Vector3(player.x, player.y, player.z);
+    const arcade = s.interior === "arcade";
+    const target = inside
+      ? arcade
+        ? ARCADE_LOOK.clone()
+        : HOUSE_LOOK.clone()
+      : new THREE.Vector3(player.x, player.y, player.z);
     let z = 1;
     if (!inside && s.nearby?.startsWith("landmark:")) {
       const c = getPlacement(s.nearby.slice(9) as LandmarkId).center;
@@ -52,11 +60,11 @@ export function CameraRig() {
     }
     focus.current.lerp(target, inside ? 1 : k);
     zoom.current += (z - zoom.current) * k * 0.6;
-    const offset = inside ? INTERIOR_OFFSET : OFFSET;
+    const offset = inside ? (arcade ? ARCADE_OFFSET : INTERIOR_OFFSET) : OFFSET;
     camera.position.copy(focus.current).addScaledVector(offset, zoom.current * (inside ? 1 : portrait));
     const persp = camera as THREE.PerspectiveCamera;
     if (persp.isPerspectiveCamera) {
-      persp.fov = inside ? 38 : 32;
+      persp.fov = inside ? (arcade ? 40 : 38) : 32;
       persp.updateProjectionMatrix();
     }
     if (inside) camera.lookAt(focus.current.x, focus.current.y + 0.15, focus.current.z);

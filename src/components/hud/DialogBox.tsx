@@ -124,7 +124,7 @@ export function DialogBox() {
                   type="button"
                   onClick={() => {
                     if (isPlaceholderText(dialog.href ?? "")) {
-                      toast("Add your resume URL in the content file.", "info");
+                      toast("Add this URL in the content file.", "info");
                       return;
                     }
                     window.open(dialog.href, "_blank", "noopener");

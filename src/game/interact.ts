@@ -1,15 +1,17 @@
 "use client";
 
 import type { ItemId, LandmarkId, ResidentId } from "@/content/landmarks";
-import { copy, getItem, getLandmark, houseInteriorCopy, landmarks, museumExhibits, residents, skills } from "@/content/landmarks";
+import { arcadePal, copy, getItem, getLandmark, landmarks, museumExhibits, residents, skills } from "@/content/landmarks";
 import { sfx } from "./audio";
 import {
   armDoorLatch,
   getInterior,
   interiorByLandmark,
+  interiors,
   outsideDoor,
   placePlayerInside,
   placePlayerOutside,
+  propCopy,
   type InteriorId,
   WIPE_IN_MS,
   WIPE_IN_MS_REDUCED,
@@ -107,7 +109,7 @@ export function currentInteractables(): Interactable[] {
   if (s.interior) {
     const room = getInterior(s.interior);
     const list: Interactable[] = room.objects.map((o) => {
-      const copyFor = houseInteriorCopy[o.id];
+      const copyFor = propCopy(s.interior!, o.id);
       return {
         id: `prop:${o.id}`,
         kind: "prop" as const,
@@ -170,18 +172,20 @@ export function currentInteractables(): Interactable[] {
       ref: c.kind,
     });
   }
-  const door = outsideDoor("house");
-  list.push({
-    id: "door:house",
-    kind: "door",
-    label: getInterior("house").name,
-    verb: "Enter",
-    x: door.x,
-    z: door.z,
-    y: door.y + 2.4,
-    r: 1.15,
-    ref: "enter:house",
-  });
+  for (const room of Object.values(interiors)) {
+    const door = outsideDoor(room.id);
+    list.push({
+      id: `door:${room.id}`,
+      kind: "door",
+      label: room.name,
+      verb: "Enter",
+      x: door.x,
+      z: door.z,
+      y: door.y + 2.4,
+      r: 1.15,
+      ref: `enter:${room.id}`,
+    });
+  }
   return list;
 }
 
@@ -357,29 +361,57 @@ export function interact(it: Interactable, player: { x: number; z: number }) {
       break;
     }
     case "prop": {
-      inspectProp(it.ref as keyof typeof houseInteriorCopy);
+      inspectProp(it.ref);
       break;
     }
   }
 }
 
-function inspectProp(id: keyof typeof houseInteriorCopy) {
-  const o = houseInteriorCopy[id];
+function field(o: object, key: string): string | undefined {
+  const v = (o as Record<string, unknown>)[key];
+  return typeof v === "string" ? v : undefined;
+}
+
+function inspectProp(id: string) {
+  const interior = useGame.getState().interior;
+  if (!interior) return;
+  const o = propCopy(interior, id);
+  if (!o) return;
   sfx.open();
+  const href = field(o, "href");
+  const hrefLabel = field(o, "hrefLabel");
+  const title = field(o, "title");
+  if (interior === "arcade") {
+    useGame.setState({
+      dialog: {
+        speaker: arcadePal.id,
+        name: arcadePal.name,
+        role: arcadePal.role,
+        tagColor: arcadePal.tagColor,
+        voice: arcadePal.voice,
+        lines: o.lines,
+        index: 0,
+        action: href ? "link" : undefined,
+        href,
+        hrefLabel,
+      },
+    });
+    return;
+  }
   const tag =
     id === "computer" ? "#D9A066" : id === "tv" ? "#7B6CF6" : id === "bed" ? "#E8513F" : id === "picture" ? "#C48A55" : "#8B5A32";
   useGame.setState({
     dialog: {
       speaker: id,
       name: o.name,
-      role: o.title,
+      role: title,
       tagColor: tag,
       voice: [240, 340],
       lines: o.lines,
       index: 0,
-      action: "href" in o && o.href ? "link" : undefined,
-      href: "href" in o ? o.href : undefined,
-      hrefLabel: "hrefLabel" in o ? o.hrefLabel : undefined,
+      action: href ? "link" : undefined,
+      href,
+      hrefLabel,
     },
     emote: id === "bed" ? { type: "stretch", at: performance.now() } : useGame.getState().emote,
   });

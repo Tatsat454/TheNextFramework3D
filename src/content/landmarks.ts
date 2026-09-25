@@ -898,6 +898,77 @@ export const copy = {
 };
 
 /**
+ * The Inspiration Arcade: pal lines, cabinet stories, and write-up links.
+ * Anything starting with PLACEHOLDER is meant to be replaced.
+ */
+export const arcadePal = {
+  id: "blink",
+  name: "Blink",
+  role: "Attendant",
+  tagColor: "#FF8AE2",
+  voice: [310, 470] as [number, number],
+  welcome: [
+    "Welcome to the arcade! These are Tatsat's inspirations, the games that made him want to build games.",
+    "Walk up to any cabinet to hear its story!",
+  ],
+};
+
+export const arcadeInteriorCopy = {
+  cabinet1: {
+    name: "God of War II",
+    verb: "Play",
+    title: "God of War II",
+    lines: [
+      "This cabinet is God of War II — one of the games that made Tatsat want to build games.",
+      "PLACEHOLDER: why God of War II inspired Tatsat.",
+      "What I learned as a future PM:",
+      "PLACEHOLDER: the PM lesson from God of War II.",
+    ],
+    href: "PLACEHOLDER God of War II write-up URL",
+    hrefLabel: "Read the full write-up",
+  },
+  cabinet2: {
+    name: "Final Fantasy VII Remake series",
+    verb: "Play",
+    title: "Final Fantasy VII Remake series",
+    lines: [
+      "This cabinet is the Final Fantasy VII Remake series — another game that pulled Tatsat toward making games.",
+      "PLACEHOLDER: why the Final Fantasy VII Remake series inspired Tatsat.",
+      "What I learned as a future PM:",
+      "PLACEHOLDER: the PM lesson from the Final Fantasy VII Remake series.",
+    ],
+    href: "PLACEHOLDER FF7 Remake write-up URL",
+    hrefLabel: "Read the full write-up",
+  },
+  cabinet3: {
+    name: "Final Fantasy XV",
+    verb: "Play",
+    title: "Final Fantasy XV",
+    lines: [
+      "This cabinet is Final Fantasy XV — a road-trip RPG that stuck with Tatsat.",
+      "PLACEHOLDER: why Final Fantasy XV inspired Tatsat.",
+      "What I learned as a future PM:",
+      "PLACEHOLDER: the PM lesson from Final Fantasy XV.",
+    ],
+    href: "PLACEHOLDER Final Fantasy XV write-up URL",
+    hrefLabel: "Read the full write-up",
+  },
+  cabinet4: {
+    name: "Horizon",
+    verb: "Play",
+    title: "Horizon",
+    lines: [
+      "This cabinet is Horizon — machines, wilds, and a world Tatsat still thinks about.",
+      "PLACEHOLDER: why Horizon inspired Tatsat.",
+      "What I learned as a future PM:",
+      "PLACEHOLDER: the PM lesson from Horizon.",
+    ],
+    href: "PLACEHOLDER Horizon write-up URL",
+    hrefLabel: "Read the full write-up",
+  },
+};
+
+/**
  * Copy for objects inside My House. Anything starting with PLACEHOLDER is meant to be replaced.
  * The computer's href should become a real resume URL.
  */
