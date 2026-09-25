@@ -1,5 +1,6 @@
 "use client";
 
+import { RoundedBox } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
@@ -21,132 +22,124 @@ function Box({ p, s, c, r, glow, shadow = true }: { p: V3; s: V3; c: string; r?:
   );
 }
 
-const CABINETS: { x: number; body: string; marquee: string; screen: string }[] = [
-  { x: -4.5, body: "#6B2430", marquee: "#C8373C", screen: "#FF6B6B" },
-  { x: -1.5, body: "#243A52", marquee: "#2F7A4B", screen: "#3DDC82" },
-  { x: 1.5, body: "#2A4A62", marquee: "#8FD3E8", screen: "#A8E8F4" },
-  { x: 4.5, body: "#4A2E1C", marquee: "#FF8A4A", screen: "#FFC857" },
-];
+const CABINETS = [
+  { x: -4.5, body: "#4A2458", marquee: "#6B2430", deck: "#5A2450", neonL: "#FF5ADF", neonR: "#C8373C", stick: "#FF5F83", title: "ASH" },
+  { x: -1.5, body: "#243A52", marquee: "#1F4A3A", deck: "#2A4058", neonL: "#3DDC82", neonR: "#5AE8FF", stick: "#54CFFF", title: "SPIRE" },
+  { x: 1.5, body: "#2A4A62", marquee: "#3A5A78", deck: "#34556E", neonL: "#A8E8F4", neonR: "#FFFFFF", stick: "#8FD3E8", title: "ICE" },
+  { x: 4.5, body: "#4A2E1C", marquee: "#6B3A20", deck: "#5A3820", neonL: "#FF8A4A", neonR: "#2EC4B6", stick: "#FFC857", title: "DUSK" },
+] as const;
 
-function JaggedArt() {
-  return (
-    <group>
-      <Box p={[0, 0.22, 0.08]} s={[0.04, 0.7, 0.28]} c="#8A8A8A" r={[0, 0, 0.45]} shadow={false} />
-      <Box p={[0, -0.05, -0.12]} s={[0.04, 0.55, 0.22]} c="#8B1E2D" r={[0, 0, -0.55]} shadow={false} />
-      <Box p={[0, 0.35, -0.18]} s={[0.04, 0.32, 0.18]} c="#C8373C" r={[0, 0, 0.2]} shadow={false} />
-      <Box p={[0, -0.28, 0.16]} s={[0.04, 0.28, 0.16]} c="#5A5A5A" r={[0, 0, -0.3]} shadow={false} />
-    </group>
-  );
-}
+const artCache = new Map<string, THREE.CanvasTexture>();
 
-function SkylineArt() {
-  const blocks = [
-    [-0.22, -0.18, 0.28],
-    [-0.08, -0.02, 0.55],
-    [0.06, -0.12, 0.38],
-    [0.2, -0.22, 0.22],
-    [-0.16, -0.28, 0.16],
-    [0.14, -0.3, 0.12],
+function cabArt(mood: number, kind: "side" | "screen" | "kick") {
+  const key = `${mood}-${kind}`;
+  const hit = artCache.get(key);
+  if (hit) return hit;
+  const w = kind === "side" ? 256 : 512;
+  const h = kind === "side" ? 512 : kind === "screen" ? 320 : 220;
+  const c = document.createElement("canvas");
+  c.width = w;
+  c.height = h;
+  const ctx = c.getContext("2d")!;
+  const rng = (() => {
+    let seed = (mood + 1) * 9973 + (kind === "side" ? 3 : kind === "screen" ? 7 : 11);
+    return () => {
+      seed = (seed * 16807) % 2147483647;
+      return (seed - 1) / 2147483646;
+    };
+  })();
+  const palettes = [
+    ["#2A1520", "#8B1E2D", "#8A8A8A", "#C8373C", "#FF6B6B"],
+    ["#152030", "#1F4A3A", "#4A6A8A", "#3DDC82", "#5AE8FF"],
+    ["#1A2A40", "#4A6A8A", "#A8E8F4", "#FFFFFF", "#8FD3E8"],
+    ["#2A1810", "#FF8A4A", "#E8513F", "#2EC4B6", "#FFC857"],
   ] as const;
-  return (
-    <group>
-      {blocks.map(([z, y, h], k) => (
-        <Box key={k} p={[0, y + h / 2, z]} s={[0.04, h, 0.1]} c={k % 2 ? "#4A6A8A" : "#2F7A4B"} shadow={false} />
-      ))}
-      {[-0.1, 0.02, 0.12].map((z, k) => (
-        <Box key={`w${k}`} p={[0.02, 0.12, z]} s={[0.02, 0.06, 0.04]} c="#3DDC82" glow shadow={false} />
-      ))}
-    </group>
-  );
+  const pal = palettes[mood]!;
+  const g = ctx.createLinearGradient(0, 0, 0, h);
+  g.addColorStop(0, pal[0]);
+  g.addColorStop(1, pal[1]);
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, w, h);
+  for (let i = 0; i < 28; i++) {
+    ctx.fillStyle = i % 2 ? pal[3] : pal[4];
+    ctx.globalAlpha = 0.35 + rng() * 0.4;
+    ctx.beginPath();
+    ctx.arc(rng() * w, rng() * h, 2 + rng() * 5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+  if (mood === 0) {
+    for (let i = 0; i < 8; i++) {
+      ctx.fillStyle = i % 2 ? pal[2] : pal[3];
+      ctx.beginPath();
+      const x = rng() * w;
+      const y = rng() * h;
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + 20 + rng() * 40, y + 50 + rng() * 80);
+      ctx.lineTo(x - 10 - rng() * 30, y + 40 + rng() * 70);
+      ctx.closePath();
+      ctx.fill();
+    }
+  } else if (mood === 1) {
+    const base = kind === "screen" ? h * 0.62 : h * 0.55;
+    for (let i = 0; i < 9; i++) {
+      const bw = w / 9;
+      const bh = 30 + rng() * (kind === "screen" ? 70 : 140);
+      ctx.fillStyle = i % 2 ? pal[2] : pal[1];
+      ctx.fillRect(i * bw + 4, base - bh, bw - 8, bh);
+      ctx.fillStyle = pal[3];
+      for (let wy = 0; wy < 4; wy++) ctx.fillRect(i * bw + 10, base - bh + 8 + wy * 14, 6, 6);
+    }
+  } else if (mood === 2) {
+    for (let i = 0; i < 7; i++) {
+      const cx = 30 + rng() * (w - 60);
+      const cy = 30 + rng() * (h - 60);
+      const rad = 12 + rng() * 28;
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(rng() * Math.PI);
+      ctx.fillStyle = i % 2 ? pal[2] : pal[3];
+      ctx.beginPath();
+      ctx.moveTo(0, -rad);
+      ctx.lineTo(rad * 0.6, 0);
+      ctx.lineTo(0, rad);
+      ctx.lineTo(-rad * 0.6, 0);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+  } else {
+    ctx.fillStyle = pal[1];
+    ctx.beginPath();
+    ctx.ellipse(w * 0.35, h * 0.78, w * 0.4, h * 0.18, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = pal[2];
+    ctx.beginPath();
+    ctx.ellipse(w * 0.7, h * 0.82, w * 0.32, h * 0.14, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = pal[4];
+    ctx.beginPath();
+    ctx.arc(w * 0.78, h * 0.22, 22, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = pal[3];
+    for (let i = 0; i < 12; i++) ctx.fillRect(20 + i * (w / 14), h * 0.55 - rng() * 40, 5, 28 + rng() * 36);
+  }
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.needsUpdate = true;
+  artCache.set(key, tex);
+  return tex;
 }
 
-function CrystalArt() {
-  return (
-    <group>
-      <mesh position={[0, 0.18, 0]} rotation={[0, 0, 0.2]} material={toon("#A8E8F4", { emissive: "#A8E8F4", noOcclude: true })}>
-        <octahedronGeometry args={[0.22, 0]} />
-      </mesh>
-      <mesh position={[0, -0.12, 0.14]} rotation={[0.3, 0, -0.4]} material={toon("#FFFFFF", { noOcclude: true })}>
-        <octahedronGeometry args={[0.12, 0]} />
-      </mesh>
-      <mesh position={[0, -0.18, -0.16]} rotation={[-0.2, 0, 0.5]} material={toon("#8FD3E8", { emissive: "#8FD3E8", noOcclude: true })}>
-        <octahedronGeometry args={[0.1, 0]} />
-      </mesh>
-    </group>
-  );
+function NeonStrip({ p, s, c }: { p: V3; s: V3; c: string }) {
+  return <Box p={p} s={s} c={c} glow shadow={false} />;
 }
 
-function HillsArt() {
+function CabButton({ x, y, z, color }: { x: number; y: number; z: number; color: string }) {
   return (
-    <group>
-      <mesh position={[0, -0.22, 0.05]} scale={[0.2, 0.28, 0.7]} material={toon("#FF8A4A", { noOcclude: true })}>
-        <sphereGeometry args={[0.35, 10, 8]} />
-      </mesh>
-      <mesh position={[0, -0.18, -0.16]} scale={[0.18, 0.22, 0.5]} material={toon("#E8513F", { noOcclude: true })}>
-        <sphereGeometry args={[0.3, 10, 8]} />
-      </mesh>
-      {[-0.22, -0.08, 0.06, 0.18, 0.28].map((z, k) => (
-        <Box key={k} p={[0, -0.02 + (k % 3) * 0.04, z]} s={[0.03, 0.22 + (k % 2) * 0.08, 0.03]} c="#2EC4B6" shadow={false} />
-      ))}
-    </group>
-  );
-}
-
-const SIDE_ART = [JaggedArt, SkylineArt, CrystalArt, HillsArt];
-
-function Cabinet({ i }: { i: number }) {
-  const spec = CABINETS[i]!;
-  const Art = SIDE_ART[i]!;
-  return (
-    <group position={[spec.x, 0, -3.52]}>
-      <Box p={[0, 0.82, 0]} s={[1.08, 1.64, 0.92]} c={spec.body} />
-      <Box p={[0, 1.78, 0.04]} s={[1.18, 0.38, 0.7]} c={spec.marquee} />
-      <Box p={[0, 1.78, 0.4]} s={[0.92, 0.22, 0.06]} c="#1A1630" />
-      <Box p={[0, 1.22, 0.44]} s={[0.78, 0.58, 0.08]} c="#12101C" />
-      <Box p={[0, 1.22, 0.48]} s={[0.68, 0.48, 0.05]} c={spec.screen} glow />
-      {i === 0 && (
-        <>
-          <Box p={[-0.12, 1.28, 0.52]} s={[0.22, 0.22, 0.02]} c="#8A8A8A" r={[0, 0, 0.5]} shadow={false} />
-          <Box p={[0.14, 1.16, 0.52]} s={[0.18, 0.3, 0.02]} c="#C8373C" r={[0, 0, -0.35]} shadow={false} />
-        </>
-      )}
-      {i === 1 &&
-        [-0.18, -0.04, 0.08, 0.2].map((x, k) => (
-          <Box key={k} p={[x, 1.08 + (k % 3) * 0.08, 0.52]} s={[0.08, 0.16 + (k % 2) * 0.1, 0.02]} c={k % 2 ? "#4A6A8A" : "#3DDC82"} glow={k % 2 === 0} shadow={false} />
-        ))}
-      {i === 2 && (
-        <mesh position={[0, 1.24, 0.52]} material={toon("#FFFFFF", { emissive: "#A8E8F4", noOcclude: true })}>
-          <octahedronGeometry args={[0.16, 0]} />
-        </mesh>
-      )}
-      {i === 3 && (
-        <>
-          <Box p={[0, 1.08, 0.52]} s={[0.5, 0.1, 0.02]} c="#FF8A4A" shadow={false} />
-          {[-0.16, -0.04, 0.08, 0.18].map((x, k) => (
-            <Box key={k} p={[x, 1.18, 0.52]} s={[0.04, 0.16 + (k % 2) * 0.06, 0.02]} c="#2EC4B6" shadow={false} />
-          ))}
-        </>
-      )}
-      <Box p={[0, 0.78, 0.52]} s={[0.98, 0.12, 0.42]} c="#1A1630" />
-      <mesh position={[-0.18, 0.92, 0.62]} material={toon("#2A2548")}>
-        <cylinderGeometry args={[0.035, 0.04, 0.14, 8]} />
-      </mesh>
-      <mesh position={[-0.18, 1.0, 0.62]} material={toon("#FFC857")}>
-        <sphereGeometry args={[0.045, 8, 8]} />
-      </mesh>
-      {[0.08, 0.22, 0.36].map((x, k) => (
-        <mesh key={k} position={[x, 0.86, 0.66]} material={toon(["#E8513F", "#7EDC7A", "#5B8CFF"][k]!)}>
-          <cylinderGeometry args={[0.035, 0.035, 0.04, 8]} />
-        </mesh>
-      ))}
-      <group position={[-0.56, 0.95, 0]}>
-        <Art />
-      </group>
-      <group position={[0.56, 0.95, 0]} rotation={[0, Math.PI, 0]}>
-        <Art />
-      </group>
-      <Box p={[0, 0.08, 0.1]} s={[1.12, 0.16, 1.05]} c="#12101C" />
-    </group>
+    <mesh position={[x, y, z]} rotation={[-Math.PI / 2, 0, 0]} material={toon(color, { emissive: color, noOcclude: true })} castShadow>
+      <cylinderGeometry args={[0.12, 0.12, 0.06, 12]} />
+    </mesh>
   );
 }
 
@@ -162,6 +155,9 @@ const GLYPH: Record<string, string[]> = {
   R: ["11110", "10001", "11110", "10100", "10010"],
   S: ["01111", "10000", "01110", "00001", "11110"],
   T: ["11111", "00100", "00100", "00100", "00100"],
+  H: ["10001", "10001", "11111", "10001", "10001"],
+  U: ["10001", "10001", "10001", "10001", "01110"],
+  K: ["10001", "10010", "11100", "10010", "10001"],
 };
 
 function NeonLine({ text, color, p, cells = 0.12 }: { text: string; color: string; p: V3; cells?: number }) {
@@ -192,6 +188,64 @@ function NeonLine({ text, color, p, cells = 0.12 }: { text: string; color: strin
           </group>
         );
       })}
+    </group>
+  );
+}
+
+function Cabinet({ i }: { i: number }) {
+  const spec = CABINETS[i]!;
+  const side = useMemo(() => cabArt(i, "side"), [i]);
+  const screen = useMemo(() => cabArt(i, "screen"), [i]);
+  const kick = useMemo(() => cabArt(i, "kick"), [i]);
+  const bodyMat = toon(spec.body, { noOcclude: true });
+  const marqueeMat = toon(spec.marquee, { noOcclude: true });
+  const deckMat = toon(spec.deck, { noOcclude: true });
+  const frameMat = toon("#151632", { noOcclude: true });
+  const coinMat = toon("#171522", { noOcclude: true });
+  return (
+    <group position={[spec.x, 0, -3.55]} scale={0.42}>
+      <RoundedBox args={[2.45, 2.75, 1.9]} radius={0.12} smoothness={4} position={[0, 1.37, 0]} castShadow receiveShadow material={bodyMat} />
+      <RoundedBox args={[2.35, 2.05, 1.48]} radius={0.13} smoothness={4} position={[0, 3.45, -0.15]} castShadow material={bodyMat} />
+      <RoundedBox args={[2.55, 0.75, 1.56]} radius={0.18} smoothness={4} position={[0, 4.83, -0.12]} castShadow material={marqueeMat} />
+      <NeonLine text={spec.title} color="#FFF9DD" p={[0, 4.86, 0.7]} cells={0.22} />
+      <RoundedBox args={[1.95, 1.28, 0.13]} radius={0.08} smoothness={4} position={[0, 3.5, 0.66]} castShadow material={frameMat} />
+      <mesh position={[0, 3.5, 0.74]}>
+        <planeGeometry args={[1.72, 1.04]} />
+        <meshBasicMaterial map={screen} toneMapped={false} />
+      </mesh>
+      <mesh position={[0, 2.42, 0.68]} rotation={[-0.28, 0, 0]} material={deckMat} castShadow>
+        <boxGeometry args={[2.35, 0.28, 1.16]} />
+      </mesh>
+      <mesh position={[-0.58, 2.62, 0.72]} material={toon("#161522", { noOcclude: true })} castShadow>
+        <cylinderGeometry args={[0.055, 0.055, 0.42, 12]} />
+      </mesh>
+      <mesh position={[-0.58, 2.88, 0.72]} material={toon(spec.stick, { emissive: spec.stick, noOcclude: true })} castShadow>
+        <sphereGeometry args={[0.16, 14, 12]} />
+      </mesh>
+      <CabButton x={0.28} y={2.58} z={0.86} color="#FF5CB9" />
+      <CabButton x={0.58} y={2.58} z={0.86} color="#FFC64D" />
+      <CabButton x={0.88} y={2.58} z={0.86} color="#54CFFF" />
+      <CabButton x={0.4} y={2.56} z={0.52} color="#FF7C45" />
+      <CabButton x={0.7} y={2.56} z={0.52} color="#FFE46F" />
+      <CabButton x={1.0} y={2.56} z={0.52} color="#67E0FF" />
+      <RoundedBox args={[0.42, 0.7, 0.08]} radius={0.05} smoothness={4} position={[-0.28, 1.18, 0.985]} castShadow material={coinMat} />
+      <RoundedBox args={[0.42, 0.7, 0.08]} radius={0.05} smoothness={4} position={[0.28, 1.18, 0.985]} castShadow material={coinMat} />
+      <mesh position={[0, 0.55, 0.96]}>
+        <planeGeometry args={[2.08, 0.85]} />
+        <meshBasicMaterial map={kick} toneMapped={false} />
+      </mesh>
+      <mesh position={[-1.236, 2.18, -0.08]} rotation={[0, Math.PI / 2, 0]}>
+        <planeGeometry args={[1.62, 4.2]} />
+        <meshBasicMaterial map={side} toneMapped={false} />
+      </mesh>
+      <mesh position={[1.236, 2.18, -0.08]} rotation={[0, -Math.PI / 2, 0]}>
+        <planeGeometry args={[1.62, 4.2]} />
+        <meshBasicMaterial map={side} toneMapped={false} />
+      </mesh>
+      <NeonStrip p={[-1.24, 2.2, 0.92]} s={[0.045, 4.4, 0.045]} c={spec.neonL} />
+      <NeonStrip p={[1.24, 2.2, 0.92]} s={[0.045, 4.4, 0.045]} c={spec.neonR} />
+      <NeonStrip p={[0, 0.03, 0.95]} s={[2.42, 0.05, 0.05]} c={spec.neonL} />
+      <NeonStrip p={[0, 5.22, 0.55]} s={[2.35, 0.05, 0.05]} c={spec.neonR} />
     </group>
   );
 }

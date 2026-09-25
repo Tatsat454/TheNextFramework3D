@@ -91,11 +91,11 @@ export const interiors: Record<InteriorId, InteriorDef> = {
       id: `cabinet${i + 1}`,
       x,
       z: -2.45,
-      y: 1.55,
+      y: 1.7,
       r: 1.15,
     })),
     blocked: [
-      ...CABINET_X.map((x) => ({ x0: x - 0.62, z0: -4.35, x1: x + 0.62, z1: -2.92 })),
+      ...CABINET_X.map((x) => ({ x0: x - 0.7, z0: -4.35, x1: x + 0.7, z1: -2.85 })),
       { x0: -5.35, z0: 2.15, x1: -3.55, z1: 3.55 }, // beanbag corner
     ],
   },
