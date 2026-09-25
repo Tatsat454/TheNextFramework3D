@@ -112,6 +112,18 @@ function Television() {
   );
 }
 
+function Couch() {
+  return (
+    <group position={[1.2, 0, 1.55]}>
+      <Box p={[0.08, 0.28, 0]} s={[0.72, 0.28, 1.55]} c="#C48A55" />
+      <Box p={[0.08, 0.42, 0]} s={[0.62, 0.16, 1.38]} c="#E8513F" />
+      <Box p={[-0.28, 0.55, 0]} s={[0.22, 0.7, 1.55]} c="#C8373C" />
+      <Box p={[0.08, 0.48, -0.72]} s={[0.7, 0.42, 0.22]} c="#C8373C" />
+      <Box p={[0.08, 0.48, 0.72]} s={[0.7, 0.42, 0.22]} c="#C8373C" />
+    </group>
+  );
+}
+
 function Picture() {
   return (
     <group position={[0.62, 1.92, -3.82]}>
@@ -285,6 +297,7 @@ export function InteriorWorld() {
       <Bookshelf />
       <Desk />
       <Television />
+      <Couch />
       <Picture />
       <WindowAndBeam />
       <Plant p={[-4.45, 0, -3.55]} />
