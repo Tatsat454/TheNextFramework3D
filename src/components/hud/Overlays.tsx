@@ -280,9 +280,10 @@ export function Toasts() {
 
 export function Confetti() {
   const at = useGame((s) => s.celebrateAt);
+  const interior = useGame((s) => s.interior);
   const canvas = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
-    if (!at || !canvas.current) return;
+    if (!at || !canvas.current || interior) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const c = canvas.current;
     const ctx = c.getContext("2d")!;
@@ -328,6 +329,7 @@ export function Confetti() {
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [at]);
+  }, [at, interior]);
+  if (interior) return null;
   return <canvas ref={canvas} className="pointer-events-none absolute inset-0 z-[55] h-full w-full" aria-hidden />;
 }

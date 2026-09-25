@@ -33,7 +33,7 @@ function Bed() {
   const patches: [number, number, string][] = [];
   const cols = ["#E8513F", "#FFF6E6", "#FFC857", "#C7B9FF", "#E8513F"];
   for (let i = 0; i < 4; i++)
-    for (let j = 0; j < 6; j++) patches.push([(i - 1.5) * 0.4, (j - 2.2) * 0.34, cols[(i + j) % cols.length]!]);
+    for (let j = 0; j < 5; j++) patches.push([(i - 1.5) * 0.36, (j - 1.7) * 0.32, cols[(i + j) % cols.length]!]);
   return (
     <group position={[-3.15, 0, -1.7]}>
       <Box p={[0, 0.18, 0]} s={[1.85, 0.36, 2.55]} c="#8B5A32" />
@@ -96,6 +96,8 @@ function Kitchen() {
     </group>
   );
 }
+
+function Desk() {
   return (
     <group position={[3.5, 0, -1.65]}>
       <Box p={[0, 0.42, 0]} s={[1.7, 0.12, 0.95]} c="#C48A55" />
@@ -175,9 +177,6 @@ function WindowAndBeam() {
       <RoomWindow p={[2.45, 1.85, 3.78]} />
       <mesh rotation={[-Math.PI / 2, 0, 0.55]} position={[1.25, 0.04, -0.85]} scale={[1.9, 1, 0.85]} material={flat("#F7D98A", 0.38, true)}>
         <circleGeometry args={[1.15, 28]} />
-      </mesh>
-      <mesh position={[1.7, 1.55, -2.4]} rotation={[0.72, 0, -0.32]} material={flat("#FFE7A8", 0.18, true)}>
-        <planeGeometry args={[1.6, 2.4]} />
       </mesh>
     </group>
   );
