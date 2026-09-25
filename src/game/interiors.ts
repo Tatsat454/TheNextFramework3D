@@ -60,6 +60,9 @@ export const interiors: Record<InteriorId, InteriorDef> = {
       { x0: 4.15, z0: -3.95, x1: 4.75, z1: -3.3 },
       { x0: -4.75, z0: 3.15, x1: -4.15, z1: 3.75 },
       { x0: 4.15, z0: 3.15, x1: 4.75, z1: 3.75 },
+      { x0: -8.15, z0: -0.45, x1: -6.85, z1: 1.15 }, // tub
+      { x0: -6.15, z0: -0.4, x1: -5.55, z1: 0.35 }, // toilet
+      { x0: -6.3, z0: 2.45, x1: -5.5, z1: 3.05 }, // sink
     ],
   },
 };
@@ -78,7 +81,9 @@ function overlaps(x: number, z: number, b: Rect) {
 export function canStepInterior(id: InteriorId, x: number, z: number) {
   const inRoom = x > -4.62 + RADIUS && x < 4.62 - RADIUS && z > -3.62 + RADIUS && z < 3.52;
   const inAlcove = Math.abs(x) < 0.82 && z >= 3.52 && z < 3.78;
-  if (!inRoom && !inAlcove) return false;
+  const inBath = x <= -4.62 && x > -8.05 && z > -0.25 && z < 3.1;
+  const inArch = x > -5.2 && x < -4.5 && z > 0.45 && z < 1.95;
+  if (!inRoom && !inAlcove && !inBath && !inArch) return false;
   return !interiors[id].blocked.some((b) => overlaps(x, z, b));
 }
 

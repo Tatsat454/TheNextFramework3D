@@ -210,11 +210,55 @@ function Walls() {
       <Box p={[-0.78, 1.15, 4]} s={[0.16, 2.3, 0.28]} c="#8B5A32" />
       <Box p={[0.78, 1.15, 4]} s={[0.16, 2.3, 0.28]} c="#8B5A32" />
       <Box p={[0, 2.32, 4]} s={[1.72, 0.16, 0.28]} c="#8B5A32" />
-      {/* East / west */}
-      <Box p={[-5, y, 0]} s={[t, h, 8.22]} c={HOUSE_COLORS.wall} />
+      {/* East / west, with an open arch into the bath on the west. */}
       <Box p={[5, y, 0]} s={[t, h, 8.22]} c={HOUSE_COLORS.wall} />
-      <Box p={[-4.88, stripe, 0]} s={[0.06, 0.18, 8]} c={HOUSE_COLORS.wainscot} shadow={false} />
+      <Box p={[-5, y, -1.9]} s={[t, h, 4.4]} c={HOUSE_COLORS.wall} />
+      <Box p={[-5, y, 3.1]} s={[t, h, 2.0]} c={HOUSE_COLORS.wall} />
+      <Box p={[-4.88, stripe, -1.9]} s={[0.06, 0.18, 4.4]} c={HOUSE_COLORS.wainscot} shadow={false} />
+      <Box p={[-4.88, stripe, 3.1]} s={[0.06, 0.18, 2.0]} c={HOUSE_COLORS.wainscot} shadow={false} />
       <Box p={[4.88, stripe, 0]} s={[0.06, 0.18, 8]} c={HOUSE_COLORS.wainscot} shadow={false} />
+      {/* Arch into the bath */}
+      <Box p={[-5, 1.15, 0.32]} s={[0.28, 2.3, 0.16]} c="#8B5A32" />
+      <Box p={[-5, 1.15, 2.08]} s={[0.28, 2.3, 0.16]} c="#8B5A32" />
+      <Box p={[-5, 2.32, 1.2]} s={[0.28, 0.16, 1.92]} c="#8B5A32" />
+    </group>
+  );
+}
+
+function Bathroom() {
+  const h = 3.15;
+  const y = h / 2;
+  const t = 0.22;
+  return (
+    <group>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[-6.65, 0, 1.4]} material={toon("#E8D5C0", { noOcclude: true })} receiveShadow>
+        <planeGeometry args={[3.4, 3.7]} />
+      </mesh>
+      <Box p={[-8.3, y, 1.4]} s={[t, h, 3.92]} c={HOUSE_COLORS.wall} />
+      <Box p={[-6.65, y, -0.5]} s={[3.5, h, t]} c={HOUSE_COLORS.wall} />
+      <Box p={[-6.65, y, 3.3]} s={[3.5, h, t]} c={HOUSE_COLORS.wall} />
+      <Box p={[-8.18, 0.92, 1.4]} s={[0.06, 0.18, 3.7]} c={HOUSE_COLORS.wainscot} shadow={false} />
+      <Box p={[-6.65, 0.92, -0.38]} s={[3.3, 0.18, 0.06]} c={HOUSE_COLORS.wainscot} shadow={false} />
+      <Box p={[-6.65, 0.92, 3.18]} s={[3.3, 0.18, 0.06]} c={HOUSE_COLORS.wainscot} shadow={false} />
+      {/* Tub */}
+      <Box p={[-7.55, 0.28, 0.15]} s={[1.15, 0.55, 1.9]} c="#FFF6E6" />
+      <Box p={[-7.55, 0.48, 0.15]} s={[0.88, 0.18, 1.62]} c="#A8E8F4" glow shadow={false} />
+      <mesh position={[-7.35, 0.58, 0.55]} material={toon("#FF8A65")}>
+        <sphereGeometry args={[0.1, 8, 8]} />
+      </mesh>
+      {/* Toilet */}
+      <Box p={[-5.85, 0.22, -0.05]} s={[0.42, 0.44, 0.55]} c="#FFF6E6" />
+      <Box p={[-5.85, 0.52, -0.18]} s={[0.38, 0.28, 0.22]} c="#FFF6E6" />
+      {/* Sink + mirror */}
+      <Box p={[-5.9, 0.55, 2.75]} s={[0.7, 0.12, 0.42]} c="#C48A55" />
+      <mesh position={[-5.9, 0.7, 2.75]} material={toon("#FFF6E6")} castShadow>
+        <cylinderGeometry args={[0.22, 0.18, 0.16, 12]} />
+      </mesh>
+      <Box p={[-5.9, 1.55, 3.16]} s={[0.55, 0.7, 0.06]} c="#C48A55" shadow={false} />
+      <Box p={[-5.9, 1.55, 3.12]} s={[0.42, 0.55, 0.04]} c="#E4DDFF" glow shadow={false} />
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[-6.5, 0.03, 1.5]} material={toon("#7ED4EA", { noOcclude: true })}>
+        <circleGeometry args={[0.55, 16]} />
+      </mesh>
     </group>
   );
 }
@@ -272,6 +316,7 @@ export function InteriorWorld() {
         <planeGeometry args={[1.45, 0.7]} />
       </mesh>
       <Walls />
+      <Bathroom />
       <Bed />
       <Bookshelf />
       <Desk />

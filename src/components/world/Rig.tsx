@@ -11,7 +11,7 @@ import { useGame } from "@/game/store";
 import type { TimePreset } from "@/game/time-of-day";
 
 const OFFSET = new THREE.Vector3(0, 14.8, 18.4);
-const INTERIOR_OFFSET = new THREE.Vector3(0, 16.8, 7.4);
+const INTERIOR_OFFSET = new THREE.Vector3(-1.4, 18.4, 8.6);
 const tmp = new THREE.Vector3();
 
 export function CameraRig() {
@@ -31,7 +31,7 @@ export function CameraRig() {
       init.current = false;
     }
     const inside = !!s.interior;
-    const target = inside ? new THREE.Vector3(0, 0.25, -0.35) : new THREE.Vector3(player.x, player.y, player.z);
+    const target = inside ? new THREE.Vector3(-1.45, 0.25, -0.1) : new THREE.Vector3(player.x, player.y, player.z);
     let z = 1;
     if (!inside && s.nearby?.startsWith("landmark:")) {
       const c = getPlacement(s.nearby.slice(9) as LandmarkId).center;
@@ -56,7 +56,7 @@ export function CameraRig() {
     camera.position.copy(focus.current).addScaledVector(offset, zoom.current * (inside ? 1 : portrait));
     const persp = camera as THREE.PerspectiveCamera;
     if (persp.isPerspectiveCamera) {
-      persp.fov = inside ? 36 : 32;
+      persp.fov = inside ? 38 : 32;
       persp.updateProjectionMatrix();
     }
     if (inside) camera.lookAt(focus.current.x, focus.current.y + 0.15, focus.current.z);
