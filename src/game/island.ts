@@ -101,13 +101,45 @@ for (const t of grid) {
 
 /** Pond spills south over the rim as a short river, then falls off the island. */
 export const stream = { i0: 15, i1: 18, j0: 41, j1: 45 };
-for (let j = stream.j0; j <= stream.j1; j++) {
-  for (let i = stream.i0; i <= stream.i1; i++) {
+for (let i = stream.i0; i <= stream.i1; i++) {
+  for (let j = stream.j0; j <= stream.j1; j++) {
     const t = tileAt(i, j);
-    if (!t) continue;
+    // Never grow a water pier into the void — the fall starts at the real lip.
+    if (!t || t.kind === "void") break;
     t.kind = "water";
     t.blocked = true;
     t.h = 1;
+  }
+}
+
+const isSolid = (t: Tile | undefined) => !!t && t.kind !== "void" && t.kind !== "water";
+// Close 1-tile stair corners on the south apron so the beach isn't a stack of shelves.
+for (let pass = 0; pass < 2; pass++) {
+  const fill: Tile[] = [];
+  const cut: Tile[] = [];
+  for (const t of grid) {
+    if (t.j < 39) continue;
+    const n = tileAt(t.i, t.j - 1);
+    const s = tileAt(t.i, t.j + 1);
+    const e = tileAt(t.i + 1, t.j);
+    const w = tileAt(t.i - 1, t.j);
+    if (t.kind === "void") {
+      if (isSolid(n) && isSolid(w) && !isSolid(s) && !isSolid(e)) fill.push(t);
+      else if (isSolid(n) && isSolid(e) && !isSolid(s) && !isSolid(w)) fill.push(t);
+    } else if (t.kind === "sand" || t.kind === "grass") {
+      const neighbors = [isSolid(n), isSolid(s), isSolid(e), isSolid(w)].filter(Boolean).length;
+      if (neighbors <= 1) cut.push(t);
+    }
+  }
+  for (const t of fill) {
+    t.kind = "sand";
+    t.blocked = false;
+    t.h = 1;
+  }
+  for (const t of cut) {
+    t.kind = "void";
+    t.blocked = true;
+    t.h = 0;
   }
 }
 

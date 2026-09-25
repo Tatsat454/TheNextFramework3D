@@ -80,7 +80,7 @@ export function Terrain() {
       if (t.kind === "water") {
         const top = LEVEL - 0.32;
         const sy = top - BASE;
-        dirt.push({ x, y: BASE + sy / 2, z, sx: 1.42, sy, sz: 1.42, c: palette.dirt });
+        dirt.push({ x, y: BASE + sy / 2, z, sx: 1.08, sy, sz: 1.08, c: palette.dirt });
         weld(water, t.i, t.j, t.i + 1, t.j + 1, WATER_Y);
         const south = tileAt(t.i, t.j + 1);
         if ((!south || south.kind === "void") && t.j >= 40) pushFall(x, z, 0.72);
@@ -88,7 +88,7 @@ export function Terrain() {
       }
       const top = t.h * LEVEL;
       const sy = top - 0.02 - BASE;
-      dirt.push({ x, y: BASE + sy / 2, z, sx: 1.42, sy, sz: 1.42, c: t.kind === "sand" ? palette.sand : palette.dirt });
+      dirt.push({ x, y: BASE + sy / 2, z, sx: 1.08, sy, sz: 1.08, c: palette.dirt });
       if (t.kind === "ramp" || t.kind === "dock") continue;
       if (t.kind === "path") weld(path, t.i, t.j, t.i + 1, t.j + 1, top + 0.04);
       else if (t.kind === "sand") weld(sand, t.i, t.j, t.i + 1, t.j + 1, top + 0.02);
