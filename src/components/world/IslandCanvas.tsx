@@ -5,7 +5,9 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { presetFromSearch } from "@/game/time-of-day";
+import { useGame } from "@/game/store";
 import { Ambient } from "./Ambient";
+import { ClearColor, InteriorWorld } from "./Interior";
 import { Landmarks } from "./Landmarks";
 import { Nature } from "./Nature";
 import { Pickups } from "./Pickups";
@@ -52,6 +54,7 @@ export default function IslandCanvas({ onReady, onNoWebGL }: { onReady: () => vo
   const [h, setH] = useState(hour);
   const [search, setSearch] = useState(() => window.location.search);
   const preset = presetFromSearch(search, h);
+  const interior = useGame((s) => s.interior);
 
   useEffect(() => {
     if (!supported) onNoWebGL();
@@ -93,16 +96,23 @@ export default function IslandCanvas({ onReady, onNoWebGL }: { onReady: () => vo
           setDpr(1);
         }}
       />
-      <Sky preset={preset} />
-      <Lights preset={preset} shadows={shadows} />
+      {interior ? (
+        <InteriorWorld />
+      ) : (
+        <>
+          <ClearColor color={preset.fog} />
+          <Sky preset={preset} />
+          <Lights preset={preset} shadows={shadows} />
+          <Terrain />
+          <Nature />
+          <Landmarks />
+          <Pickups />
+          <Residents />
+          <Ambient />
+        </>
+      )}
       <CameraRig />
-      <Terrain />
-      <Nature />
-      <Landmarks />
-      <Pickups />
-      <Residents />
       <Player />
-      <Ambient />
       <Prompt />
       <FirstFrame onReady={onReady} />
     </Canvas>

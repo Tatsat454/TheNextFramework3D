@@ -6,11 +6,13 @@ import * as THREE from "three";
 import type { LandmarkId } from "@/content/landmarks";
 import { getPlacement } from "@/game/island";
 import { bend } from "@/game/materials";
-import { player, reducedMotion } from "@/game/player-state";
+import { player, playerScreen, reducedMotion } from "@/game/player-state";
 import { useGame } from "@/game/store";
 import type { TimePreset } from "@/game/time-of-day";
 
 const OFFSET = new THREE.Vector3(0, 14.8, 18.4);
+const INTERIOR_OFFSET = new THREE.Vector3(0, 16.8, 7.4);
+const tmp = new THREE.Vector3();
 
 export function CameraRig() {
   const { camera, size } = useThree();
@@ -19,33 +21,52 @@ export function CameraRig() {
   const focus = useRef(new THREE.Vector3(player.x, player.y, player.z));
   const zoom = useRef(1);
   const init = useRef(false);
+  const lastInterior = useRef<string | null>(null);
 
   useFrame((_, rawDt) => {
     const dt = Math.min(rawDt, 1 / 20);
     const s = useGame.getState();
-    const target = new THREE.Vector3(player.x, player.y, player.z);
+    if (s.interior !== lastInterior.current) {
+      lastInterior.current = s.interior;
+      init.current = false;
+    }
+    const inside = !!s.interior;
+    const target = inside ? new THREE.Vector3(0, 0.25, -0.35) : new THREE.Vector3(player.x, player.y, player.z);
     let z = 1;
-    if (s.nearby?.startsWith("landmark:")) {
+    if (!inside && s.nearby?.startsWith("landmark:")) {
       const c = getPlacement(s.nearby.slice(9) as LandmarkId).center;
       target.x += (c.x - player.x) * 0.22;
       target.z += (c.z - player.z) * 0.22;
       z = 0.85;
     }
     if (s.card || s.dialog) z = Math.min(z, 0.9);
-    target.x = THREE.MathUtils.clamp(target.x, -18, 18);
-    target.z = THREE.MathUtils.clamp(target.z, -20, 18);
+    if (!inside) {
+      target.x = THREE.MathUtils.clamp(target.x, -18, 18);
+      target.z = THREE.MathUtils.clamp(target.z, -20, 18);
+    }
 
     const k = reducedMotion.value ? 1 - Math.pow(1 - 0.2, dt * 60) : 1 - Math.pow(1 - 0.08, dt * 60);
     if (!init.current) {
       focus.current.copy(target);
       init.current = true;
     }
-    focus.current.lerp(target, k);
+    focus.current.lerp(target, inside ? 1 : k);
     zoom.current += (z - zoom.current) * k * 0.6;
-    camera.position.copy(focus.current).addScaledVector(OFFSET, zoom.current * portrait);
-    camera.lookAt(focus.current.x, focus.current.y + 0.6, focus.current.z - 1.6);
+    const offset = inside ? INTERIOR_OFFSET : OFFSET;
+    camera.position.copy(focus.current).addScaledVector(offset, zoom.current * (inside ? 1 : portrait));
+    const persp = camera as THREE.PerspectiveCamera;
+    if (persp.isPerspectiveCamera) {
+      persp.fov = inside ? 36 : 32;
+      persp.updateProjectionMatrix();
+    }
+    if (inside) camera.lookAt(focus.current.x, focus.current.y + 0.15, focus.current.z);
+    else camera.lookAt(focus.current.x, focus.current.y + 0.6, focus.current.z - 1.6);
+    bend.uBend.value = inside ? 0 : 0.0016;
     bend.uBendCenter.value.copy(focus.current);
     bend.uPlayer.value.set(player.x, player.y + 0.55, player.z);
+    tmp.set(player.x, player.y + 0.7, player.z).project(camera);
+    playerScreen.x = THREE.MathUtils.clamp((tmp.x + 1) / 2, 0.08, 0.92);
+    playerScreen.y = THREE.MathUtils.clamp((-tmp.y + 1) / 2, 0.08, 0.92);
   });
   return null;
 }

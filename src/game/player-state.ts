@@ -12,4 +12,7 @@ export const player = {
   onSand: false,
 };
 
+/** Player projected to the screen, 0–1, used by the interior iris wipe. */
+export const playerScreen = { x: 0.5, y: 0.55 };
+
 export const reducedMotion = { value: false };

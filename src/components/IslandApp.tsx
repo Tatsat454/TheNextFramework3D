@@ -6,12 +6,13 @@ import { MotionConfig } from "motion/react";
 import { useCallback, useEffect, useState } from "react";
 import { setAmbient } from "@/game/audio";
 import { input } from "@/game/input";
-import { talkTo } from "@/game/interact";
+import { requestEnter, requestExit, talkTo } from "@/game/interact";
 import { heightAt, isWalkable } from "@/game/island";
 import { player, reducedMotion } from "@/game/player-state";
 import { hydrate, readPosition, savePosition, useGame } from "@/game/store";
 import { cn } from "@/lib/utils";
 import { DialogBox, dialogControl } from "./hud/DialogBox";
+import { CircleWipe } from "./hud/CircleWipe";
 import { Hud } from "./hud/Hud";
 import { LandmarkCard } from "./hud/LandmarkCard";
 import { LoadingScreen } from "./hud/LoadingScreen";
@@ -32,7 +33,7 @@ export default function IslandApp() {
 
   useEffect(() => {
     hydrate();
-    if (process.env.NODE_ENV !== "production") Object.assign(window, { __pocket: { player, useGame } });
+    if (process.env.NODE_ENV !== "production") Object.assign(window, { __pocket: { player, useGame, requestEnter, requestExit } });
     const pos = readPosition();
     if (pos && isWalkable(pos.x, pos.z)) {
       player.x = pos.x;
@@ -44,7 +45,9 @@ export default function IslandApp() {
     reducedMotion.value = mq.matches;
     const onMq = () => (reducedMotion.value = mq.matches);
     mq.addEventListener("change", onMq);
-    const keep = setInterval(() => savePosition(player), 1000);
+    const keep = setInterval(() => {
+      if (!useGame.getState().interior) savePosition(player);
+    }, 1000);
     return () => {
       mq.removeEventListener("change", onMq);
       clearInterval(keep);
@@ -160,6 +163,7 @@ export default function IslandApp() {
             <Pockets />
             <IslandMap />
             <Confetti />
+            <CircleWipe />
           </>
         )}
         <LoadingScreen ready={ready} onDone={onLoaded} />

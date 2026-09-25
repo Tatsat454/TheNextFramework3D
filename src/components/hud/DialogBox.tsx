@@ -2,9 +2,9 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
-import { isPlaceholderText, residents } from "@/content/landmarks";
+import { isPlaceholderText } from "@/content/landmarks";
 import { sfx } from "@/game/audio";
-import { useGame } from "@/game/store";
+import { toast, useGame } from "@/game/store";
 import { cn } from "@/lib/utils";
 
 export const dialogControl = { advance: () => {} };
@@ -12,7 +12,9 @@ export const dialogControl = { advance: () => {} };
 export function DialogBox() {
   const dialog = useGame((s) => s.dialog);
   const set = useGame((s) => s.set);
-  const speaker = dialog ? residents.find((r) => r.id === dialog.speaker)! : null;
+  const speaker = dialog
+    ? { name: dialog.name, role: dialog.role, tagColor: dialog.tagColor, voice: dialog.voice }
+    : null;
   const line = dialog ? dialog.lines[dialog.index] : "";
   const lineKey = dialog ? `${dialog.speaker}:${dialog.index}:${line}` : "";
   const [typed, setTyped] = useState({ key: "", n: 0 });
@@ -84,7 +86,7 @@ export function DialogBox() {
               style={{ background: speaker.tagColor }}
             >
               {speaker.name}
-              <span className="ml-1.5 text-[12px] font-medium opacity-70">{speaker.role}</span>
+              {speaker.role ? <span className="ml-1.5 text-[12px] font-medium opacity-70">{speaker.role}</span> : null}
             </span>
             <p aria-live="polite" className={cn("min-h-[3.4em] text-[18px] leading-[1.6] sm:text-[19px]", isPlaceholderText(line) && "text-ink-soft")}>
               {line.slice(0, shown)}
@@ -100,6 +102,26 @@ export function DialogBox() {
                 </button>
                 <button type="button" onClick={() => set({ dialog: null })} className="rounded-2xl bg-white px-4 py-2.5 text-[15px] font-bold text-ink">
                   Maybe later
+                </button>
+              </div>
+            ) : done && last && dialog.action === "link" && dialog.href ? (
+              <div className="mt-3 flex gap-2" onClick={(e) => e.stopPropagation()}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (isPlaceholderText(dialog.href ?? "")) {
+                      toast("Add your resume URL in the content file.", "info");
+                      return;
+                    }
+                    window.open(dialog.href, "_blank", "noopener");
+                    sfx.open();
+                  }}
+                  className="lift rounded-2xl bg-coral px-4 py-2.5 text-[15px] font-bold text-white"
+                >
+                  {dialog.hrefLabel ?? "Open link"}
+                </button>
+                <button type="button" onClick={() => set({ dialog: null })} className="rounded-2xl bg-white px-4 py-2.5 text-[15px] font-bold text-ink">
+                  Close
                 </button>
               </div>
             ) : (

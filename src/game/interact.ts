@@ -1,12 +1,26 @@
 "use client";
 
 import type { ItemId, LandmarkId, ResidentId } from "@/content/landmarks";
-import { copy, getItem, getLandmark, landmarks, museumExhibits, residents, skills } from "@/content/landmarks";
+import { copy, getItem, getLandmark, houseInteriorCopy, landmarks, museumExhibits, residents, skills } from "@/content/landmarks";
 import { sfx } from "./audio";
+import {
+  armDoorLatch,
+  getInterior,
+  interiorByLandmark,
+  outsideDoor,
+  placePlayerInside,
+  placePlayerOutside,
+  type InteriorId,
+  WIPE_IN_MS,
+  WIPE_IN_MS_REDUCED,
+  WIPE_OUT_MS,
+  WIPE_OUT_MS_REDUCED,
+} from "./interiors";
 import { gardenRows, getPlacement, landmarkPlacements, LEVEL, pedestals, pickups, trees } from "./island";
+import { playerScreen, reducedMotion } from "./player-state";
 import { checkArrivals, toast, useGame } from "./store";
 
-export type InteractKind = "landmark" | "exhibit" | "row" | "tree" | "pickup" | "resident" | "critter";
+export type InteractKind = "landmark" | "exhibit" | "row" | "tree" | "pickup" | "resident" | "critter" | "door" | "prop";
 
 export type Interactable = {
   id: string;
@@ -22,17 +36,19 @@ export type Interactable = {
 };
 
 const staticList: Interactable[] = [
-  ...landmarkPlacements.map((p) => ({
-    id: `landmark:${p.id}`,
-    kind: "landmark" as const,
-    label: getLandmark(p.id).name,
-    verb: "Open",
-    x: p.interact.x,
-    z: p.interact.z,
-    y: p.level * LEVEL + (p.id === "townhall" || p.id === "museum" ? 4.4 : p.id === "dock" ? 1.8 : 3.4),
-    r: p.radius,
-    ref: p.id,
-  })),
+  ...landmarkPlacements
+    .filter((p) => !interiorByLandmark(p.id))
+    .map((p) => ({
+      id: `landmark:${p.id}`,
+      kind: "landmark" as const,
+      label: getLandmark(p.id).name,
+      verb: "Open",
+      x: p.interact.x,
+      z: p.interact.z,
+      y: p.level * LEVEL + (p.id === "townhall" || p.id === "museum" ? 4.4 : p.id === "dock" ? 1.8 : 3.4),
+      r: p.radius,
+      ref: p.id,
+    })),
   ...pedestals.map((p, k) => ({
     id: `exhibit:${p.slug}`,
     kind: "exhibit" as const,
@@ -88,6 +104,35 @@ const critterCopy: Record<CritterKind, { label: string; line: string; r: number 
 
 export function currentInteractables(): Interactable[] {
   const s = useGame.getState();
+  if (s.interior) {
+    const room = getInterior(s.interior);
+    const list: Interactable[] = room.objects.map((o) => {
+      const copyFor = houseInteriorCopy[o.id];
+      return {
+        id: `prop:${o.id}`,
+        kind: "prop" as const,
+        label: copyFor.name,
+        verb: copyFor.verb,
+        x: o.x,
+        z: o.z,
+        y: o.y,
+        r: o.r,
+        ref: o.id,
+      };
+    });
+    list.push({
+      id: `door-exit:${room.id}`,
+      kind: "door",
+      label: room.name,
+      verb: "Leave",
+      x: room.doormat.x,
+      z: room.doormat.z,
+      y: 1.4,
+      r: 0.85,
+      ref: `exit:${room.id}`,
+    });
+    return list;
+  }
   const list = [...staticList];
   for (const p of pickups) {
     if (s.collected[p.id]) continue;
@@ -125,6 +170,18 @@ export function currentInteractables(): Interactable[] {
       ref: c.kind,
     });
   }
+  const door = outsideDoor("house");
+  list.push({
+    id: "door:house",
+    kind: "door",
+    label: getInterior("house").name,
+    verb: "Enter",
+    x: door.x,
+    z: door.z,
+    y: door.y + 2.4,
+    r: 1.15,
+    ref: "enter:house",
+  });
   return list;
 }
 
@@ -275,7 +332,18 @@ export function interact(it: Interactable, player: { x: number; z: number }) {
     case "resident": {
       const r = residents.find((x) => x.id === it.ref)!;
       const lines = [r.intro, ...r.lines].map((l) => fillTemplate(l, player.x, player.z));
-      useGame.setState({ dialog: { speaker: r.id, lines, index: 0, action: r.id === "sol" ? "museum" : undefined } });
+      useGame.setState({
+        dialog: {
+          speaker: r.id,
+          name: r.name,
+          role: r.role,
+          tagColor: r.tagColor,
+          voice: r.voice,
+          lines,
+          index: 0,
+          action: r.id === "sol" ? "museum" : undefined,
+        },
+      });
       break;
     }
     case "critter": {
@@ -283,7 +351,89 @@ export function interact(it: Interactable, player: { x: number; z: number }) {
       toast(critterCopy[kind].line, "info");
       break;
     }
+    case "door": {
+      if (it.ref.startsWith("enter:")) requestEnter(it.ref.slice(6) as InteriorId);
+      else requestExit();
+      break;
+    }
+    case "prop": {
+      inspectProp(it.ref as keyof typeof houseInteriorCopy);
+      break;
+    }
   }
+}
+
+function inspectProp(id: keyof typeof houseInteriorCopy) {
+  const o = houseInteriorCopy[id];
+  sfx.open();
+  const tag =
+    id === "computer" ? "#D9A066" : id === "tv" ? "#7B6CF6" : id === "bed" ? "#E8513F" : id === "picture" ? "#C48A55" : "#8B5A32";
+  useGame.setState({
+    dialog: {
+      speaker: id,
+      name: o.name,
+      role: o.title,
+      tagColor: tag,
+      voice: [240, 340],
+      lines: o.lines,
+      index: 0,
+      action: "href" in o && o.href ? "link" : undefined,
+      href: "href" in o ? o.href : undefined,
+      hrefLabel: "hrefLabel" in o ? o.hrefLabel : undefined,
+    },
+    emote: id === "bed" ? { type: "stretch", at: performance.now() } : useGame.getState().emote,
+  });
+}
+
+export function requestEnter(id: InteriorId) {
+  const s = useGame.getState();
+  if (s.interior || s.transitioning) return;
+  const rm = reducedMotion.value;
+  const outMs = rm ? WIPE_OUT_MS_REDUCED : WIPE_OUT_MS;
+  const inMs = rm ? WIPE_IN_MS_REDUCED : WIPE_IN_MS;
+  useGame.setState({
+    transitioning: true,
+    wipe: { phase: "out", x: playerScreen.x, y: playerScreen.y, at: performance.now() },
+    card: null,
+    dialog: null,
+  });
+  sfx.door();
+  window.setTimeout(() => {
+    visit(getInterior(id).landmarkId);
+    placePlayerInside(id);
+    useGame.setState({
+      interior: id,
+      nearby: null,
+      wipe: { phase: "in", x: 0.5, y: 0.7, at: performance.now() },
+    });
+    armDoorLatch(720);
+  }, outMs);
+  window.setTimeout(() => useGame.setState({ transitioning: false, wipe: null }), outMs + inMs);
+}
+
+export function requestExit() {
+  const s = useGame.getState();
+  if (!s.interior || s.transitioning) return;
+  const id = s.interior;
+  const rm = reducedMotion.value;
+  const outMs = rm ? WIPE_OUT_MS_REDUCED : WIPE_OUT_MS;
+  const inMs = rm ? WIPE_IN_MS_REDUCED : WIPE_IN_MS;
+  useGame.setState({
+    transitioning: true,
+    wipe: { phase: "out", x: playerScreen.x, y: playerScreen.y, at: performance.now() },
+    dialog: null,
+  });
+  sfx.door();
+  window.setTimeout(() => {
+    placePlayerOutside(id);
+    useGame.setState({
+      interior: null,
+      nearby: null,
+      wipe: { phase: "in", x: 0.5, y: 0.58, at: performance.now() },
+    });
+    armDoorLatch(720);
+  }, outMs);
+  window.setTimeout(() => useGame.setState({ transitioning: false, wipe: null }), outMs + inMs);
 }
 
 /** Opens a resident's dialog directly (used for the first-visit greeting). */

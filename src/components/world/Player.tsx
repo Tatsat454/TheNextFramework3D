@@ -5,7 +5,8 @@ import { useMemo, useRef } from "react";
 import * as THREE from "three";
 import { profile } from "@/content/landmarks";
 import { sfx } from "@/game/audio";
-import { findNearby, interact, type Interactable } from "@/game/interact";
+import { findNearby, interact, requestEnter, requestExit, type Interactable } from "@/game/interact";
+import { canStepInterior, doorZoneAt } from "@/game/interiors";
 import { canStep, heightAt, tileAt, worldToTile } from "@/game/island";
 import { input, moveAxes } from "@/game/input";
 import { flat, palette, toon } from "@/game/materials";
@@ -25,12 +26,15 @@ export function triggerInteract() {
   if (!it) return;
   nearbyInteractable = it;
   interact(it, player);
-  useGame.setState({ hopAt: performance.now() });
-  sfx.hop();
+  if (it.kind !== "door") {
+    useGame.setState({ hopAt: performance.now() });
+    sfx.hop();
+  }
 }
 
 function tryStep(x: number, z: number, dx: number, dz: number) {
-  const ok = (px: number, pz: number) => canStep(x, z, px, pz);
+  const interior = useGame.getState().interior;
+  const ok = (px: number, pz: number) => (interior ? canStepInterior(interior, px, pz) : canStep(x, z, px, pz));
   const blocked = (nx: number, nz: number) => {
     const sx = nx !== x ? Math.sign(nx - x) : 0;
     const sz = nz !== z ? Math.sign(nz - z) : 0;
@@ -204,10 +208,19 @@ export function Player() {
     }
     player.moving = moving;
     player.running = moving && running;
-    const ground = heightAt(player.x, player.z);
+    const ground = s.interior ? 0 : heightAt(player.x, player.z);
     player.y += (ground - player.y) * (1 - Math.pow(0.0001, dt));
-    const tile = tileAt(worldToTile(player.x, player.z).i, worldToTile(player.x, player.z).j);
-    player.onSand = !!tile && tile.kind === "sand";
+    if (s.interior) player.onSand = false;
+    else {
+      const tile = tileAt(worldToTile(player.x, player.z).i, worldToTile(player.x, player.z).j);
+      player.onSand = !!tile && tile.kind === "sand";
+    }
+
+    if (!paused) {
+      const zone = doorZoneAt(player.x, player.z);
+      if (zone === "enter") requestEnter("house");
+      else if (zone === "exit") requestExit();
+    }
 
     if (a.wasMoving && !moving) a.stopAt = t;
     a.wasMoving = moving;
@@ -260,6 +273,12 @@ export function Player() {
       const c = Math.sin(et * 22) * 0.35;
       armLz = -0.5 + c;
       armRz = 0.5 - c;
+    } else if (emote === "stretch") {
+      armL = -2.65;
+      armR = -2.85;
+      armLz = -0.45;
+      armRz = 0.55;
+      headTilt = -0.18;
     }
     if (emoteHop && !rm) g.position.y += emoteHop;
     lerpRot(p.armL, armL, armLz);

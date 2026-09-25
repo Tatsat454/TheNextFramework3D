@@ -66,6 +66,11 @@ export const sfx = {
   hop() {
     tone(420, 0.12, { type: "sine", gain: 0.06, slide: 1.6 });
   },
+  door() {
+    tone(170, 0.32, { type: "triangle", gain: 0.07, slide: 0.72 });
+    tone(240, 0.24, { type: "sine", gain: 0.05, at: 0.05, slide: 1.18 });
+    tone(92, 0.4, { type: "sine", gain: 0.045 });
+  },
   jingle() {
     const notes = [523, 659, 784, 1047, 988, 1047];
     notes.forEach((f, k) => tone(f, 0.22, { type: "triangle", gain: 0.09, at: k * 0.11 }));

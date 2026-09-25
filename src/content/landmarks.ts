@@ -890,9 +890,70 @@ export const copy = {
   islandComplete: "You found every corner of Pocket Island!",
   pocketsFull: "Your pockets are full",
   wateringCan: "You got a watering can!",
+  insidePrefix: "Inside",
   currentlyPlaying: {
     placeholder: true,
     games: ["PLACEHOLDER game", "PLACEHOLDER game", "PLACEHOLDER game"],
+  },
+};
+
+/**
+ * Copy for objects inside My House. Anything starting with PLACEHOLDER is meant to be replaced.
+ * The computer's href should become a real resume URL.
+ */
+export const houseInteriorCopy = {
+  computer: {
+    name: "Computer",
+    verb: "Use",
+    title: "My resume",
+    lines: [
+      "The chunky beige box still boots. Resume's on the desktop — the short version of how I got here.",
+      "PLACEHOLDER: one sentence on what you want a hiring manager to notice first.",
+    ],
+    href: "PLACEHOLDER resume URL",
+    hrefLabel: "Open resume",
+  },
+  tv: {
+    name: "TV",
+    verb: "Watch",
+    title: "What I'm watching right now",
+    lines: [
+      "The queue is a mix of prestige, comfort, and legal-drama popcorn.",
+      "Lanterns, on HBO Max. PLACEHOLDER: why you're watching it / where you are in it.",
+      "Jane the Virgin. PLACEHOLDER: a favorite thing about it.",
+      "Suits. PLACEHOLDER: a favorite thing about it.",
+    ],
+    shows: [
+      { title: "Lanterns", detail: "HBO Max", color: "#1F6B4A" },
+      { title: "Jane the Virgin", detail: "Comfort rewatch", color: "#E8513F" },
+      { title: "Suits", detail: "Legal popcorn", color: "#2C3A6B" },
+    ],
+  },
+  bookshelf: {
+    name: "Bookshelf",
+    verb: "Browse",
+    title: "The shelf",
+    lines: [
+      "PLACEHOLDER: a book that shaped how you think, and one sentence on why.",
+      "PLACEHOLDER: another title — econ, games, or something unexpected.",
+      "PLACEHOLDER: what you're reading this month.",
+    ],
+  },
+  picture: {
+    name: "Framed picture",
+    verb: "Look",
+    title: "About me",
+    lines: [
+      "Hi — I'm Tatsat. M.S. Economics at Georgia Tech, former founder, weekly writer, lifelong gamer.",
+      "I want to build the economies and systems that make games feel alive.",
+      "PLACEHOLDER: one personal detail you'd tell someone standing in your living room.",
+    ],
+  },
+  bed: {
+    name: "Bed",
+    verb: "Sit",
+    title: "Bed",
+    lines: ["Not sleepy yet!"],
   },
 };
 

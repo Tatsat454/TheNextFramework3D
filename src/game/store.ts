@@ -3,8 +3,9 @@
 import { create } from "zustand";
 import type { ItemId, LandmarkId, ResidentId } from "@/content/landmarks";
 import { residents } from "@/content/landmarks";
+import type { InteriorId } from "./interiors";
 
-export type Emote = "wave" | "cheer" | "thinking" | "clap";
+export type Emote = "wave" | "cheer" | "thinking" | "clap" | "stretch";
 
 export type Card =
   | { type: "landmark"; id: LandmarkId }
@@ -13,11 +14,19 @@ export type Card =
   | { type: "item"; id: ItemId };
 
 export type DialogState = {
-  speaker: ResidentId;
+  speaker: string;
+  name: string;
+  role?: string;
+  tagColor: string;
+  voice: [number, number];
   lines: string[];
   index: number;
-  action?: "museum";
+  action?: "museum" | "link";
+  href?: string;
+  hrefLabel?: string;
 };
+
+export type Wipe = { phase: "out" | "in"; x: number; y: number; at: number };
 
 export type Toast = { id: number; title: string; color?: string; kind: "found" | "info" | "celebrate" };
 
@@ -50,6 +59,9 @@ type State = Persisted & {
   drops: { id: string; item: ItemId; x: number; z: number; y: number; at: number }[];
   waterAt: { id: string; at: number } | null;
   arrivalAt: Partial<Record<ResidentId, number>>;
+  interior: InteriorId | null;
+  transitioning: boolean;
+  wipe: Wipe | null;
   set: (p: Partial<State>) => void;
 };
 
@@ -108,6 +120,9 @@ export const useGame = create<State>((set) => ({
   drops: [],
   waterAt: null,
   arrivalAt: {},
+  interior: null,
+  transitioning: false,
+  wipe: null,
   set: (p) => set(p),
 }));
 
@@ -161,7 +176,7 @@ export function readPosition(): { x: number; z: number; facing: number } | null 
   }
 }
 
-export const isPaused = (s: State) => !!(s.card || s.dialog || s.mapOpen || s.pocketsOpen);
+export const isPaused = (s: State) => !!(s.card || s.dialog || s.mapOpen || s.pocketsOpen || s.transitioning);
 
 let toastId = 1;
 export function toast(title: string, kind: Toast["kind"] = "found", color?: string) {

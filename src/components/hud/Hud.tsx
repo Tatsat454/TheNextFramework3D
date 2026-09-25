@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Backpack, Map as MapIcon, Smile, Volume2, VolumeX } from "lucide-react";
 import { copy, landmarks, profile } from "@/content/landmarks";
+import { getInterior } from "@/game/interiors";
 import { setAmbient, sfx } from "@/game/audio";
 import { useGame } from "@/game/store";
 import { cn } from "@/lib/utils";
@@ -27,7 +28,9 @@ export function Hud() {
   const touch = useGame((s) => s.touch);
   const set = useGame((s) => s.set);
   const busy = useGame((s) => !!s.dialog || !!s.card);
+  const interiorId = useGame((s) => s.interior);
   const found = Object.keys(visited).length;
+  const inside = interiorId ? getInterior(interiorId) : null;
 
   const toggleSound = () => {
     const next = !sound;
@@ -67,18 +70,26 @@ export function Hud() {
         <div className="glass pointer-events-auto flex max-w-full items-center gap-3 rounded-full px-4 py-2.5 text-[13px] sm:text-[14px]">
           <span className="hidden font-medium text-ink-soft sm:inline">{touch ? copy.hudHint.mobile : copy.hudHint.desktop}</span>
           <span className="hidden text-ink-soft/50 sm:inline" aria-hidden>·</span>
-          <span className="font-bold text-ink">
-            {found} of {landmarks.length} landmarks found
-          </span>
-          <span className="flex items-center gap-1" aria-hidden>
-            {landmarks.map((l) => (
-              <span
-                key={l.id}
-                title={l.name}
-                className={cn("size-2 rounded-full transition-all duration-300", visited[l.id] ? "scale-110 bg-violet" : "bg-ink/15")}
-              />
-            ))}
-          </span>
+          {inside ? (
+            <span className="font-bold text-ink">
+              {copy.insidePrefix}: {inside.name}
+            </span>
+          ) : (
+            <>
+              <span className="font-bold text-ink">
+                {found} of {landmarks.length} landmarks found
+              </span>
+              <span className="flex items-center gap-1" aria-hidden>
+                {landmarks.map((l) => (
+                  <span
+                    key={l.id}
+                    title={l.name}
+                    className={cn("size-2 rounded-full transition-all duration-300", visited[l.id] ? "scale-110 bg-violet" : "bg-ink/15")}
+                  />
+                ))}
+              </span>
+            </>
+          )}
         </div>
       </div>
 

@@ -1,0 +1,139 @@
+import type { LandmarkId } from "@/content/landmarks";
+import { houseInteriorCopy } from "@/content/landmarks";
+import { getPlacement, heightAt, LEVEL } from "./island";
+import { player } from "./player-state";
+import { useGame } from "./store";
+
+export type InteriorId = "house";
+
+export type InteriorObjectId = keyof typeof houseInteriorCopy;
+
+type Rect = { x0: number; z0: number; x1: number; z1: number };
+
+export type InteriorObject = {
+  id: InteriorObjectId;
+  x: number;
+  z: number;
+  y: number;
+  r: number;
+};
+
+export type InteriorDef = {
+  id: InteriorId;
+  landmarkId: LandmarkId;
+  name: string;
+  /** Player spawn just inside the south door, facing the room. */
+  spawn: { x: number; z: number; facing: number };
+  doormat: { x: number; z: number; w: number; d: number };
+  objects: InteriorObject[];
+  blocked: Rect[];
+};
+
+export const HOUSE_COLORS = {
+  floor: "#D9A066",
+  wall: "#FFF6E6",
+  wainscot: "#C48A55",
+  rug: "#E8513F",
+};
+
+/** 10×8 tile bedroom, origin at the room center. +z is south (toward the door / camera). */
+export const interiors: Record<InteriorId, InteriorDef> = {
+  house: {
+    id: "house",
+    landmarkId: "house",
+    name: "My House",
+    spawn: { x: 0, z: 2.45, facing: Math.PI },
+    doormat: { x: 0, z: 3.32, w: 1.55, d: 0.82 },
+    objects: [
+      { id: "bed", x: -3.1, z: -1.35, y: 1.15, r: 1.25 },
+      { id: "bookshelf", x: -0.95, z: -3.35, y: 2.1, r: 1.05 },
+      { id: "picture", x: 1.45, z: -3.25, y: 2.15, r: 0.95 },
+      { id: "computer", x: 3.45, z: -1.65, y: 1.55, r: 1.15 },
+      { id: "tv", x: 3.45, z: 1.55, y: 1.35, r: 1.2 },
+    ],
+    blocked: [
+      { x0: -4.55, z0: -2.55, x1: -1.62, z1: -0.12 }, // bed
+      { x0: -2.2, z0: -3.95, x1: 0.4, z1: -3.12 }, // bookshelf
+      { x0: 2.32, z0: -2.88, x1: 4.7, z1: -0.42 }, // desk
+      { x0: 2.4, z0: 0.52, x1: 4.7, z1: 2.58 }, // tv stand
+      { x0: -4.75, z0: -3.95, x1: -4.15, z1: -3.3 },
+      { x0: 4.15, z0: -3.95, x1: 4.75, z1: -3.3 },
+      { x0: -4.75, z0: 3.15, x1: -4.15, z1: 3.75 },
+      { x0: 4.15, z0: 3.15, x1: 4.75, z1: 3.75 },
+    ],
+  },
+};
+
+export const interiorByLandmark = (id: LandmarkId): InteriorDef | undefined =>
+  Object.values(interiors).find((room) => room.landmarkId === id);
+
+export const getInterior = (id: InteriorId) => interiors[id];
+
+const RADIUS = 0.28;
+
+function overlaps(x: number, z: number, b: Rect) {
+  return x + RADIUS > b.x0 && x - RADIUS < b.x1 && z + RADIUS > b.z0 && z - RADIUS < b.z1;
+}
+
+export function canStepInterior(id: InteriorId, x: number, z: number) {
+  const inRoom = x > -4.62 + RADIUS && x < 4.62 - RADIUS && z > -3.62 + RADIUS && z < 3.52;
+  const inAlcove = Math.abs(x) < 0.82 && z >= 3.52 && z < 3.78;
+  if (!inRoom && !inAlcove) return false;
+  return !interiors[id].blocked.some((b) => overlaps(x, z, b));
+}
+
+function inPad(x: number, z: number, cx: number, cz: number, w: number, d: number) {
+  return Math.abs(x - cx) <= w / 2 && Math.abs(z - cz) <= d / 2;
+}
+
+export function outsideDoor(id: InteriorId) {
+  const pl = getPlacement(interiors[id].landmarkId);
+  return { x: pl.center.x, z: pl.center.z + 1.58, w: 1.2, d: 0.78, y: pl.level * LEVEL };
+}
+
+export function outsideExitSpawn(id: InteriorId) {
+  const pl = getPlacement(interiors[id].landmarkId);
+  return { x: pl.interact.x, z: pl.interact.z + 0.55, facing: 0, y: pl.level * LEVEL };
+}
+
+let doorLatch = 0;
+export function armDoorLatch(ms = 640) {
+  doorLatch = performance.now() + ms;
+}
+
+/** Walk-on trigger: enter from the island door mat, or exit from the interior doormat. */
+export function doorZoneAt(x: number, z: number): "enter" | "exit" | null {
+  if (performance.now() < doorLatch) return null;
+  const id = useGame.getState().interior;
+  if (id) {
+    const m = interiors[id].doormat;
+    return inPad(x, z, m.x, m.z, m.w, m.d) ? "exit" : null;
+  }
+  const door = outsideDoor("house");
+  return inPad(x, z, door.x, door.z, door.w, door.d) ? "enter" : null;
+}
+
+export function placePlayerInside(id: InteriorId) {
+  const room = interiors[id];
+  player.x = room.spawn.x;
+  player.z = room.spawn.z;
+  player.y = 0;
+  player.facing = room.spawn.facing;
+  player.moving = false;
+  player.onSand = false;
+}
+
+export function placePlayerOutside(id: InteriorId) {
+  const spawn = outsideExitSpawn(id);
+  player.x = spawn.x;
+  player.z = spawn.z;
+  player.y = spawn.y;
+  player.facing = spawn.facing;
+  player.moving = false;
+  player.y = heightAt(player.x, player.z);
+}
+
+export const WIPE_OUT_MS = 460;
+export const WIPE_IN_MS = 520;
+export const WIPE_OUT_MS_REDUCED = 160;
+export const WIPE_IN_MS_REDUCED = 180;
