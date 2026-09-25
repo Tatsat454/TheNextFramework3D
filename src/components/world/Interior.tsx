@@ -153,14 +153,14 @@ function Television() {
 
 function Picture() {
   return (
-    <group position={[1.45, 1.85, -3.86]}>
-      <Box p={[0, 0, 0]} s={[0.95, 1.15, 0.08]} c="#C48A55" shadow={false} />
-      <Box p={[0, 0, 0.04]} s={[0.78, 0.98, 0.05]} c="#E8C9A0" shadow={false} />
-      <mesh position={[-0.12, 0.08, 0.08]} material={toon("#7B6CF6")} castShadow>
-        <sphereGeometry args={[0.16, 10, 8]} />
+    <group position={[1.35, 1.92, -3.82]}>
+      <Box p={[0, 0, 0]} s={[1.05, 1.22, 0.1]} c="#C48A55" shadow={false} />
+      <Box p={[0, 0, 0.05]} s={[0.86, 1.02, 0.06]} c="#7ED4EA" glow shadow={false} />
+      <mesh position={[-0.14, 0.06, 0.1]} material={toon("#7B6CF6")} castShadow>
+        <sphereGeometry args={[0.18, 10, 8]} />
       </mesh>
-      <mesh position={[0.16, -0.12, 0.08]} material={toon("#FF8A65")} castShadow>
-        <sphereGeometry args={[0.2, 10, 8]} />
+      <mesh position={[0.18, -0.14, 0.1]} material={toon("#FF8A65")} castShadow>
+        <sphereGeometry args={[0.22, 10, 8]} />
       </mesh>
     </group>
   );
@@ -175,8 +175,8 @@ function WindowAndBeam() {
         <Box p={[0, 0, 0.08]} s={[0.06, 1.12, 0.02]} c="#C48A55" shadow={false} />
         <Box p={[0, 0, 0.08]} s={[1.12, 0.06, 0.02]} c="#C48A55" shadow={false} />
       </group>
-      <mesh position={[1.4, 0.9, -1.6]} rotation={[0.95, 0, -0.45]} material={flat("#FFE7A8", 0.22, true)}>
-        <planeGeometry args={[2.8, 4.2]} />
+      <mesh position={[1.1, 1.05, -1.4]} rotation={[1.05, 0, -0.38]} material={flat("#FFE7A8", 0.32, true)}>
+        <planeGeometry args={[3.2, 5.2]} />
       </mesh>
     </group>
   );
@@ -190,8 +190,7 @@ function Walls() {
   return (
     <group>
       {/* North */}
-      <Box p={[-1.7, y, -4]} s={[6.6, h, t]} c={HOUSE_COLORS.wall} shadow={false} />
-      <Box p={[3.55, y, -4]} s={[2.7, h, t]} c={HOUSE_COLORS.wall} shadow={false} />
+      <Box p={[0, y, -4]} s={[10, h, t]} c={HOUSE_COLORS.wall} shadow={false} />
       <Box p={[0, stripe, -3.88]} s={[10, 0.18, 0.06]} c={HOUSE_COLORS.wainscot} shadow={false} />
       {/* South, with a door gap */}
       <Box p={[-2.85, y, 4]} s={[4.3, h, t]} c={HOUSE_COLORS.wall} />
