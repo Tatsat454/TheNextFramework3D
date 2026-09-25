@@ -117,7 +117,12 @@ export function hydrate() {
   hydrated = true;
   const saved = readSaved();
   const touch = typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches;
-  useGame.setState({ ...saved, touch });
+  const count = Object.keys(saved.visited).length;
+  const arrived = { ...saved.arrived };
+  for (const r of residents) {
+    if (count >= r.unlockAt) arrived[r.id] = true;
+  }
+  useGame.setState({ ...saved, arrived, touch });
   useGame.subscribe((s, prev) => {
     if (
       s.visited !== prev.visited ||

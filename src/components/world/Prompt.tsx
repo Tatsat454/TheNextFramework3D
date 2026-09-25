@@ -33,9 +33,13 @@ export function Prompt() {
         <button
           key={it.id}
           type="button"
-          onClick={() => {
+          onPointerDown={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
             input.interactQueued = true;
           }}
+          onMouseDown={(e) => e.preventDefault()}
+          tabIndex={-1}
           className="prompt-pop glass-soft pointer-events-auto flex items-center gap-2 whitespace-nowrap rounded-full py-1.5 pl-3.5 pr-1.5 text-[14px] font-medium text-ink"
           aria-label={`${it.verb} ${it.label}`}
         >

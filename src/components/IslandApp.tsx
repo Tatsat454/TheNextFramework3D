@@ -94,7 +94,13 @@ export default function IslandApp() {
         playEmote(EMOTE_KEYS[Number(e.code.slice(5)) - 1]);
         return;
       }
-      if ((e.code === "KeyE" || e.code === "Space") && !focusedControl) {
+      // E always talks/opens, even if the floating prompt button stole focus.
+      if (e.code === "KeyE") {
+        e.preventDefault();
+        triggerInteract();
+        return;
+      }
+      if (e.code === "Space" && !focusedControl) {
         e.preventDefault();
         triggerInteract();
         return;

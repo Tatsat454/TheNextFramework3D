@@ -20,8 +20,11 @@ export let nearbyInteractable: Interactable | null = null;
 
 export function triggerInteract() {
   const s = useGame.getState();
-  if (isPaused(s) || !nearbyInteractable) return;
-  interact(nearbyInteractable, player);
+  if (isPaused(s)) return;
+  const it = findNearby(player.x, player.z) ?? nearbyInteractable;
+  if (!it) return;
+  nearbyInteractable = it;
+  interact(it, player);
   useGame.setState({ hopAt: performance.now() });
   sfx.hop();
 }

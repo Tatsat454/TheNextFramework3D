@@ -5,8 +5,8 @@ import { useRef } from "react";
 import * as THREE from "three";
 import type { ResidentId } from "@/content/landmarks";
 import { residents } from "@/content/landmarks";
-import { residentSpots } from "@/game/interact";
-import { heightAt, residentHomes } from "@/game/island";
+import { residentSpots, RESIDENT_TALK_R } from "@/game/interact";
+import { canStep, heightAt, residentHomes } from "@/game/island";
 import { flat, palette, toon } from "@/game/materials";
 import { player, reducedMotion } from "@/game/player-state";
 import { useGame } from "@/game/store";
@@ -156,7 +156,7 @@ function Resident({ id }: { id: ResidentId }) {
     const t = state.clock.elapsedTime;
     const dPlayer = Math.hypot(player.x - s.x, player.z - s.z);
     let moving = false;
-    if (talking || dPlayer < 2.2) {
+    if (talking || dPlayer < RESIDENT_TALK_R) {
       const face = Math.atan2(player.x - s.x, player.z - s.z);
       s.facing += (((face - s.facing + Math.PI * 3) % (Math.PI * 2)) - Math.PI) * 0.12;
     } else if (s.wait > 0) {
@@ -172,8 +172,19 @@ function Resident({ id }: { id: ResidentId }) {
         s.wait = 2 + Math.random() * 2.5;
       } else {
         const step = Math.min(d, 0.9 * dt);
-        s.x += (dx / d) * step;
-        s.z += (dz / d) * step;
+        const nx = s.x + (dx / d) * step;
+        const nz = s.z + (dz / d) * step;
+        if (canStep(s.x, s.z, nx, nz)) {
+          s.x = nx;
+          s.z = nz;
+        } else if (canStep(s.x, s.z, nx, s.z)) {
+          s.x = nx;
+        } else if (canStep(s.x, s.z, s.x, nz)) {
+          s.z = nz;
+        } else {
+          s.target = (s.target + 1 + Math.floor(Math.random() * (homes.length - 1))) % homes.length;
+          s.wait = 0.5;
+        }
         const face = Math.atan2(dx, dz);
         s.facing += (((face - s.facing + Math.PI * 3) % (Math.PI * 2)) - Math.PI) * 0.1;
         moving = true;

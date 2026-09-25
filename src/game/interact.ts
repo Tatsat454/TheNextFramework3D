@@ -6,7 +6,7 @@ import { sfx } from "./audio";
 import { gardenRows, getPlacement, landmarkPlacements, LEVEL, pedestals, pickups, trees } from "./island";
 import { checkArrivals, toast, useGame } from "./store";
 
-export type InteractKind = "landmark" | "exhibit" | "row" | "tree" | "pickup" | "resident";
+export type InteractKind = "landmark" | "exhibit" | "row" | "tree" | "pickup" | "resident" | "critter";
 
 export type Interactable = {
   id: string;
@@ -74,6 +74,18 @@ const staticList: Interactable[] = [
 /** Residents register (and move) themselves here every frame. */
 export const residentSpots = new Map<ResidentId, { x: number; z: number; y: number }>();
 
+/** How close you need to be to talk — matches the distance they stop and look at you. */
+export const RESIDENT_TALK_R = 2.4;
+
+export type CritterKind = "butterfly" | "bee" | "fish";
+export const critterSpots = new Map<string, { kind: CritterKind; x: number; z: number; y: number }>();
+
+const critterCopy: Record<CritterKind, { label: string; line: string; r: number }> = {
+  butterfly: { label: "Butterfly", line: "A butterfly! It flutters just out of reach.", r: 2.0 },
+  bee: { label: "Bee", line: "Bzz! Too busy with the flowers to chat.", r: 1.35 },
+  fish: { label: "Fish", line: "A little fish slips under the shade and is gone.", r: 1.6 },
+};
+
 export function currentInteractables(): Interactable[] {
   const s = useGame.getState();
   const list = [...staticList];
@@ -88,7 +100,30 @@ export function currentInteractables(): Interactable[] {
   for (const r of residents) {
     const spot = residentSpots.get(r.id);
     if (!spot || !s.arrived[r.id]) continue;
-    list.push({ id: `resident:${r.id}`, kind: "resident", label: r.name, verb: "Talk", x: spot.x, z: spot.z, y: spot.y + 1.7, r: 1.35, ref: r.id });
+    list.push({
+      id: `resident:${r.id}`,
+      kind: "resident",
+      label: r.name,
+      verb: "Talk",
+      x: spot.x,
+      z: spot.z,
+      y: spot.y + 1.7,
+      r: RESIDENT_TALK_R,
+      ref: r.id,
+    });
+  }
+  for (const [id, c] of critterSpots) {
+    list.push({
+      id: `critter:${id}`,
+      kind: "critter",
+      label: critterCopy[c.kind].label,
+      verb: "Greet",
+      x: c.x,
+      z: c.z,
+      y: c.y + 0.5,
+      r: critterCopy[c.kind].r,
+      ref: c.kind,
+    });
   }
   return list;
 }
@@ -100,8 +135,15 @@ export function findNearby(x: number, z: number): Interactable | null {
   for (const it of currentInteractables()) {
     const d = Math.hypot(it.x - x, it.z - z);
     if (d > it.r) continue;
-    // Anything you can pick up wins, so a fallen fruit isn't hidden behind its tree's prompt.
-    const score = it.kind === "pickup" ? d / it.r - 1 : (d / it.r) * (it.kind === "resident" ? 0.7 : 1);
+    // Pickups win over trees. Residents win over buildings so E talks when a creature looks at you.
+    const score =
+      it.kind === "pickup"
+        ? d / it.r - 1
+        : it.kind === "resident"
+          ? d / it.r - 0.55
+          : it.kind === "critter"
+            ? d / it.r + 0.45
+            : d / it.r;
     if (score < bestScore) {
       best = it;
       bestScore = score;
@@ -234,6 +276,11 @@ export function interact(it: Interactable, player: { x: number; z: number }) {
       const r = residents.find((x) => x.id === it.ref)!;
       const lines = [r.intro, ...r.lines].map((l) => fillTemplate(l, player.x, player.z));
       useGame.setState({ dialog: { speaker: r.id, lines, index: 0, action: r.id === "sol" ? "museum" : undefined } });
+      break;
+    }
+    case "critter": {
+      const kind = it.ref as CritterKind;
+      toast(critterCopy[kind].line, "info");
       break;
     }
   }

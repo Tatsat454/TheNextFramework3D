@@ -4,6 +4,7 @@ import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
 import { flowers, gardenRows, LEVEL, pond, tileCenter, trees, WATER_Y, W } from "@/game/island";
+import { critterSpots } from "@/game/interact";
 import { flat, palette, toon } from "@/game/materials";
 import { player, reducedMotion } from "@/game/player-state";
 import { mulberry32 } from "@/game/rng";
@@ -46,6 +47,7 @@ function Butterflies() {
       b.z += (tz - b.z) * dt * (0.6 + b.flee * 2);
       b.y += (b.hy + 0.7 + b.flee * 1.4 + Math.sin(t * 2 + b.seed) * 0.2 - b.y) * dt * 2;
       g.position.set(b.x, b.y, b.z);
+      critterSpots.set(`butterfly:${k}`, { kind: "butterfly", x: b.x, z: b.z, y: b.y });
       g.rotation.y = Math.atan2(tx - b.x, tz - b.z);
       const flap = reducedMotion.value ? 0.5 : Math.sin(t * (16 + b.flee * 10) + b.seed) * 0.9;
       (g.children[0] as THREE.Object3D).rotation.z = flap;
@@ -125,6 +127,7 @@ function Bees() {
       const r = 0.45 + Math.sin(t * 0.7 + b.seed) * 0.15;
       g.position.set(b.f.x + Math.cos(t * 1.8 + b.seed) * r, b.f.y + 0.55 + Math.sin(t * 4 + b.seed) * 0.08, b.f.z + Math.sin(t * 1.8 + b.seed) * r);
       g.rotation.y = -t * 1.8 - b.seed;
+      critterSpots.set(`bee:${k}`, { kind: "bee", x: g.position.x, z: g.position.z, y: g.position.y });
     });
   });
   return (
@@ -165,6 +168,7 @@ function FishShadows() {
       const wobble = Math.sin(t * 0.9 + f.seed) * 0.3;
       m.position.set(f.cx + Math.cos(a) * f.r, WATER_Y + 0.02, f.cz + Math.sin(a) * (f.r * 0.6 + wobble));
       m.rotation.z = -a - Math.PI / 2;
+      critterSpots.set(`fish:${k}`, { kind: "fish", x: m.position.x, z: m.position.z, y: m.position.y });
     });
   });
   return (
