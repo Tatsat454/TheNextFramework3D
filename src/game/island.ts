@@ -101,11 +101,20 @@ for (const t of grid) {
 
 /** Pond spills south over the rim as a short river, then falls off the island. */
 export const stream = { i0: 15, i1: 18, j0: 41, j1: 45 };
-for (let i = stream.i0; i <= stream.i1; i++) {
-  for (let j = stream.j0; j <= stream.j1; j++) {
+let streamLip = stream.j0 - 1;
+for (let j = stream.j0; j <= stream.j1; j++) {
+  let allLand = true;
+  for (let i = stream.i0; i <= stream.i1; i++) {
     const t = tileAt(i, j);
-    // Never grow a water pier into the void — the fall starts at the real lip.
-    if (!t || t.kind === "void") break;
+    if (!t || t.kind === "void") {
+      allLand = false;
+      break;
+    }
+  }
+  if (!allLand) break;
+  streamLip = j;
+  for (let i = stream.i0; i <= stream.i1; i++) {
+    const t = tileAt(i, j)!;
     t.kind = "water";
     t.blocked = true;
     t.h = 1;
@@ -140,6 +149,19 @@ for (let pass = 0; pass < 2; pass++) {
     t.kind = "void";
     t.blocked = true;
     t.h = 0;
+  }
+}
+
+// Square the beach into the waterfall so the lip is one straight drop, not an L-shaped shelf.
+for (let i = stream.i1 + 1; i <= stream.i1 + 5; i++) {
+  for (let j = stream.j0; j <= streamLip; j++) {
+    const t = tileAt(i, j);
+    if (!t || t.kind !== "void") continue;
+    if (isSolid(tileAt(i + 1, j)) || isSolid(tileAt(i, j - 1))) {
+      t.kind = "sand";
+      t.blocked = false;
+      t.h = 1;
+    }
   }
 }
 

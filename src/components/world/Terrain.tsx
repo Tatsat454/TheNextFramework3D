@@ -166,8 +166,8 @@ export function Terrain() {
     const pos = g.attributes.position;
     const cols = new Float32Array(pos.count * 3);
     for (let k = 0; k < pos.count; k++) {
-      const v = pos.getY(k) > 0 ? 1 : 0.72;
-      cols.set([v, v * 0.98, v * 0.9], k * 3);
+      const v = pos.getY(k) > 0 ? 0.78 : 0.55;
+      cols.set([v, v * 0.92, v * 0.78], k * 3);
     }
     g.setAttribute("color", new THREE.BufferAttribute(cols, 3));
     return g;
