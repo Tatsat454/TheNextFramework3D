@@ -136,7 +136,7 @@ export default function IslandApp() {
     }
     if (!greeted && Object.keys(s.visited).length === 0) {
       setTimeout(() => {
-        if (!useGame.getState().card) talkTo("bramble", player);
+        if (!useGame.getState().card && !useGame.getState().interior) talkTo("bramble", player);
       }, 900);
     }
   }, [set]);

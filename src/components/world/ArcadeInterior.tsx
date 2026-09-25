@@ -164,9 +164,8 @@ const GLYPH: Record<string, string[]> = {
   T: ["11111", "00100", "00100", "00100", "00100"],
 };
 
-function NeonLine({ text, color, p }: { text: string; color: string; p: V3 }) {
-  const cells = 0.11;
-  const gap = 0.04;
+function NeonLine({ text, color, p, cells = 0.12 }: { text: string; color: string; p: V3; cells?: number }) {
+  const gap = cells * 0.9;
   const letterW = 5 * cells + gap;
   const width = text.length * letterW - gap;
   return (
@@ -182,7 +181,7 @@ function NeonLine({ text, color, p }: { text: string; color: string; p: V3 }) {
                   <Box
                     key={`${x}:${y}`}
                     p={[(x - 2) * cells, (2 - y) * cells, 0]}
-                    s={[cells * 0.86, cells * 0.86, 0.06]}
+                    s={[cells * 0.82, cells * 0.82, 0.07]}
                     c={color}
                     glow
                     shadow={false}
@@ -199,10 +198,10 @@ function NeonLine({ text, color, p }: { text: string; color: string; p: V3 }) {
 
 function NeonSign() {
   return (
-    <group position={[0, 2.72, -4.32]}>
-      <Box p={[0, 0.02, -0.06]} s={[8.4, 0.95, 0.1]} c="#12101C" shadow={false} />
-      <NeonLine text="INSPIRATION" color="#FF5AD9" p={[0, 0.18, 0]} />
-      <NeonLine text="ARCADE" color="#5AE8FF" p={[0, -0.22, 0]} />
+    <group position={[0, 2.78, -4.32]}>
+      <Box p={[0, -0.06, -0.06]} s={[9.2, 1.35, 0.1]} c="#12101C" shadow={false} />
+      <NeonLine text="INSPIRATION" color="#FF5AD9" p={[0, 0.32, 0]} cells={0.11} />
+      <NeonLine text="ARCADE" color="#5AE8FF" p={[0, -0.38, 0]} cells={0.16} />
     </group>
   );
 }
@@ -365,7 +364,7 @@ function BlinkPal() {
     const rm = reducedMotion.value;
     const atCabinet = !!game.nearby?.startsWith("prop:cabinet");
 
-    if (!s.greeted && !game.transitioning && elapsed > 720 && !game.dialog) {
+    if (!s.greeted && !game.transitioning && elapsed > 720) {
       s.greeted = true;
       useGame.setState({
         dialog: {
@@ -432,7 +431,7 @@ function BlinkPal() {
   });
 
   return (
-    <group ref={group}>
+    <group ref={group} scale={1.18}>
       <group ref={inner}>
         <mesh position={[-0.08, 0.05, 0.04]} rotation={[Math.PI / 2, 0, 0]} material={toon("#4B3FB5")} castShadow>
           <cylinderGeometry args={[0.07, 0.07, 0.08, 10]} />
