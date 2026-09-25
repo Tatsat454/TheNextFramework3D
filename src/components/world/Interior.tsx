@@ -1,10 +1,9 @@
 "use client";
 
-import { useLayoutEffect, useMemo } from "react";
+import { useLayoutEffect } from "react";
 import { useThree } from "@react-three/fiber";
-import * as THREE from "three";
 import { HOUSE_COLORS } from "@/game/interiors";
-import { flat, palette, toon, toonGradient } from "@/game/materials";
+import { flat, palette, toon } from "@/game/materials";
 
 type V3 = [number, number, number];
 
@@ -12,42 +11,6 @@ function Box({ p, s, c, r, glow, shadow = true, opacity }: { p: V3; s: V3; c: st
   return (
     <mesh position={p} rotation={r} material={toon(c, { emissive: glow ? c : undefined, transparent: opacity !== undefined, opacity, noOcclude: true })} castShadow={shadow} receiveShadow={shadow}>
       <boxGeometry args={s} />
-    </mesh>
-  );
-}
-
-function titleTex(title: string, detail: string, bg: string) {
-  const c = document.createElement("canvas");
-  c.width = 256;
-  c.height = 384;
-  const g = c.getContext("2d")!;
-  g.fillStyle = bg;
-  g.fillRect(0, 0, 256, 384);
-  g.fillStyle = "rgba(255,255,255,0.12)";
-  g.fillRect(18, 18, 220, 348);
-  g.fillStyle = "#FFF6E6";
-  g.font = "bold 28px ui-sans-serif, system-ui, sans-serif";
-  const words = title.split(" ");
-  let y = 160;
-  for (const w of words) {
-    g.fillText(w, 32, y);
-    y += 36;
-  }
-  g.font = "16px ui-sans-serif, system-ui, sans-serif";
-  g.fillStyle = "rgba(255,246,230,0.8)";
-  g.fillText(detail, 32, 330);
-  const tex = new THREE.CanvasTexture(c);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  tex.needsUpdate = true;
-  return tex;
-}
-
-function Poster({ p, title, detail, color, rotY = 0 }: { p: V3; title: string; detail: string; color: string; rotY?: number }) {
-  const tex = useMemo(() => titleTex(title, detail, color), [title, detail, color]);
-  const mat = useMemo(() => new THREE.MeshToonMaterial({ map: tex, gradientMap: toonGradient() }), [tex]);
-  return (
-    <mesh position={p} rotation={[0, rotY, 0]} material={mat} castShadow>
-      <boxGeometry args={[0.52, 0.78, 0.06]} />
     </mesh>
   );
 }
@@ -136,14 +99,15 @@ function Desk() {
 
 function Television() {
   return (
-    <group position={[3.5, 0, 1.55]}>
-      <Box p={[0, 0.22, 0]} s={[1.55, 0.44, 0.7]} c="#6E4526" />
-      <Box p={[0, 0.78, -0.02]} s={[1.05, 0.72, 0.55]} c="#3B3470" />
-      <Box p={[0, 0.8, 0.22]} s={[0.82, 0.5, 0.08]} c="#1A1730" glow />
-      <Box p={[0.48, 0.78, 0.12]} s={[0.06, 0.18, 0.06]} c="#C8B79A" shadow={false} />
-      {/* Console */}
-      <Box p={[-0.15, 0.5, 0.38]} s={[0.7, 0.14, 0.38]} c="#7B6CF6" />
-      <Box p={[-0.15, 0.5, 0.55]} s={[0.18, 0.04, 0.08]} c="#FFC857" shadow={false} />
+    <group position={[3.72, 0, 1.62]}>
+      <Box p={[0, 0.2, 0]} s={[0.88, 0.4, 1.65]} c="#6E4526" />
+      <Box p={[-0.02, 0.82, 0.08]} s={[0.32, 0.82, 1.12]} c="#2A2548" />
+      <Box p={[-0.2, 0.84, 0.08]} s={[0.08, 0.64, 0.92]} c="#5B8CFF" glow />
+      <Box p={[-0.34, 0.48, 0.2]} s={[0.4, 0.14, 0.72]} c="#7B6CF6" />
+      <Box p={[-0.34, 0.5, 0.48]} s={[0.1, 0.04, 0.18]} c="#FFC857" shadow={false} />
+      <Box p={[0.12, 0.52, -0.58]} s={[0.1, 0.28, 0.2]} c="#1F6B4A" />
+      <Box p={[0.2, 0.54, -0.36]} s={[0.1, 0.32, 0.2]} c="#E8513F" />
+      <Box p={[0.28, 0.52, -0.14]} s={[0.1, 0.28, 0.2]} c="#2C3A6B" />
     </group>
   );
 }
@@ -327,9 +291,6 @@ export function InteriorWorld() {
       <Plant p={[4.45, 0, -3.55]} />
       <Plant p={[-4.45, 0, 3.4]} />
       <Plant p={[4.45, 0, 3.4]} />
-      <Poster p={[2.85, 0.72, 2.05]} title="Lanterns" detail="HBO Max" color="#1F6B4A" rotY={0.35} />
-      <Poster p={[3.35, 0.72, 2.22]} title="Jane the Virgin" detail="Rewatch" color="#E8513F" rotY={0.12} />
-      <Poster p={[3.85, 0.72, 2.12]} title="Suits" detail="Legal popcorn" color="#2C3A6B" rotY={-0.2} />
     </group>
   );
 }
