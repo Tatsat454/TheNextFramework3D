@@ -135,7 +135,7 @@ function Certificate() {
 
 function NoticeBoard() {
   return (
-    <group position={[6.82, 1.55, 2.85]} rotation={[0, Math.PI / 2, 0]}>
+    <group position={[-6.82, 1.55, 2.85]} rotation={[0, -Math.PI / 2, 0]}>
       <Box p={[0, 0, 0]} s={[1.55, 1.55, 0.1]} c="#8B5A32" />
       <Box p={[0, 0, 0.04]} s={[1.38, 1.38, 0.06]} c="#C48A55" />
       <Box p={[-0.28, 0.28, 0.1]} s={[0.42, 0.48, 0.02]} c="#FFF6E6" r={[0, 0, 0.08]} shadow={false} />

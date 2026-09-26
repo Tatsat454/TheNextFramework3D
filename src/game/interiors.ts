@@ -126,12 +126,12 @@ export const interiors: Record<InteriorId, InteriorDef> = {
       { id: "clerk", x: -1.85, z: 1.42, y: 1.55, r: 1.55 },
       { id: "stamp", x: 0.55, z: 1.55, y: 1.25, r: 0.85 },
       { id: "certificate", x: 5.35, z: -4.15, y: 2.15, r: 1.1 },
-      { id: "notices", x: 6.15, z: 2.85, y: 1.7, r: 1.15 },
+      { id: "notices", x: -6.15, z: 2.85, y: 1.7, r: 1.15 },
     ],
     blocked: [
       { x0: -1.62, z0: 0.62, x1: 1.62, z1: 1.72 }, // front desk
       { x0: 4.05, z0: -4.55, x1: 6.55, z1: -2.55 }, // mayor desk
-      { x0: 6.15, z0: 2.15, x1: 6.72, z1: 3.55 }, // notice board, east wall
+      { x0: -6.72, z0: 2.15, x1: -6.15, z1: 3.55 }, // notice board, west wall
       { x0: -6.45, z0: -0.55, x1: -5.35, z1: 0.85 }, // west bench
       { x0: 5.35, z0: -0.55, x1: 6.45, z1: 0.85 }, // east bench
     ],
