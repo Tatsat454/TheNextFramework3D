@@ -33,7 +33,7 @@ export default function IslandApp() {
 
   useEffect(() => {
     hydrate();
-    if (process.env.NODE_ENV !== "production") Object.assign(window, { __pocket: { player, useGame, requestEnter, requestExit, debugCam, input } });
+    if (process.env.NODE_ENV !== "production") Object.assign(window, { __pocket: { player, useGame, requestEnter, requestExit, debugCam, input, isWalkable } });
     const pos = readPosition();
     if (pos && isWalkable(pos.x, pos.z)) {
       player.x = pos.x;

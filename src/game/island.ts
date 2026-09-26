@@ -420,15 +420,15 @@ export const boardTile = (() => {
 })();
 
 export function nearPlazaProp(x: number, z: number, extra = 0) {
-  if (plazaLanterns.some((p) => Math.hypot(x - p.x, z - p.z) < 1.05 + extra)) return true;
-  if (plazaBenches.some((p) => Math.hypot(x - p.x, z - p.z) < 1.0 + extra)) return true;
-  if (Math.hypot(x - plazaSign.x, z - plazaSign.z) < 0.55 + extra) return true;
-  if (Math.hypot(x - boardTile.x, z - boardTile.z) < 0.85 + extra) return true;
+  if (plazaLanterns.some((p) => Math.hypot(x - p.x, z - p.z) < 0.42 + extra)) return true;
+  if (plazaBenches.some((p) => Math.hypot(x - p.x, z - p.z) < 0.72 + extra)) return true;
+  if (Math.hypot(x - plazaSign.x, z - plazaSign.z) < 0.45 + extra) return true;
+  if (Math.hypot(x - boardTile.x, z - boardTile.z) < 0.7 + extra) return true;
   return false;
 }
 
 export function plazaPropHit(x: number, z: number) {
-  if (plazaLanterns.some((p) => Math.hypot(x - p.x, z - p.z) < 0.28)) return true;
+  if (plazaLanterns.some((p) => Math.hypot(x - p.x, z - p.z) < 0.16)) return true;
   for (const b of plazaBenches) {
     const dx = x - b.x;
     const dz = z - b.z;
@@ -711,9 +711,17 @@ export function isWalkable(x: number, z: number): boolean {
   if (gazeboColumnHit(x, z)) return false;
   if (plazaPropHit(x, z)) return false;
   if (inGazeboWalk(x, z)) return true;
+  const d = Math.hypot(x - fountain.x, z - fountain.z);
+  // Garden collision is circular so 1×1 tiles don't spill onto the paving next to lanterns.
+  if (d >= plazaRing.gardenInner && d <= plazaRing.gardenOuter && !plazaPathOpening(x, z, 0.06)) return false;
   const { i, j } = worldToTile(x, z);
   const t = tileAt(i, j);
-  return !!t && !t.blocked && t.kind !== "water" && t.kind !== "void";
+  if (!t || t.kind === "water" || t.kind === "void") return false;
+  if (d < plazaRing.gardenInner) {
+    if (i >= 31 && i <= 34 && j >= 29 && j <= 31) return false;
+    return true;
+  }
+  return !t.blocked;
 }
 
 export function canStep(fromX: number, fromZ: number, toX: number, toZ: number): boolean {
