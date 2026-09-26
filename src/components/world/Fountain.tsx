@@ -198,9 +198,9 @@ function CoinToss() {
     const age = (now - pose.tossAt) / 1000;
     const active = pose.tossAt > 0 && age < 2.4;
     const g = coin.current;
-    if (g) g.visible = active && age < 0.72;
+    if (g) g.visible = active && age < 0.92;
 
-    if (active && age < 0.72 && g) {
+    if (active && age < 0.92 && g) {
       const u = reducedMotion.value ? 1 : Math.min(1, age / 0.7);
       const tx = fountain.x;
       const tz = fountain.z;
