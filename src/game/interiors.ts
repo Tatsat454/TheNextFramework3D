@@ -123,7 +123,7 @@ export const interiors: Record<InteriorId, InteriorDef> = {
         y: 2.05,
         r: 1.05,
       })),
-      { id: "clerk", x: 0, z: 1.15, y: 1.55, r: 1.55 },
+      { id: "clerk", x: -1.85, z: 1.42, y: 1.55, r: 1.55 },
       { id: "stamp", x: 0.55, z: 1.55, y: 1.25, r: 0.85 },
       { id: "certificate", x: 5.35, z: -4.15, y: 2.15, r: 1.1 },
       { id: "notices", x: -5.35, z: 3.55, y: 1.7, r: 1.15 },

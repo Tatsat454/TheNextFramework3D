@@ -355,15 +355,15 @@ function QuillClerk() {
       sfx.open();
     }
 
-    const face = Math.atan2(player.x - 0, player.z - 1.05);
+    const face = Math.atan2(player.x - -1.85, player.z - 1.42);
     s.facing += (((face - s.facing + Math.PI * 3) % (Math.PI * 2)) - Math.PI) * 0.16;
     const hop = !rm && elapsed < 1600 ? Math.abs(Math.sin((elapsed / 1000) * 9)) * 0.16 : 0;
-    g.position.set(0, hop, 1.05);
+    g.position.set(-1.85, hop, 1.42);
     g.rotation.y = s.facing;
   });
 
   return (
-    <group ref={group} scale={1.12}>
+    <group ref={group} scale={1.35}>
       <QuillOwl />
       <mesh position={[0, 0.015, 0]} rotation={[-Math.PI / 2, 0, 0]} material={flat("#1E1B3A", 0.22)}>
         <circleGeometry args={[0.22, 14]} />

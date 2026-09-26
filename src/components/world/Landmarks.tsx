@@ -116,13 +116,13 @@ function Flagpole({ p }: { p: V3 }) {
   });
   return (
     <group position={p}>
-      <Cyl p={[0, 1.45, 0]} r={0.045} h={2.9} c={palette.stone} />
-      <mesh position={[0, 2.92, 0]} material={toon("#D4A017")}>
-        <sphereGeometry args={[0.08, 10, 8]} />
+      <Cyl p={[0, 1.7, 0]} r={0.05} h={3.4} c={palette.stone} />
+      <mesh position={[0, 3.42, 0]} material={toon("#D4A017")}>
+        <sphereGeometry args={[0.1, 10, 8]} />
       </mesh>
-      <mesh ref={ref} position={[0, 2.45, 0]}>
-        <mesh position={[0.42, 0, 0]} material={toon("#4B3FB5")} castShadow>
-          <boxGeometry args={[0.84, 0.48, 0.04]} />
+      <mesh ref={ref} position={[0, 2.85, 0]}>
+        <mesh position={[0.52, 0, 0]} material={toon("#4B3FB5")} castShadow>
+          <boxGeometry args={[1.04, 0.58, 0.05]} />
         </mesh>
       </mesh>
     </group>
@@ -172,7 +172,7 @@ function TownHall() {
         <cylinderGeometry args={[0.24, 0.24, 0.08, 20]} />
       </mesh>
       <Box p={[0, 2.78, 2.47]} s={[0.03, 0.14, 0.02]} c={palette.ink} shadow={false} />
-      <Flagpole p={[-1.95, 0, 2.38]} />
+      <Flagpole p={[-2.25, 0, 2.55]} />
       {/* Notice board */}
       <group position={[board.x - pl.center.x, 0, board.z - pl.center.z]} rotation={[0, -0.2, 0]}>
         <Cyl p={[-0.38, 0.5, 0]} r={0.05} h={1.0} c={palette.woodDeep} />

@@ -13,10 +13,10 @@ import type { TimePreset } from "@/game/time-of-day";
 const OFFSET = new THREE.Vector3(0, 14.8, 18.4);
 const INTERIOR_OFFSET = new THREE.Vector3(-1.4, 18.4, 8.6);
 const ARCADE_OFFSET = new THREE.Vector3(0, 19.6, 10.4);
-const TOWN_OFFSET = new THREE.Vector3(0, 22.4, 12.2);
+const TOWN_OFFSET = new THREE.Vector3(0, 17.2, 14.6);
 const HOUSE_LOOK = new THREE.Vector3(-1.45, 0.25, -0.1);
 const ARCADE_LOOK = new THREE.Vector3(0, 0.22, 0.15);
-const TOWN_LOOK = new THREE.Vector3(0, 0.22, 0.12);
+const TOWN_LOOK = new THREE.Vector3(0, 0.35, -0.35);
 const tmp = new THREE.Vector3();
 
 export function CameraRig() {
@@ -69,7 +69,7 @@ export function CameraRig() {
     camera.position.copy(focus.current).addScaledVector(offset, zoom.current * (inside ? 1 : portrait));
     const persp = camera as THREE.PerspectiveCamera;
     if (persp.isPerspectiveCamera) {
-      persp.fov = inside ? (arcade ? 40 : 38) : 32;
+      persp.fov = inside ? (arcade ? 40 : townhall ? 42 : 38) : 32;
       persp.updateProjectionMatrix();
     }
     if (inside) camera.lookAt(focus.current.x, focus.current.y + 0.15, focus.current.z);
