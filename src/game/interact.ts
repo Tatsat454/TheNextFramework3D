@@ -1,7 +1,7 @@
 "use client";
 
 import type { ItemId, LandmarkId, ResidentId } from "@/content/landmarks";
-import { arcadePal, copy, galleryExhibits, getItem, getLandmark, landmarks, museumExhibits, museumPal, plazaCopy, residents, townHallPal } from "@/content/landmarks";
+import { arcadePal, copy, galleryExhibits, getItem, getLandmark, landmarks, museumPal, plazaCopy, residents, townHallPal } from "@/content/landmarks";
 import { sfx } from "./audio";
 import {
   armDoorLatch,
@@ -18,11 +18,11 @@ import {
   WIPE_OUT_MS,
   WIPE_OUT_MS_REDUCED,
 } from "./interiors";
-import { fountain, getPlacement, landmarkPlacements, LEVEL, pedestals, pickups, plazaBenches, trees } from "./island";
+import { fountain, getPlacement, landmarkPlacements, LEVEL, pickups, plazaBenches, trees } from "./island";
 import { player, playerScreen, pose, reducedMotion } from "./player-state";
 import { checkArrivals, toast, useGame } from "./store";
 
-export type InteractKind = "landmark" | "exhibit" | "tree" | "pickup" | "resident" | "critter" | "door" | "prop" | "plaza";
+export type InteractKind = "landmark" | "tree" | "pickup" | "resident" | "critter" | "door" | "prop" | "plaza";
 
 export type Interactable = {
   id: string;
@@ -51,17 +51,6 @@ const staticList: Interactable[] = [
       r: p.radius,
       ref: p.id,
     })),
-  ...pedestals.map((p, k) => ({
-    id: `exhibit:${p.slug}`,
-    kind: "exhibit" as const,
-    label: `Exhibit ${k + 1}`,
-    verb: "Look",
-    x: p.interact.x,
-    z: p.interact.z,
-    y: p.level * LEVEL + 2.1,
-    r: 0.95,
-    ref: p.slug,
-  })),
   ...trees
     .map((t, k) => ({ t, k }))
     .filter(({ t }) => t.kind === "fruit")
@@ -284,12 +273,6 @@ function fillTemplate(line: string, px: number, pz: number): string {
     const up = target.level > 1 ? " Take the stairs up." : "";
     return `Have you seen the ${lm.name}? It's ${dir === "right around here" ? dir : `to the ${dir}`}. That's where you'll find his ${lm.section.toLowerCase()}.${up}`;
   }
-  if (line === "{museum}") {
-    const n = museumExhibits.filter((slug) => s.donated[slug]).length;
-    return n === museumExhibits.length
-      ? "Every exhibit donated! The museum is complete. Thank you, truly."
-      : `So far ${n} of ${museumExhibits.length} exhibits are donated. Shall I show you the collection?`;
-  }
   if (line === "{gallery}") {
     const n = galleryExhibits.filter((slug) => s.donated[slug]).length;
     return n === galleryExhibits.length ? museumPal.thanks : museumPal.progress.replace("{n}", String(n));
@@ -342,11 +325,6 @@ export function interact(it: Interactable, player: { x: number; z: number }) {
       useGame.setState({ card: { type: "landmark", id } });
       break;
     }
-    case "exhibit":
-      sfx.open();
-      visit("museum");
-      useGame.setState({ card: { type: "exhibit", slug: it.ref } });
-      break;
     case "tree": {
       const k = Number(it.ref);
       const tree = trees[k];
@@ -383,7 +361,6 @@ export function interact(it: Interactable, player: { x: number; z: number }) {
           voice: r.voice,
           lines,
           index: 0,
-          action: r.id === "sol" ? "museum" : undefined,
         },
       });
       break;

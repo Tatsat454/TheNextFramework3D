@@ -20,7 +20,7 @@ function Cyl({ p, r, h, c, seg = 12, rot, rt }: { p: V3; r: number; h: number; c
   );
 }
 
-/** Tiny toon models shared by the outdoor museum lawn and the indoor gallery pedestals. */
+/** Tiny toon models for the indoor gallery pedestals. */
 export function ExhibitObject({ slug }: { slug: string }) {
   switch (slug) {
     case "nyc-taxi-ddc":

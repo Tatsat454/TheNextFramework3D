@@ -40,12 +40,12 @@ A floating oval about 40×36 tiles across. You arrive on the southern beach, pas
 |---|---|
 | My House | About me |
 | Town Hall | Work experience |
-| Museum (on the plateau) | Projects: six exhibits on pedestals; reading one to the end "donates" it (gold star) |
+| Museum (on the plateau) | Projects: five indoor exhibits; reading one to the end "donates" it (gold star) |
 | Market Stall | Econ thesis: virtual economies (prices drift while you watch) |
 | Arcade Shack | Game teardowns + games Tatsat built |
 | Dock | Contact |
 
-Four original residents move in as you explore: **Bramble** (Greeter), **Drizzle** (Guide), **Pip** (Fan) and **Sol** (Curator). Shells, fruit from shaken trees and hidden items go into your 10-slot Pockets, each with a note about Tatsat. Progress is saved in `localStorage`.
+Three original residents move in as you explore: **Bramble** (Greeter), **Drizzle** (Guide), and **Pip** (Fan). Inside the Museum, **Moss** curates the collection. Shells, fruit from shaken trees and hidden items go into your 10-slot Pockets, each with a note about Tatsat. Progress is saved in `localStorage`.
 
 ## Editing content
 

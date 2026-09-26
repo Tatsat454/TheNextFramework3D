@@ -105,39 +105,7 @@ function Pip() {
   );
 }
 
-function Sol() {
-  return (
-    <group>
-      {[-1, 1].map((s) => (
-        <mesh key={s} position={[s * 0.07, 0.03, 0.06]} rotation={[Math.PI / 2, 0, 0]} material={toon(palette.orange)}>
-          <coneGeometry args={[0.045, 0.1, 6]} />
-        </mesh>
-      ))}
-      <mesh position={[0, 0.27, 0]} material={toon(palette.sun)} castShadow>
-        <sphereGeometry args={[0.25, 18, 14]} />
-      </mesh>
-      <mesh position={[0, 0.22, 0.12]} scale={[1, 0.9, 0.6]} material={toon("#FFE7A8")}>
-        <sphereGeometry args={[0.16, 14, 10]} />
-      </mesh>
-      <mesh position={[0, 0.27, 0.26]} rotation={[Math.PI / 2, 0, 0]} material={toon(palette.orange)}>
-        <coneGeometry args={[0.04, 0.09, 8]} />
-      </mesh>
-      {[-1, 1].map((s) => (
-        <mesh key={s} position={[s * 0.24, 0.25, -0.02]} rotation={[0, 0, s * 0.6]} scale={[0.4, 1, 0.8]} material={toon("#F2B53C")} name={s < 0 ? "wingL" : "wingR"}>
-          <sphereGeometry args={[0.12, 10, 8]} />
-        </mesh>
-      ))}
-      {[-0.3, 0, 0.3].map((r) => (
-        <mesh key={r} position={[r * 0.1, 0.53, -0.02]} rotation={[0, 0, r]} material={toon(palette.orange)}>
-          <coneGeometry args={[0.03, 0.12, 5]} />
-        </mesh>
-      ))}
-      <Eyes y={0.33} z={0.22} spread={0.08} />
-    </group>
-  );
-}
-
-const bodies: Record<ResidentId, () => React.JSX.Element> = { bramble: Bramble, drizzle: Drizzle, pip: Pip, sol: Sol };
+const bodies: Record<ResidentId, () => React.JSX.Element> = { bramble: Bramble, drizzle: Drizzle, pip: Pip };
 
 function Resident({ id }: { id: ResidentId }) {
   const homes = residentHomes[id];

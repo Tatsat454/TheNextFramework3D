@@ -9,7 +9,7 @@ import {
   getLandmark,
   getStory,
   marketGoods,
-  museumExhibits,
+  galleryExhibits,
   profile,
   type Landmark,
 } from "@/content/landmarks";
@@ -36,17 +36,17 @@ function PrimaryLink({ href, children }: { href: string; children: React.ReactNo
 
 function Museum() {
   const donated = useGame((s) => s.donated);
-  const count = museumExhibits.filter((s) => donated[s]).length;
+  const count = galleryExhibits.filter((s) => donated[s]).length;
   return (
     <div className="mt-4">
       <div className="mb-2 flex items-center justify-between text-[13px] font-bold text-ink-soft">
         <span>The collection</span>
         <span className="rounded-full bg-sun/30 px-2.5 py-0.5 text-ink">
-          {count} of {museumExhibits.length} exhibits donated
+          {count} of {galleryExhibits.length} exhibits donated
         </span>
       </div>
       <ul className="-mx-1 max-h-[38vh] space-y-1 overflow-y-auto px-1">
-        {museumExhibits.map((slug, k) => {
+        {galleryExhibits.map((slug, k) => {
           const st = getStory(slug)!;
           return (
             <li key={slug}>
@@ -148,34 +148,7 @@ function LandmarkBody({ lm }: { lm: Landmark }) {
 }
 
 function CardBody({ card }: { card: Card }) {
-  const donated = useGame((s) => s.donated);
   if (card.type === "landmark") return <LandmarkBody lm={getLandmark(card.id)} />;
-  if (card.type === "exhibit") {
-    const st = getStory(card.slug)!;
-    const n = museumExhibits.indexOf(card.slug as (typeof museumExhibits)[number]) + 1;
-    return (
-      <>
-        <p className="eyebrow">Exhibit {n} · Museum</p>
-        <h2 className="mt-1.5 font-serif text-[32px] leading-[1.05] text-ink">{st.title}</h2>
-        <p className="mt-3 text-[15px] leading-relaxed text-ink-soft">{st.summary}</p>
-        {st.tags && (
-          <ul className="mt-3 flex flex-wrap gap-1.5">
-            {st.tags.map((t) => (
-              <li key={t} className="rounded-full bg-violet/10 px-2.5 py-1 text-[12px] font-medium text-indigo">
-                {t}
-              </li>
-            ))}
-          </ul>
-        )}
-        {donated[card.slug] && (
-          <p className="mt-3 flex items-center gap-1.5 text-[13px] font-bold text-ink">
-            <Star className="size-4 fill-sun text-[#E0A21B]" /> Donated to the museum
-          </p>
-        )}
-        <PrimaryLink href={`/story/${card.slug}`}>Read the exhibit</PrimaryLink>
-      </>
-    );
-  }
   return null;
 }
 
@@ -192,7 +165,7 @@ export function LandmarkCard() {
     if (card) setTimeout(() => panel.current?.querySelector<HTMLElement>("[data-autofocus]")?.focus(), 50);
   }, [card]);
 
-  const key = card ? `${card.type}:${"id" in card ? card.id : card.slug}` : "none";
+  const key = card ? `${card.type}:${card.id}` : "none";
   return (
     <AnimatePresence>
       {card && (

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowUpRight } from "lucide-react";
-import { copy, galleryExhibits, getStory, isPlaceholderText, museumExhibits, skills, stories } from "@/content/landmarks";
+import { copy, galleryExhibits, getStory, isPlaceholderText, skills, stories } from "@/content/landmarks";
 import { DonateOnRead } from "@/components/story/DonateOnRead";
 import { Chip, PageShell } from "@/components/story/PageShell";
 
@@ -21,8 +21,8 @@ export default async function StoryPage({ params }: PageProps<"/story/[slug]">) 
   const { slug } = await params;
   const story = getStory(slug);
   if (!story) notFound();
-  const exhibitIndex = museumExhibits.indexOf(slug as (typeof museumExhibits)[number]);
-  const next = exhibitIndex >= 0 ? getStory(museumExhibits[(exhibitIndex + 1) % museumExhibits.length]) : null;
+  const exhibitIndex = galleryExhibits.indexOf(slug as (typeof galleryExhibits)[number]);
+  const next = exhibitIndex >= 0 ? getStory(galleryExhibits[(exhibitIndex + 1) % galleryExhibits.length]) : null;
 
   return (
     <PageShell>

@@ -3,11 +3,9 @@
 import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
-import { getPlacement, LEVEL, mailboxTile, pedestals, tileCenter } from "@/game/island";
+import { getPlacement, LEVEL, mailboxTile, tileCenter } from "@/game/island";
 import { palette, toon } from "@/game/materials";
 import { reducedMotion } from "@/game/player-state";
-import { useGame } from "@/game/store";
-import { ExhibitObject } from "./ExhibitObject";
 
 type V3 = [number, number, number];
 
@@ -207,44 +205,6 @@ function Museum() {
   );
 }
 
-function Star({ p, s = 1 }: { p: V3; s?: number }) {
-  const geo = useMemo(() => {
-    const shape = new THREE.Shape();
-    for (let k = 0; k < 10; k++) {
-      const r = k % 2 ? 0.08 : 0.19;
-      const a = (k / 10) * Math.PI * 2 + Math.PI / 2;
-      if (k === 0) shape.moveTo(Math.cos(a) * r, Math.sin(a) * r);
-      else shape.lineTo(Math.cos(a) * r, Math.sin(a) * r);
-    }
-    const g = new THREE.ExtrudeGeometry(shape, { depth: 0.06, bevelEnabled: true, bevelSize: 0.02, bevelThickness: 0.02, bevelSegments: 1 });
-    g.center();
-    return g;
-  }, []);
-  const ref = useRef<THREE.Mesh>(null);
-  useFrame((st) => {
-    if (ref.current && !reducedMotion.value) ref.current.rotation.y = st.clock.elapsedTime * 1.5;
-  });
-  return <mesh ref={ref} geometry={geo} position={p} scale={s} material={toon(palette.sun, { emissive: "#FFB800" })} castShadow />;
-}
-
-function Pedestals() {
-  const donated = useGame((s) => s.donated);
-  return (
-    <group>
-      {pedestals.map((p) => (
-        <group key={p.slug} position={[p.x, p.level * LEVEL, p.z]}>
-          <Cyl p={[0, 0.35, 0]} r={0.3} rt={0.26} h={0.7} c={palette.cream} seg={14} />
-          <Cyl p={[0, 0.72, 0]} r={0.36} h={0.08} c={palette.earth} seg={14} />
-          <group position={[0, 0.76, 0]}>
-            <ExhibitObject slug={p.slug} />
-          </group>
-          {donated[p.slug] && <Star p={[0, 1.55, 0]} s={1.1} />}
-        </group>
-      ))}
-    </group>
-  );
-}
-
 function MarketStall() {
   const pl = getPlacement("market");
   const stripes = 7;
@@ -393,7 +353,6 @@ export function Landmarks() {
       <House />
       <TownHall />
       <Museum />
-      <Pedestals />
       <MarketStall />
       <ArcadeShack />
       <Dock />

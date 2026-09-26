@@ -99,7 +99,7 @@ export function museumStairSouth() {
   return MUSEUM.deckZ + MUSEUM.steps * MUSEUM.stepD;
 }
 
-/** Five gallery pedestals. +z is south (plaque faces the door). `toy` keeps the outdoor exhibit models. */
+/** Five gallery pedestals. +z is south (plaque faces the door). */
 export const MUSEUM_PEDESTALS = [
   { id: "exhibit1", n: 1, x: 0, z: -3.55, tier: "top" as const, slug: galleryExhibits[0], toy: "nyc-taxi-ddc" },
   { id: "exhibit2", n: 2, x: -3.42, z: -2.38, tier: "top" as const, slug: galleryExhibits[1], toy: "pjm-ai-electricity" },

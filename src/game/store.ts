@@ -9,7 +9,6 @@ export type Emote = "wave" | "cheer" | "thinking" | "clap" | "stretch";
 
 export type Card =
   | { type: "landmark"; id: LandmarkId }
-  | { type: "exhibit"; slug: string }
   | { type: "item"; id: ItemId };
 
 export type DialogState = {
@@ -20,7 +19,7 @@ export type DialogState = {
   voice: [number, number];
   lines: string[];
   index: number;
-  action?: "museum" | "link" | "choices";
+  action?: "link" | "choices";
   href?: string;
   hrefLabel?: string;
   choices?: { id: string; label: string }[];

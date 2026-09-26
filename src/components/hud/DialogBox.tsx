@@ -74,11 +74,6 @@ export function DialogBox() {
     dialogControl.advance = advance;
   });
 
-  const openMuseum = () => {
-    set({ dialog: null, card: { type: "landmark", id: "museum" } });
-    sfx.open();
-  };
-
   return (
     <AnimatePresence>
       {dialog && speaker && (
@@ -110,16 +105,7 @@ export function DialogBox() {
             {isPlaceholderText(line) && done && (
               <span className="mt-1 inline-block rounded-full bg-sun/40 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider">Placeholder</span>
             )}
-            {done && last && dialog.action === "museum" ? (
-              <div className="mt-3 flex gap-2" onClick={(e) => e.stopPropagation()}>
-                <button type="button" onClick={openMuseum} className="lift rounded-2xl bg-coral px-4 py-2.5 text-[15px] font-bold text-white">
-                  Show me the collection
-                </button>
-                <button type="button" onClick={() => set({ dialog: null })} className="rounded-2xl bg-white px-4 py-2.5 text-[15px] font-bold text-ink">
-                  Maybe later
-                </button>
-              </div>
-            ) : done && last && dialog.action === "choices" && dialog.choices?.length ? (
+            {done && last && dialog.action === "choices" && dialog.choices?.length ? (
               <div className="mt-3 flex flex-col gap-2 sm:flex-row" onClick={(e) => e.stopPropagation()}>
                 {dialog.choices.map((choice) => (
                   <button

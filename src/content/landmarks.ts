@@ -718,7 +718,7 @@ export const landmarks: Landmark[] = [
     section: "Projects",
     eyebrow: "Museum · Projects",
     title: "The collection",
-    blurb: "Six exhibits, from structural econometrics to a robot for my grandparents. Read one to the end to donate it to the museum.",
+    blurb: "Five exhibits inside, each one a project. Walk in — Moss will show you around. Read a story to the end to donate it.",
     cta: null,
   },
   {
@@ -925,13 +925,13 @@ export const items: Item[] = [
   },
 ];
 
-export type ResidentId = "bramble" | "drizzle" | "pip" | "sol";
+export type ResidentId = "bramble" | "drizzle" | "pip";
 
 export type Resident = {
   id: ResidentId;
   name: string;
   species: string;
-  role: "Greeter" | "Guide" | "Fan" | "Curator";
+  role: "Greeter" | "Guide" | "Fan";
   tagColor: string;
   /** Babble voice range in Hz. */
   voice: [number, number];
@@ -984,21 +984,6 @@ export const residents: Resident[] = [
       "Shake the fruit trees. Everything that falls out has a fact about him in it.",
     ],
   },
-  {
-    id: "sol",
-    name: "Sol",
-    species: "a round sunny bird",
-    role: "Curator",
-    tagColor: "#FF8A65",
-    voice: [480, 700],
-    unlockAt: 5,
-    intro: "Welcome, welcome! I'm the curator of this fine museum.",
-    lines: [
-      "Each pedestal out front holds one of Tatsat's projects.",
-      "Read an exhibit all the way to the end and I'll mark it donated with a gold star.",
-      "{museum}",
-    ],
-  },
 ];
 
 /** Market Stall ticker: prices drift slowly around these bases. */
@@ -1041,7 +1026,7 @@ export const arcadePal = {
 };
 
 /**
- * The Museum: Moss the Curator (indoor; not Sol on the lawn) and the five gallery plaques.
+ * The Museum: Moss the Curator and the five gallery plaques.
  * Anything starting with PLACEHOLDER is meant to be replaced.
  */
 export const museumPal = {

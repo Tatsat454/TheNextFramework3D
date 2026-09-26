@@ -1,5 +1,4 @@
 import type { ItemId, LandmarkId, ResidentId } from "@/content/landmarks";
-import { museumExhibits } from "@/content/landmarks";
 import { mulberry32, valueNoise } from "./rng";
 
 /** Simulation grid. Land itself is a ~40×36 oval inside this, with void around it so the island floats. */
@@ -511,15 +510,6 @@ export function inPlazaPathSkip(x: number, z: number) {
   block(boardTile.i, boardTile.j, boardTile.i, boardTile.j);
 }
 
-export const pedestals = museumExhibits.map((slug, k) => {
-  const left = k < 3;
-  const i = left ? 29 + k : 34 + (k - 3);
-  const j = 14;
-  block(i, j, i, j);
-  const c = tileCenter(i, j);
-  return { slug, i, j, x: c.x, z: c.z, level: 2, interact: { x: c.x, z: c.z + 0.95 } };
-});
-
 export type TreeKind = "round" | "blossom" | "pine" | "fruit";
 export type TreeSpot = { kind: TreeKind; x: number; z: number; y: number; s: number; seed: number; item?: ItemId };
 
@@ -537,8 +527,6 @@ for (const l of landmarkPlacements) {
   const [i0, j0, i1, j1] = l.rect;
   for (let j = j0 - 1; j <= j1 + 2; j++) for (let i = i0 - 1; i <= i1 + 1; i++) reserve(i, j, 0);
 }
-for (const p of pedestals) reserve(p.i, p.j, 1);
-
 const free = (t: Tile | undefined) => !!t && t.kind === "grass" && !t.blocked && !reserved.has(t.j * W + t.i);
 
 export const trees: TreeSpot[] = [];
@@ -688,7 +676,6 @@ export const residentHomes: Record<ResidentId, Vec2[]> = {
   bramble: [tileCenter(34, 36), tileCenter(30, 34), tileCenter(35, 32)],
   drizzle: [tileCenter(32, 27), tileCenter(28, 30), tileCenter(25, 32)],
   pip: [tileCenter(37, 28), tileCenter(41, 28), tileCenter(39, 25)],
-  sol: [tileCenter(32, 16), tileCenter(35, 14), tileCenter(30, 15)],
 };
 
 export const tiles = grid;
