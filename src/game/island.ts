@@ -449,11 +449,6 @@ export function plazaPropHit(x: number, z: number) {
   return false;
 }
 
-/** Open lawn around each lantern so the garden ring doesn't form an invisible wall. */
-export function inLanternApron(x: number, z: number) {
-  return plazaLanterns.some((p) => Math.hypot(x - p.x, z - p.z) < 1.25);
-}
-
 export function gazeboColumnHit(x: number, z: number) {
   return gazebo.columns.some((c) => Math.hypot(x - c.x, z - c.z) < gazebo.columnRad + 0.05);
 }
@@ -505,12 +500,7 @@ export function inPlazaPathSkip(x: number, z: number) {
   for (const t of grid) {
     if (t.kind === "void" || t.kind === "path" || t.kind === "ramp" || t.kind === "dock") continue;
     const c = tileCenter(t.i, t.j);
-    if (gazeboHeightAt(c.x, c.z) !== null || inGazeboWalk(c.x, c.z)) {
-      t.blocked = false;
-      continue;
-    }
-    const d = Math.hypot(c.x - fountain.x, c.z - fountain.z);
-    if (d >= plazaRing.gardenInner && d <= plazaRing.gardenOuter && !plazaPathOpening(c.x, c.z, 0.06) && !inLanternApron(c.x, c.z)) t.blocked = true;
+    if (gazeboHeightAt(c.x, c.z) !== null || inGazeboWalk(c.x, c.z)) t.blocked = false;
   }
   block(boardTile.i, boardTile.j, boardTile.i, boardTile.j);
 }
@@ -717,16 +707,7 @@ export function isWalkable(x: number, z: number): boolean {
   if (inGazeboWalk(x, z)) return true;
   const { i, j } = worldToTile(x, z);
   const t = tileAt(i, j);
-  if (!t || t.kind === "water" || t.kind === "void") return false;
-  if (inLanternApron(x, z)) return true;
-  const d = Math.hypot(x - fountain.x, z - fountain.z);
-  // Garden collision is circular so 1×1 tiles don't spill onto the paving next to lanterns.
-  if (d >= plazaRing.gardenInner && d <= plazaRing.gardenOuter && !plazaPathOpening(x, z, 0.06)) return false;
-  if (d < plazaRing.gardenInner) {
-    if (i >= 31 && i <= 34 && j >= 29 && j <= 31) return false;
-    return true;
-  }
-  return !t.blocked;
+  return !!t && !t.blocked && t.kind !== "water" && t.kind !== "void";
 }
 
 export function canStep(fromX: number, fromZ: number, toX: number, toZ: number): boolean {
