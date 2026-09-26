@@ -438,16 +438,28 @@ for (const [i, j, s] of [
   if (free(tileAt(i, j))) plant("blossom", i, j, s);
 }
 
-// A few orchard blossoms near the house and plaza.
+// A few orchard blossoms near the house — plaza framing trees are separate.
 for (const [i, j, s] of [
   [21, 35, 1],
   [22, 40, 0.95],
-  [36, 35, 1],
-  [28, 34, 0.9],
   [40, 22, 1],
 ] as const) {
   if (free(tileAt(i, j))) plant("blossom", i, j, s);
 }
+
+/** Three big cherry trees that frame the plaza (west, east, northwest). */
+export const plazaBlossoms: { x: number; z: number; y: number; s: number; seed: number }[] = [];
+const plantPlazaBlossom = (i: number, j: number, s: number, seed: number) => {
+  const t = tileAt(i, j);
+  if (!t || t.kind === "void" || t.kind === "water") return;
+  t.blocked = true;
+  const c = tileCenter(i, j);
+  plazaBlossoms.push({ x: c.x, z: c.z, y: t.h * LEVEL, s, seed });
+  reserve(i, j, 1);
+};
+plantPlazaBlossom(27, 32, 1.42, 0.21);
+plantPlazaBlossom(37, 32, 1.36, 0.74);
+plantPlazaBlossom(29, 24, 1.5, 0.43);
 
 // Lighthouse bluff (northeast): a tight pine stand on the high ground.
 for (const [i, j, s] of [
@@ -471,7 +483,6 @@ for (const t of grid) {
 for (const [i, j, s] of [
   [22, 24, 1],
   [36, 24, 1],
-  [26, 34, 0.9],
   [40, 34, 0.95],
   [29, 16, 0.85],
   [36, 12, 0.9],

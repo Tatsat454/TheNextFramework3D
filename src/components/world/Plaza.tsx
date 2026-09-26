@@ -1,13 +1,14 @@
 "use client";
 
+import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import { useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
-import type { ThreeEvent } from "@react-three/fiber";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { input } from "@/game/input";
-import { LEVEL, plazaPathOpening, plazaRing } from "@/game/island";
+import { fountain, LEVEL, plazaBlossoms, plazaPathOpening, plazaRing } from "@/game/island";
 import { palette, toon } from "@/game/materials";
+import { reducedMotion } from "@/game/player-state";
 import { mulberry32 } from "@/game/rng";
 import { isPaused, useGame } from "@/game/store";
 
@@ -380,6 +381,198 @@ export function Plaza() {
         />
       ))}
       <instancedMesh ref={lupineRef} args={[lupineGeo, toon(LUPINE, { flatShading: true }), data.lupines.length]} />
+      <PlazaBlossoms />
     </group>
+  );
+}
+
+const CANOPY = "#FFB7D2";
+const CANOPY_DEEP = "#FF9EBF";
+const TRUNK = "#4E2F22";
+const PETAL = "#FFB7D2";
+const WATER_R = 1.08;
+const WATER_Y = LEVEL + 0.39;
+const GROUND_Y = LEVEL + 0.045;
+const PER_TREE = 26;
+
+function blob(r: number, x: number, y: number, z: number) {
+  return new THREE.IcosahedronGeometry(r, 0).translate(x, y, z);
+}
+
+function PlazaBlossoms() {
+  const trunkGeo = useMemo(
+    () =>
+      mergeGeometries([
+        new THREE.CylinderGeometry(0.15, 0.22, 1.12, 7).translate(0, 0.56, 0),
+        new THREE.SphereGeometry(0.2, 6, 5).translate(0, 1.12, 0),
+      ]),
+    [],
+  );
+  const canopyGeo = useMemo(
+    () =>
+      mergeGeometries([
+        blob(0.82, 0, 1.92, 0),
+        blob(0.58, 0.62, 1.62, 0.18),
+        blob(0.54, -0.58, 1.7, -0.16),
+        blob(0.5, 0.08, 2.48, -0.06),
+        blob(0.46, 0.22, 1.58, 0.58),
+        blob(0.44, -0.18, 1.52, -0.52),
+        blob(0.4, 0.48, 2.18, 0.32),
+        blob(0.38, -0.44, 2.22, 0.2),
+        blob(0.34, 0.12, 2.05, -0.48),
+      ]),
+    [],
+  );
+  const deepGeo = useMemo(
+    () => mergeGeometries([blob(0.46, -0.28, 1.78, 0.28), blob(0.4, 0.38, 1.88, -0.22), blob(0.32, 0.05, 1.48, 0.12)]),
+    [],
+  );
+
+  return (
+    <group>
+      {plazaBlossoms.map((t) => (
+        <group key={t.seed} position={[t.x, t.y, t.z]} rotation={[0, t.seed * Math.PI * 2, 0]} scale={t.s}>
+          <mesh geometry={trunkGeo} material={toon(TRUNK)} castShadow />
+          <mesh geometry={canopyGeo} material={toon(CANOPY, { flatShading: true, sway: true })} castShadow receiveShadow />
+          <mesh geometry={deepGeo} material={toon(CANOPY_DEEP, { flatShading: true, sway: true })} castShadow />
+        </group>
+      ))}
+    </group>
+  );
+}
+
+type Petal = {
+  tree: number;
+  t: number;
+  dur: number;
+  ox: number;
+  oz: number;
+  spin: number;
+  sway: number;
+  wind: number;
+  seek: boolean;
+  waterA: number;
+  waterR: number;
+  waterSp: number;
+  mode: 0 | 1 | 2;
+  rest: number;
+  rx: number;
+  rz: number;
+};
+
+function seedPetal(p: Petal, k: number, rand: () => number) {
+  p.tree = k % plazaBlossoms.length;
+  p.t = rand() * 0.2;
+  p.dur = 4.4 + rand() * 2.4;
+  p.ox = (rand() - 0.5) * 1.5;
+  p.oz = (rand() - 0.5) * 1.5;
+  p.spin = rand() * 6;
+  p.sway = 1.2 + rand() * 1.1;
+  p.wind = 0.08 + rand() * 0.18;
+  p.seek = k % 5 === 0 || rand() < 0.22;
+  p.waterA = rand() * Math.PI * 2;
+  p.waterR = 0.28 + rand() * 0.72;
+  p.waterSp = 0.08 + rand() * 0.1;
+  p.mode = 0;
+  p.rest = 0;
+  p.rx = 0;
+  p.rz = 0;
+}
+
+/** Drawn after the fountain so petals sit on the water instead of under it. */
+export function PlazaPetals() {
+  const count = plazaBlossoms.length * PER_TREE;
+  const ref = useRef<THREE.InstancedMesh>(null);
+  const tmpObj = useMemo(() => new THREE.Object3D(), []);
+  const state = useMemo(() => {
+    const rand = mulberry32(41);
+    return Array.from({ length: count }, (_, k) => {
+      const p = {} as Petal;
+      seedPetal(p, k, rand);
+      p.t = rand() * p.dur;
+      return p;
+    });
+  }, [count]);
+
+  useFrame((_, rawDt) => {
+    const mesh = ref.current;
+    if (!mesh || !plazaBlossoms.length) return;
+    const dt = Math.min(rawDt, 1 / 20);
+    const rm = reducedMotion.value;
+    for (let k = 0; k < state.length; k++) {
+      const p = state[k]!;
+      const tree = plazaBlossoms[p.tree]!;
+      const canopy = tree.y + 1.85 * tree.s;
+
+      if (rm) {
+        if (k % 7 === 0) {
+          tmpObj.position.set(fountain.x + Math.cos(p.waterA) * p.waterR, WATER_Y, fountain.z + Math.sin(p.waterA) * p.waterR);
+          tmpObj.rotation.set(1.2, p.spin, 0);
+          tmpObj.scale.setScalar(0.85);
+        } else if (k % 4 === 0) {
+          tmpObj.position.set(tree.x + p.ox, GROUND_Y, tree.z + p.oz);
+          tmpObj.rotation.set(1.35, p.spin, 0.2);
+          tmpObj.scale.setScalar(0.8);
+        } else {
+          tmpObj.scale.setScalar(0);
+        }
+        tmpObj.updateMatrix();
+        mesh.setMatrixAt(k, tmpObj.matrix);
+        continue;
+      }
+
+      if (p.mode === 0) {
+        p.t += dt;
+        const u = Math.min(1, p.t / p.dur);
+        let x = tree.x + p.ox + Math.sin(p.t * p.sway + p.spin) * 0.38 + u * p.wind * 1.4;
+        let z = tree.z + p.oz + Math.cos(p.t * p.sway * 0.85 + p.spin) * 0.28 + u * 0.12;
+        if (p.seek) {
+          const tx = fountain.x + Math.cos(p.waterA) * p.waterR;
+          const tz = fountain.z + Math.sin(p.waterA) * p.waterR;
+          const kSeek = u * u * 0.92;
+          x += (tx - x) * kSeek;
+          z += (tz - z) * kSeek;
+        }
+        const y = canopy - u * (canopy - GROUND_Y + 0.02);
+        const d = Math.hypot(x - fountain.x, z - fountain.z);
+        if (u >= 1 || y <= GROUND_Y + 0.01) {
+          p.rx = x;
+          p.rz = z;
+          p.rest = 0;
+          p.mode = d < WATER_R ? 2 : 1;
+        }
+        tmpObj.position.set(x, Math.max(y, GROUND_Y), z);
+        tmpObj.rotation.set(p.t * 1.8 + p.spin, p.t * 0.9 + p.spin, Math.sin(p.t * 2.2) * 0.6);
+        tmpObj.scale.set(1, 0.55, 1);
+      } else if (p.mode === 1) {
+        p.rest += dt;
+        const fade = Math.max(0, 1 - Math.max(0, p.rest - 1.15) / 1.1);
+        tmpObj.position.set(p.rx, GROUND_Y, p.rz);
+        tmpObj.rotation.set(1.4, p.spin + p.rest * 0.05, 0.15);
+        tmpObj.scale.setScalar(fade);
+        if (fade <= 0) seedPetal(p, k, () => Math.random());
+      } else {
+        p.rest += dt;
+        p.waterA += p.waterSp * dt;
+        const r = p.waterR + Math.sin(p.rest * 0.7 + p.spin) * 0.04;
+        const x = fountain.x + Math.cos(p.waterA) * r;
+        const z = fountain.z + Math.sin(p.waterA) * r;
+        const fade = Math.max(0, 1 - Math.max(0, p.rest - 3.4) / 1.6);
+        tmpObj.position.set(x, WATER_Y + Math.sin(p.rest * 1.4 + p.spin) * 0.01, z);
+        tmpObj.rotation.set(1.15, p.waterA, 0.2);
+        tmpObj.scale.set(0.95 * fade, 0.45 * fade, 0.95 * fade);
+        if (fade <= 0) seedPetal(p, k, () => Math.random());
+      }
+      tmpObj.updateMatrix();
+      mesh.setMatrixAt(k, tmpObj.matrix);
+    }
+    mesh.instanceMatrix.needsUpdate = true;
+  });
+
+  if (!count) return null;
+  return (
+    <instancedMesh ref={ref} args={[undefined, undefined, count]} frustumCulled={false} material={toon(PETAL, { side: THREE.DoubleSide, noOcclude: true, transparent: true, opacity: 0.92 })}>
+      <circleGeometry args={[0.055, 5]} />
+    </instancedMesh>
   );
 }
