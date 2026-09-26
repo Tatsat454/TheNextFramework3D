@@ -101,7 +101,7 @@ function StairRail({ x }: { x: number }) {
 
 function StairFlight({ x, halfW, rails }: { x: number; halfW: number; rails: boolean }) {
   const m = MUSEUM;
-  const TH = 0.11;
+  const TH = 0.13;
   const treads = Array.from({ length: m.steps }, (_, i) => {
     const top = m.deckH - i * m.stepH;
     const z = m.deckZ + (i + 0.5) * m.stepD;
@@ -110,7 +110,7 @@ function StairFlight({ x, halfW, rails }: { x: number; halfW: number; rails: boo
   return (
     <group>
       {treads.map((t) => (
-        <Box key={t.i} p={[x, t.top - TH / 2, t.z]} s={[halfW * 2, TH, m.stepD + 0.06]} c={t.i % 2 ? C.stoneDeep : C.stone} />
+        <Box key={t.i} p={[x, t.top - TH / 2, t.z]} s={[halfW * 2, TH, m.stepD + 0.04]} c={t.i % 2 ? C.stoneDeep : C.stone} />
       ))}
       {rails && (
         <>
@@ -167,25 +167,34 @@ function cliffSpots(x0: number, x1: number): Spot[] {
   const m = MUSEUM;
   const spots: Spot[] = [];
   const w = x1 - x0;
-  const n = Math.max(2, Math.round(w / 0.5));
+  const n = Math.max(3, Math.round(w / 0.38));
   for (let i = 0; i < n; i++) {
-    const t = (i + 0.48) / n;
+    const t = (i + 0.5) / n;
     const x = x0 + t * w;
-    const jig = ((i * 5 + 3) % 7) * 0.045 - 0.14;
+    const jig = ((i * 5 + 3) % 7) * 0.04 - 0.12;
     spots.push({
-      p: [x + jig * 0.4, 0, m.deckZ + 0.08],
-      s: [0.95 + (i % 3) * 0.08, 1.28 + (i % 2) * 0.12, 0.82],
-      ry: i * 0.73,
+      p: [x + jig * 0.35, 0, m.deckZ - 0.02],
+      s: [1.05 + (i % 3) * 0.1, 1.42 + (i % 2) * 0.1, 0.78],
+      ry: i * 0.67,
       geo: 4,
       c: i % 3,
     });
     spots.push({
-      p: [x - jig, 0.08, m.deckZ + 0.16],
-      s: [0.72 + (i % 2) * 0.1, 0.95, 0.7],
-      ry: i * 1.1 + 0.4,
+      p: [x - jig, 0.06, m.deckZ + 0.1],
+      s: [0.78 + (i % 2) * 0.12, 1.05, 0.62],
+      ry: i * 1.05 + 0.35,
       geo: i % 3,
-      c: (i + 1) % 3,
+      c: (i + 2) % 3,
     });
+    if (i % 2 === 0) {
+      spots.push({
+        p: [x + jig * 0.8, 0.55, m.deckZ + 0.06],
+        s: [0.62, 0.8, 0.5],
+        ry: i * 0.4 + 1.2,
+        geo: 2,
+        c: (i + 1) % 3,
+      });
+    }
   }
   return spots;
 }
@@ -194,29 +203,34 @@ function terraceRocks(): Spot[] {
   const y = MUSEUM.deckH;
   const back: Spot[] = [
     // NW corner mound
-    { p: [-6.85, y, -5.35], s: [1.45, 1.35, 1.35], ry: 0.4, geo: 0, c: 0 },
-    { p: [-6.15, y, -5.55], s: [1.15, 1.05, 1.1], ry: 1.8, geo: 2, c: 2 },
-    { p: [-7.25, y, -4.55], s: [1.05, 0.95, 1.0], ry: 2.4, geo: 1, c: 1 },
-    { p: [-6.45, y, -4.75], s: [0.85, 0.8, 0.85], ry: 0.9, geo: 1, c: 2 },
-    { p: [-7.35, y, -5.55], s: [0.7, 0.65, 0.7], ry: 3.1, geo: 3, c: 0 },
+    { p: [-6.75, y, -5.25], s: [1.75, 1.55, 1.6], ry: 0.4, geo: 0, c: 0 },
+    { p: [-5.95, y, -5.5], s: [1.35, 1.2, 1.25], ry: 1.8, geo: 2, c: 2 },
+    { p: [-7.28, y, -4.4], s: [1.25, 1.1, 1.15], ry: 2.4, geo: 1, c: 1 },
+    { p: [-6.35, y, -4.55], s: [1.05, 0.95, 1.0], ry: 0.9, geo: 1, c: 2 },
+    { p: [-7.38, y, -5.5], s: [0.9, 0.85, 0.85], ry: 3.1, geo: 0, c: 0 },
+    { p: [-7.05, y, -3.85], s: [0.95, 0.85, 0.9], ry: 1.2, geo: 2, c: 1 },
     // North wall, west of center
-    { p: [-4.55, y, -5.52], s: [1.05, 0.95, 0.95], ry: 0.2, geo: 0, c: 1 },
-    { p: [-3.55, y, -5.58], s: [0.9, 0.85, 0.85], ry: 1.4, geo: 2, c: 0 },
-    { p: [-2.55, y, -5.48], s: [0.8, 0.75, 0.8], ry: 2.2, geo: 1, c: 2 },
+    { p: [-4.65, y, -5.48], s: [1.2, 1.05, 1.05], ry: 0.2, geo: 0, c: 1 },
+    { p: [-3.55, y, -5.55], s: [1.1, 1.0, 1.0], ry: 1.4, geo: 2, c: 0 },
+    { p: [-2.5, y, -5.42], s: [0.95, 0.9, 0.9], ry: 2.2, geo: 1, c: 2 },
+    { p: [-4.05, y, -5.15], s: [0.75, 0.7, 0.75], ry: 0.7, geo: 3, c: 1 },
     // Behind the center exhibit pad
-    { p: [-0.85, y, -5.55], s: [1.0, 0.95, 0.9], ry: 0.6, geo: 0, c: 2 },
-    { p: [0.15, y, -5.62], s: [0.95, 1.05, 0.9], ry: 2.0, geo: 2, c: 0 },
-    { p: [0.95, y, -5.48], s: [0.85, 0.8, 0.85], ry: 1.1, geo: 1, c: 1 },
+    { p: [-0.95, y, -5.5], s: [1.2, 1.1, 1.05], ry: 0.6, geo: 0, c: 2 },
+    { p: [0.2, y, -5.58], s: [1.15, 1.2, 1.05], ry: 2.0, geo: 2, c: 0 },
+    { p: [1.05, y, -5.42], s: [1.0, 0.95, 0.95], ry: 1.1, geo: 1, c: 1 },
+    { p: [0.15, y, -5.1], s: [0.7, 0.65, 0.7], ry: 2.5, geo: 3, c: 2 },
     // North wall, east of center
-    { p: [2.55, y, -5.48], s: [0.8, 0.75, 0.8], ry: 0.5, geo: 1, c: 0 },
-    { p: [3.55, y, -5.58], s: [0.9, 0.85, 0.85], ry: 2.6, geo: 2, c: 2 },
-    { p: [4.55, y, -5.52], s: [1.05, 0.95, 0.95], ry: 1.7, geo: 0, c: 1 },
+    { p: [2.5, y, -5.42], s: [0.95, 0.9, 0.9], ry: 0.5, geo: 1, c: 0 },
+    { p: [3.55, y, -5.55], s: [1.1, 1.0, 1.0], ry: 2.6, geo: 2, c: 2 },
+    { p: [4.65, y, -5.48], s: [1.2, 1.05, 1.05], ry: 1.7, geo: 0, c: 1 },
+    { p: [4.05, y, -5.15], s: [0.75, 0.7, 0.75], ry: 0.3, geo: 3, c: 0 },
     // NE corner mound
-    { p: [6.85, y, -5.35], s: [1.45, 1.35, 1.35], ry: 2.1, geo: 0, c: 2 },
-    { p: [6.15, y, -5.55], s: [1.15, 1.05, 1.1], ry: 0.3, geo: 2, c: 0 },
-    { p: [7.25, y, -4.55], s: [1.05, 0.95, 1.0], ry: 1.2, geo: 1, c: 1 },
-    { p: [6.45, y, -4.75], s: [0.85, 0.8, 0.85], ry: 2.8, geo: 1, c: 0 },
-    { p: [7.35, y, -5.55], s: [0.7, 0.65, 0.7], ry: 0.8, geo: 3, c: 2 },
+    { p: [6.75, y, -5.25], s: [1.75, 1.55, 1.6], ry: 2.1, geo: 0, c: 2 },
+    { p: [5.95, y, -5.5], s: [1.35, 1.2, 1.25], ry: 0.3, geo: 2, c: 0 },
+    { p: [7.28, y, -4.4], s: [1.25, 1.1, 1.15], ry: 1.2, geo: 1, c: 1 },
+    { p: [6.35, y, -4.55], s: [1.05, 0.95, 1.0], ry: 2.8, geo: 1, c: 0 },
+    { p: [7.38, y, -5.5], s: [0.9, 0.85, 0.85], ry: 0.8, geo: 0, c: 2 },
+    { p: [7.05, y, -3.85], s: [0.95, 0.85, 0.9], ry: 2.3, geo: 2, c: 1 },
     // West terrace edge
     { p: [-7.38, y, -3.35], s: [0.85, 0.8, 0.9], ry: 0.4, geo: 1, c: 0 },
     { p: [-7.42, y, -2.15], s: [0.75, 0.7, 0.8], ry: 1.9, geo: 2, c: 2 },
@@ -308,9 +322,7 @@ function CliffFill() {
         const cx = (g.x0 + g.x1) / 2;
         return (
           <group key={`${g.x0}:${g.x1}`}>
-            <Box p={[cx, 0.34, m.deckZ + 0.1]} s={[w, 0.68, 0.42]} c={C.rockC} />
-            <Box p={[cx, 0.78, m.deckZ + 0.04]} s={[w * 0.97, 0.52, 0.36]} c={C.rockA} />
-            <Box p={[cx, 1.08, m.deckZ - 0.02]} s={[w * 0.92, 0.22, 0.3]} c={C.rockB} />
+            <Box p={[cx, m.deckH / 2, m.deckZ + 0.02]} s={[w, m.deckH, 0.22]} c={C.rockC} />
           </group>
         );
       })}
@@ -320,13 +332,12 @@ function CliffFill() {
 
 function Terrace() {
   const m = MUSEUM;
-  const front = m.deckZ - 0.14;
-  const depth = front - -m.halfD;
-  const cz = (-m.halfD + front) / 2;
+  const depth = m.deckZ - -m.halfD;
+  const cz = (-m.halfD + m.deckZ) / 2;
   return (
     <group>
       <Box p={[0, m.deckH / 2, cz]} s={[m.halfW * 2 - 0.22, m.deckH, depth]} c={C.rockA} />
-      <Box p={[0, m.deckH + 0.015, cz]} s={[m.halfW * 2 - 0.28, 0.03, depth - 0.06]} c={C.rockB} shadow={false} />
+      <Box p={[0, m.deckH + 0.015, cz]} s={[m.halfW * 2 - 0.28, 0.03, depth - 0.08]} c={C.rockB} shadow={false} />
       <CliffFill />
     </group>
   );
