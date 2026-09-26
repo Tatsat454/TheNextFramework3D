@@ -5,7 +5,7 @@ import { useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { MUSEUM, MUSEUM_COLORS, MUSEUM_PEDESTALS, museumStairSouth } from "@/game/interiors";
-import { palette, toon } from "@/game/materials";
+import { palette, toon, flat } from "@/game/materials";
 import { ClearColor } from "./Interior";
 import { ExhibitObject } from "./ExhibitObject";
 
@@ -359,6 +359,24 @@ function sandRing(radius: number, count: number, seed: number) {
   return rocks;
 }
 
+function SpotPool({ r }: { r: number }) {
+  return (
+    <group>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.07, 0]} scale={[1.15, 1, 0.92]} material={flat("#F7D98A", 0.32, true)}>
+        <circleGeometry args={[r * 1.55, 28]} />
+      </mesh>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.08, 0]} scale={[1.1, 1, 0.9]} material={flat("#FFE9B4", 0.4, true)}>
+        <circleGeometry args={[r * 1.05, 24]} />
+      </mesh>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.09, 0]} material={flat("#FFF6D2", 0.5, true)}>
+        <circleGeometry args={[r * 0.52, 20]} />
+      </mesh>
+      <mesh position={[0, 1.28, 0]} material={flat("#FFE6B0", 0.14, true)}>
+        <coneGeometry args={[r * 1.22, 2.45, 22, 1, true]} />
+      </mesh>
+    </group>
+  );
+}
 function Pedestal({ x, z, y, large, geo, slug }: { x: number; z: number; y: number; large: boolean; geo: THREE.BufferGeometry; slug: string }) {
   const padR = large ? 1.08 : 0.78;
   const ring = sandRing(padR * 0.92, large ? 9 : 7, Math.abs(Math.round(x * 10 + z * 3)));
@@ -385,13 +403,11 @@ function Pedestal({ x, z, y, large, geo, slug }: { x: number; z: number; y: numb
       <Box p={[0, 0.55, 0]} s={[0.66, 0.08, 0.66]} c={C.velvet} />
       <Box p={[0, 0.3, 0.38]} s={[0.22, 0.12, 0.04]} c={C.gold} />
       <Box p={[0, 0.3, 0.4]} s={[0.16, 0.06, 0.02]} c="#C48A55" shadow={false} />
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.055, 0]} material={toon("#F4DEAA", { emissive: "#F4DEAA", emissiveIntensity: 0.95, noOcclude: true, transparent: true, opacity: 0.72 })}>
-        <circleGeometry args={[padR * 0.82, 20]} />
-      </mesh>
+      <SpotPool r={padR} />
       <group position={[0, 0.59, 0]} scale={1.28}>
         <ExhibitObject slug={slug} />
       </group>
-      <pointLight color="#FFE4B0" intensity={1.85} distance={4.2} position={[0, 1.85, 0.08]} />
+      <pointLight color="#FFE4B0" intensity={1.4} distance={3.8} position={[0, 1.9, 0.08]} />
     </group>
   );
 }
@@ -420,6 +436,9 @@ function NorthBanner({ x }: { x: number }) {
       <Box p={[0, -0.08, 0.11]} s={[0.48, 0.09, 0.03]} c={C.gold} />
       <Box p={[0, 0.88, 0.12]} s={[0.28, 0.12, 0.2]} c="#E8D5A8" />
       <Box p={[0, 0.8, 0.2]} s={[0.2, 0.08, 0.14]} c="#FFE7A8" glow />
+      <mesh position={[0, 0.78, 0.28]} material={flat("#FFE6B0", 0.4, true)}>
+        <sphereGeometry args={[0.18, 10, 8]} />
+      </mesh>
     </group>
   );
 }
@@ -446,6 +465,9 @@ function SideBanner({ side }: { side: -1 | 1 }) {
       ))}
       <Box p={[0, 0.86, 0.14]} s={[0.2, 0.12, 0.22]} c="#8B5A32" />
       <Box p={[0, 0.86, 0.26]} s={[0.14, 0.1, 0.12]} c="#FFE7A8" glow />
+      <mesh position={[0, 0.86, 0.32]} material={flat("#FFE6B0", 0.35, true)}>
+        <sphereGeometry args={[0.22, 10, 8]} />
+      </mesh>
     </group>
   );
 }
@@ -490,6 +512,12 @@ function GalleryDecor() {
       <Bench x={4.35} z={4.22} />
       <CornerBush x={-7.05} z={4.88} />
       <CornerBush x={7.05} z={4.88} />
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[-5.05, 0.04, 4.55]} scale={[1.15, 1, 0.7]} material={flat("#F7D98A", 0.3, true)}>
+        <circleGeometry args={[1.05, 24]} />
+      </mesh>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[5.05, 0.04, 4.55]} scale={[1.15, 1, 0.7]} material={flat("#F7D98A", 0.3, true)}>
+        <circleGeometry args={[1.05, 24]} />
+      </mesh>
     </group>
   );
 }
@@ -521,10 +549,10 @@ function Carpet() {
 function MuseumLights() {
   return (
     <>
-      <hemisphereLight args={["#FFF6E6", "#B87A4B", 0.42]} />
-      <ambientLight intensity={0.26} />
-      <directionalLight color="#FFE7A8" intensity={0.55} position={[6, 10, -8]} />
-      <pointLight color="#FFD9CC" intensity={0.22} distance={14} position={[0, 3.1, 0]} />
+      <hemisphereLight args={["#FFF6E6", "#B87A4B", 0.62]} />
+      <ambientLight intensity={0.38} />
+      <directionalLight color="#FFE7A8" intensity={0.88} position={[6, 10, -8]} />
+      <pointLight color="#FFD9CC" intensity={0.35} distance={16} position={[0, 3.1, 0]} />
     </>
   );
 }
