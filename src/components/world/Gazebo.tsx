@@ -11,6 +11,7 @@ const CREAM_RIM = "#FAF0DC";
 const ROOF = "#B89AE0";
 const ROOF_LIP = "#C9B0EA";
 const GOLD = "#E8C35A";
+const STEP = "#E8D4B0";
 const VINE = "#4E8F48";
 const WISTERIA = "#9B6ED4";
 const WISTERIA_DEEP = "#7A4CB8";
@@ -29,19 +30,20 @@ export function Gazebo() {
   const vineGeo = useMemo(
     () =>
       mergeGeometries([
-        new THREE.CylinderGeometry(0.018, 0.028, 0.72, 5).translate(0, -0.36, 0),
-        new THREE.CylinderGeometry(0.014, 0.02, 0.4, 5).rotateZ(0.35).translate(0.08, -0.55, 0.02),
+        new THREE.CylinderGeometry(0.012, 0.02, 0.38, 5).translate(0, -0.16, 0),
+        new THREE.SphereGeometry(0.045, 6, 4).translate(0.04, -0.08, 0.02),
+        new THREE.SphereGeometry(0.038, 6, 4).translate(-0.03, -0.18, 0),
       ]),
     [],
   );
   const clusterGeo = useMemo(
     () =>
       mergeGeometries([
-        new THREE.SphereGeometry(0.055, 6, 5).translate(0, -0.42, 0),
-        new THREE.SphereGeometry(0.07, 6, 5).translate(0.02, -0.55, 0.01),
-        new THREE.SphereGeometry(0.062, 6, 5).translate(-0.02, -0.68, 0),
-        new THREE.SphereGeometry(0.048, 6, 5).translate(0.01, -0.8, 0.02),
-        new THREE.SphereGeometry(0.034, 6, 5).translate(0, -0.9, 0),
+        new THREE.SphereGeometry(0.048, 6, 5).translate(0, -0.22, 0),
+        new THREE.SphereGeometry(0.062, 6, 5).translate(0.015, -0.34, 0.01),
+        new THREE.SphereGeometry(0.055, 6, 5).translate(-0.02, -0.46, 0),
+        new THREE.SphereGeometry(0.042, 6, 5).translate(0.01, -0.56, 0.015),
+        new THREE.SphereGeometry(0.028, 6, 5).translate(0, -0.64, 0),
       ]),
     [],
   );
@@ -50,11 +52,11 @@ export function Gazebo() {
   const midStepGeo = useMemo(() => sectorCylinder(gazebo.steps[0].r, gazebo.steps[0].h, gazebo.stepHalf), []);
   const vines = useMemo(() => {
     const list: { a: number; y: number; s: number; drop: number }[] = [];
-    for (let k = 0; k < 16; k++) {
-      const a = (k / 16) * Math.PI * 2 + 0.08;
-      const front = Math.cos(a) > -0.15;
-      if (!front && k % 2 === 1) continue;
-      list.push({ a, y: 1.92, s: 0.85 + (k % 3) * 0.12, drop: front ? 1 : 0.78 });
+    for (let k = 0; k < 18; k++) {
+      const a = (k / 18) * Math.PI * 2 + 0.12;
+      const front = Math.cos(a) > -0.2;
+      if (!front && k % 3 === 1) continue;
+      list.push({ a, y: 2.02, s: 0.9 + (k % 3) * 0.1, drop: front ? 1.05 : 0.82 });
     }
     return list;
   }, []);
@@ -65,7 +67,7 @@ export function Gazebo() {
       vines.forEach((v, k) => {
         const r = 1.52;
         tmp.position.set(Math.sin(v.a) * r, v.y + yOff, Math.cos(v.a) * r);
-        tmp.rotation.set(0.18, v.a, 0.08);
+        tmp.rotation.set(0.35, v.a, 0.12);
         tmp.scale.set(v.s, v.s * v.drop * sMul, v.s);
         tmp.updateMatrix();
         mesh.setMatrixAt(k, tmp.matrix);
@@ -89,8 +91,8 @@ export function Gazebo() {
       <mesh position={[0, deck + 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]} material={toon(CREAM_RIM, { noOcclude: true })} receiveShadow>
         <circleGeometry args={[gazebo.platformR - 0.04, 20]} />
       </mesh>
-      <mesh position={[0, gazebo.steps[0].h / 2, 0]} geometry={midStepGeo} material={toon(CREAM)} receiveShadow castShadow />
-      <mesh position={[0, gazebo.steps[1].h / 2, 0]} geometry={lowStepGeo} material={toon(CREAM)} receiveShadow castShadow />
+      <mesh position={[0, gazebo.steps[0].h / 2, 0]} geometry={midStepGeo} material={toon(STEP)} receiveShadow castShadow />
+      <mesh position={[0, gazebo.steps[1].h / 2, 0]} geometry={lowStepGeo} material={toon(STEP)} receiveShadow castShadow />
       {gazebo.columns.map((_, k) => {
         const a = Math.PI / 6 + (k * Math.PI) / 3;
         const x = Math.sin(a) * gazebo.columnRing;

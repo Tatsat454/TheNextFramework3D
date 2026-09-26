@@ -30,8 +30,8 @@ export function CameraRig() {
 
   useFrame((_, rawDt) => {
     if (debugCam.gazebo) {
-      camera.position.set(gazebo.x + 0.55, LEVEL + 2.55, gazebo.z + 4.35);
-      camera.lookAt(gazebo.x, LEVEL + 1.15, gazebo.z);
+      camera.position.set(gazebo.x + 1.85, LEVEL + 3.55, gazebo.z + 6.15);
+      camera.lookAt(gazebo.x, LEVEL + 1.12, gazebo.z);
       bend.uBend.value = 0.0016;
       bend.uBendCenter.value.set(gazebo.x, LEVEL, gazebo.z);
       bend.uPlayer.value.set(player.x, player.y + 0.55, player.z);
