@@ -4,7 +4,7 @@ import { useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import type { ThreeEvent } from "@react-three/fiber";
-import { dock, H, LEVEL, rampRuns, tileAt, tileCenter, tiles, W, WATER_Y } from "@/game/island";
+import { dock, H, inPlazaPathSkip, LEVEL, rampRuns, tileAt, tileCenter, tiles, W, WATER_Y } from "@/game/island";
 import { input } from "@/game/input";
 import { palette, toon } from "@/game/materials";
 import { isPaused, useGame } from "@/game/store";
@@ -90,8 +90,10 @@ export function Terrain() {
       const sy = top - 0.02 - BASE;
       dirt.push({ x, y: BASE + sy / 2, z, sx: 1.08, sy, sz: 1.08, c: palette.dirt });
       if (t.kind === "ramp" || t.kind === "dock") continue;
-      if (t.kind === "path") weld(path, t.i, t.j, t.i + 1, t.j + 1, top + 0.04);
-      else if (t.kind === "sand") weld(sand, t.i, t.j, t.i + 1, t.j + 1, top + 0.02);
+      if (t.kind === "path") {
+        if (inPlazaPathSkip(x, z)) weld(grass, t.i, t.j, t.i + 1, t.j + 1, top + 0.02);
+        else weld(path, t.i, t.j, t.i + 1, t.j + 1, top + 0.04);
+      } else if (t.kind === "sand") weld(sand, t.i, t.j, t.i + 1, t.j + 1, top + 0.02);
       else weld(grass, t.i, t.j, t.i + 1, t.j + 1, top + 0.02);
     }
 

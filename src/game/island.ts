@@ -242,9 +242,8 @@ for (const t of grid) {
 // Spine: spawn / plaza / stairs / museum. District spokes stay short.
 paint(32, 42, 33, 23); // beach → stairs
 paint(32, 20, 33, 13); // stairs top → museum door
-paint(30, 28, 35, 32); // plaza hub
 paint(16, 39, 31, 40); // house door → spine
-paint(24, 29, 31, 29); // town hall front
+paint(24, 29, 30, 29); // town hall front (meets the plaza ring)
 paint(35, 28, 40, 28); // → arcade
 paint(36, 29, 40, 32); // → market (west approach)
 bridge(16, 39, 24, 40); // across the house pond, on the door line
@@ -335,6 +334,21 @@ export const fountain = (() => {
   return { x, z };
 })();
 
+/** Circular plaza around the fountain. Terrain hides the square path fill inside this radius. */
+export const plazaRing = {
+  x: fountain.x,
+  z: fountain.z,
+  grassInner: 1.58,
+  grassOuter: 2.14,
+  sandInner: 2.02,
+  sandOuter: 3.22,
+  skipPath: 2.92,
+};
+
+export function inPlazaPathSkip(x: number, z: number) {
+  return Math.hypot(x - plazaRing.x, z - plazaRing.z) < plazaRing.skipPath;
+}
+
 export const pedestals = museumExhibits.map((slug, k) => {
   const left = k < 3;
   const i = left ? 29 + k : 34 + (k - 3);
@@ -352,6 +366,10 @@ const reserve = (i: number, j: number, r = 1) => {
   for (let dj = -r; dj <= r; dj++) for (let di = -r; di <= r; di++) reserved.add((j + dj) * W + (i + di));
 };
 for (const t of grid) if (t.kind === "path" || t.kind === "ramp" || t.kind === "dock" || t.kind === "sand") reserve(t.i, t.j, 1);
+for (const t of grid) {
+  const c = tileCenter(t.i, t.j);
+  if (Math.hypot(c.x - fountain.x, c.z - fountain.z) < plazaRing.sandOuter + 0.35) reserve(t.i, t.j, 0);
+}
 for (const l of landmarkPlacements) {
   const [i0, j0, i1, j1] = l.rect;
   for (let j = j0 - 1; j <= j1 + 2; j++) for (let i = i0 - 1; i <= i1 + 1; i++) reserve(i, j, 0);
