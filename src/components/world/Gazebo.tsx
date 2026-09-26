@@ -103,7 +103,7 @@ export function Gazebo() {
       <mesh position={[0, gazebo.steps[0].h / 2, 0]} geometry={midStepGeo} material={toon(STEP)} receiveShadow castShadow />
       <mesh position={[0, gazebo.steps[1].h / 2, 0]} geometry={lowStepGeo} material={toon(STEP)} receiveShadow castShadow />
       {gazebo.columns.map((_, k) => {
-        const a = Math.PI / 6 + (k * Math.PI) / 3;
+        const a = Math.PI / 5 + (k * Math.PI) / 3;
         const x = Math.sin(a) * gazebo.columnRing;
         const z = Math.cos(a) * gazebo.columnRing;
         return (

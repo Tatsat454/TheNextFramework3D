@@ -353,11 +353,11 @@ export const gazebo = (() => {
   const x = fountain.x + 2.48;
   const z = fountain.z - 5.08;
   const facing = Math.atan2(fountain.x - x, fountain.z - z);
-  const columnRing = 1.18;
+  const columnRing = 1.26;
   const cf = Math.cos(facing);
   const sf = Math.sin(facing);
   const columns = Array.from({ length: 6 }, (_, k) => {
-    const a = Math.PI / 6 + (k * Math.PI) / 3;
+    const a = Math.PI / 5 + (k * Math.PI) / 3;
     const lx = Math.sin(a) * columnRing;
     const lz = Math.cos(a) * columnRing;
     return { x: x + lx * cf + lz * sf, z: z - lx * sf + lz * cf };
@@ -366,11 +366,11 @@ export const gazebo = (() => {
     x,
     z,
     facing,
-    platformR: 1.38,
+    platformR: 1.46,
     deckH: 0.38,
     columnRing,
-    columnRad: 0.11,
-    stepHalf: 0.92,
+    columnRad: 0.1,
+    stepHalf: 0.95,
     steps: [
       { r: 1.78, h: 0.24 },
       { r: 2.28, h: 0.12 },
@@ -386,7 +386,7 @@ export function nearGazebo(x: number, z: number, extra = 0) {
 }
 
 export function gazeboColumnHit(x: number, z: number) {
-  return gazebo.columns.some((c) => Math.hypot(x - c.x, z - c.z) < gazebo.columnRad + 0.08);
+  return gazebo.columns.some((c) => Math.hypot(x - c.x, z - c.z) < gazebo.columnRad + 0.05);
 }
 
 export function inGazeboWalk(x: number, z: number) {
