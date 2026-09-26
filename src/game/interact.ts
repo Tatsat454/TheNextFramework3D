@@ -1,7 +1,7 @@
 "use client";
 
 import type { ItemId, LandmarkId, ResidentId } from "@/content/landmarks";
-import { arcadePal, copy, getItem, getLandmark, landmarks, museumExhibits, plazaCopy, residents, townHallPal } from "@/content/landmarks";
+import { arcadePal, copy, galleryExhibits, getItem, getLandmark, landmarks, museumExhibits, museumPal, plazaCopy, residents, townHallPal } from "@/content/landmarks";
 import { sfx } from "./audio";
 import {
   armDoorLatch,
@@ -290,7 +290,26 @@ function fillTemplate(line: string, px: number, pz: number): string {
       ? "Every exhibit donated! The museum is complete. Thank you, truly."
       : `So far ${n} of ${museumExhibits.length} exhibits are donated. Shall I show you the collection?`;
   }
+  if (line === "{gallery}") {
+    const n = galleryExhibits.filter((slug) => s.donated[slug]).length;
+    return n === galleryExhibits.length ? museumPal.thanks : museumPal.progress.replace("{n}", String(n));
+  }
   return line;
+}
+
+export function galleryDonatedCount(donated: Record<string, true> = useGame.getState().donated) {
+  return galleryExhibits.filter((slug) => donated[slug]).length;
+}
+
+/** Confetti + thank-you the first time all five indoor exhibits are donated. */
+export function celebrateGalleryIfComplete() {
+  const s = useGame.getState();
+  if (s.galleryCelebrated) return false;
+  if (galleryDonatedCount(s.donated) < galleryExhibits.length) return false;
+  useGame.setState({ galleryCelebrated: true, celebrateAt: performance.now() });
+  toast("You've seen every exhibit!", "celebrate", "#D4A13A");
+  sfx.jingle();
+  return true;
 }
 
 function tossCoin(from: { x: number; z: number }) {
@@ -414,6 +433,25 @@ function inspectProp(id: string) {
         tagColor: arcadePal.tagColor,
         voice: arcadePal.voice,
         lines: o.lines,
+        index: 0,
+        action: href ? "link" : undefined,
+        href,
+        hrefLabel,
+      },
+    });
+    return;
+  }
+  if (interior === "museum") {
+    const lines = o.lines.map((l) => fillTemplate(l, player.x, player.z));
+    if (id === "curator") celebrateGalleryIfComplete();
+    useGame.setState({
+      dialog: {
+        speaker: museumPal.id,
+        name: id === "curator" ? museumPal.name : o.name,
+        role: id === "curator" ? museumPal.role : title,
+        tagColor: museumPal.tagColor,
+        voice: museumPal.voice,
+        lines,
         index: 0,
         action: href ? "link" : undefined,
         href,

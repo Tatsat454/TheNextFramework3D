@@ -1,12 +1,16 @@
 import type { LandmarkId } from "@/content/landmarks";
-import { arcadeInteriorCopy, houseInteriorCopy, museumExhibits, townHallInteriorCopy } from "@/content/landmarks";
+import { arcadeInteriorCopy, galleryExhibits, houseInteriorCopy, museumInteriorCopy, townHallInteriorCopy } from "@/content/landmarks";
 import { getPlacement, heightAt, LEVEL } from "./island";
 import { player } from "./player-state";
 import { useGame } from "./store";
 
 export type InteriorId = "house" | "arcade" | "townhall" | "museum";
 
-export type InteriorObjectId = keyof typeof houseInteriorCopy | keyof typeof arcadeInteriorCopy | keyof typeof townHallInteriorCopy;
+export type InteriorObjectId =
+  | keyof typeof houseInteriorCopy
+  | keyof typeof arcadeInteriorCopy
+  | keyof typeof townHallInteriorCopy
+  | keyof typeof museumInteriorCopy;
 
 type Rect = { x0: number; z0: number; x1: number; z1: number };
 
@@ -95,14 +99,16 @@ export function museumStairSouth() {
   return MUSEUM.deckZ + MUSEUM.steps * MUSEUM.stepD;
 }
 
-/** Five gallery pedestals. +z is south (plaque faces the door). */
+/** Five gallery pedestals. +z is south (plaque faces the door). `toy` keeps the outdoor exhibit models. */
 export const MUSEUM_PEDESTALS = [
-  { id: "exhibit1", n: 1, x: 0, z: -3.55, tier: "top" as const, slug: museumExhibits[0] },
-  { id: "exhibit2", n: 2, x: -3.42, z: -2.38, tier: "top" as const, slug: museumExhibits[1] },
-  { id: "exhibit3", n: 3, x: 3.42, z: -2.38, tier: "top" as const, slug: museumExhibits[2] },
-  { id: "exhibit4", n: 4, x: -3.22, z: 2.22, tier: "low" as const, slug: museumExhibits[3] },
-  { id: "exhibit5", n: 5, x: 3.22, z: 2.22, tier: "low" as const, slug: museumExhibits[4] },
+  { id: "exhibit1", n: 1, x: 0, z: -3.55, tier: "top" as const, slug: galleryExhibits[0], toy: "nyc-taxi-ddc" },
+  { id: "exhibit2", n: 2, x: -3.42, z: -2.38, tier: "top" as const, slug: galleryExhibits[1], toy: "pjm-ai-electricity" },
+  { id: "exhibit3", n: 3, x: 3.42, z: -2.38, tier: "top" as const, slug: galleryExhibits[2], toy: "startup-failure" },
+  { id: "exhibit4", n: 4, x: -3.22, z: 2.22, tier: "low" as const, slug: galleryExhibits[3], toy: "home-robot-vlm" },
+  { id: "exhibit5", n: 5, x: 3.22, z: 2.22, tier: "low" as const, slug: galleryExhibits[4], toy: "pokemon-red-agent" },
 ] as const;
+
+export const MUSEUM_CURATOR = { x: 1.18, z: 4.28 };
 
 export function museumHeightAt(x: number, z: number) {
   const m = MUSEUM;
@@ -208,7 +214,16 @@ export const interiors: Record<InteriorId, InteriorDef> = {
     spawn: { x: 0, z: 4.55, facing: Math.PI },
     doormat: { x: 0, z: 5.42, w: 1.7, d: 0.88 },
     outsidePad: { z: 1.62, w: 1.15, d: 0.78 },
-    objects: [],
+    objects: [
+      { id: "curator", x: MUSEUM_CURATOR.x, z: MUSEUM_CURATOR.z, y: 1.45, r: 1.45 },
+      ...MUSEUM_PEDESTALS.map((p) => ({
+        id: p.id,
+        x: p.x,
+        z: p.z,
+        y: (p.tier === "top" ? MUSEUM.deckH : 0) + 1.35,
+        r: 1.12,
+      })),
+    ],
     blocked: [
       // Side-stair rails
       { x0: -MUSEUM.sideX - MUSEUM.sideHalf - 0.16, z0: MUSEUM.deckZ - 0.08, x1: -MUSEUM.sideX - MUSEUM.sideHalf + 0.02, z1: museumStairSouth() + 0.08 },
@@ -233,6 +248,7 @@ export const interiors: Record<InteriorId, InteriorDef> = {
       { x0: 3.48, z0: 3.9, x1: 5.22, z1: 4.58 },
       { x0: -7.58, z0: 4.38, x1: -6.48, z1: 5.42 },
       { x0: 6.48, z0: 4.38, x1: 7.58, z1: 5.42 },
+      { x0: 0.86, z0: 3.98, x1: 1.5, z1: 4.58 },
     ],
   },
 };
@@ -245,6 +261,7 @@ export const getInterior = (id: InteriorId) => interiors[id];
 export function propCopy(interior: InteriorId, id: string) {
   if (interior === "arcade") return arcadeInteriorCopy[id as keyof typeof arcadeInteriorCopy];
   if (interior === "townhall") return townHallInteriorCopy[id as keyof typeof townHallInteriorCopy];
+  if (interior === "museum") return museumInteriorCopy[id as keyof typeof museumInteriorCopy];
   return houseInteriorCopy[id as keyof typeof houseInteriorCopy];
 }
 

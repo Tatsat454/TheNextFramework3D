@@ -487,6 +487,126 @@ export const stories: Story[] = [
     links: [{ label: "Edge Finder on GitHub", href: "https://github.com/Tatsat454/GamblingOdds" }],
   },
   {
+    slug: "game-teardown",
+    kind: "case-study",
+    eyebrow: "Exhibit · Game teardown",
+    title: "PLACEHOLDER: game teardown title",
+    summary: "PLACEHOLDER: one-line summary of the teardown — core loop, economy, or retention hook.",
+    placeholder: true,
+    sections: [
+      {
+        heading: "Problem",
+        placeholder: true,
+        body: ["PLACEHOLDER: the design or economy problem this teardown is about."],
+      },
+      {
+        heading: "Players",
+        placeholder: true,
+        body: ["PLACEHOLDER: who the game is for, and who wins if the loop is healthy."],
+      },
+      {
+        heading: "Insight",
+        placeholder: true,
+        body: ["PLACEHOLDER: the one mechanic or economy choice that makes the game work — or the one you'd change."],
+      },
+      {
+        heading: "What I'd build",
+        placeholder: true,
+        body: ["PLACEHOLDER: the change you'd ship as PM, and why."],
+      },
+      {
+        heading: "How I'd measure it",
+        placeholder: true,
+        body: ["PLACEHOLDER: the metric you'd move, plus a guardrail."],
+      },
+      {
+        heading: "What I learned",
+        placeholder: true,
+        body: ["PLACEHOLDER: the lesson you'd take to the next game."],
+      },
+    ],
+  },
+  {
+    slug: "feature-spec",
+    kind: "case-study",
+    eyebrow: "Exhibit · Feature spec",
+    title: "PLACEHOLDER: feature spec title",
+    summary: "PLACEHOLDER: one-line summary of the feature and the player problem it solves.",
+    placeholder: true,
+    sections: [
+      {
+        heading: "Problem",
+        placeholder: true,
+        body: ["PLACEHOLDER: the player or operator problem this spec is answering."],
+      },
+      {
+        heading: "Players",
+        placeholder: true,
+        body: ["PLACEHOLDER: who uses the feature, who ships it, and who is affected if it fails."],
+      },
+      {
+        heading: "Insight",
+        placeholder: true,
+        body: ["PLACEHOLDER: the insight that shaped the spec — what you learned before writing requirements."],
+      },
+      {
+        heading: "What I'd build",
+        placeholder: true,
+        body: ["PLACEHOLDER: the feature, scoped to an MVP, with the one thing you would not cut."],
+      },
+      {
+        heading: "How I'd measure it",
+        placeholder: true,
+        body: ["PLACEHOLDER: north-star metric, guardrails, and how you'd know it shipped."],
+      },
+      {
+        heading: "What I learned",
+        placeholder: true,
+        body: ["PLACEHOLDER: what writing this spec taught you about product."],
+      },
+    ],
+  },
+  {
+    slug: "user-research",
+    kind: "case-study",
+    eyebrow: "Exhibit · User research",
+    title: "PLACEHOLDER: user-research / side-project title",
+    summary: "PLACEHOLDER: one-line summary of the research or side project and what you were trying to learn.",
+    placeholder: true,
+    sections: [
+      {
+        heading: "Problem",
+        placeholder: true,
+        body: ["PLACEHOLDER: the question you went into research with."],
+      },
+      {
+        heading: "Players",
+        placeholder: true,
+        body: ["PLACEHOLDER: who you talked to, and why they were the right people."],
+      },
+      {
+        heading: "Insight",
+        placeholder: true,
+        body: ["PLACEHOLDER: the finding that surprised you — and the one you expected."],
+      },
+      {
+        heading: "What I'd build",
+        placeholder: true,
+        body: ["PLACEHOLDER: the product or side-project change this research argues for."],
+      },
+      {
+        heading: "How I'd measure it",
+        placeholder: true,
+        body: ["PLACEHOLDER: how you'd know the next version answered the research question."],
+      },
+      {
+        heading: "What I learned",
+        placeholder: true,
+        body: ["PLACEHOLDER: the research habit you'd keep on the next project."],
+      },
+    ],
+  },
+  {
     slug: "arcade",
     kind: "page",
     eyebrow: "Arcade Shack · Games",
@@ -542,6 +662,15 @@ export const museumExhibits = [
   "home-robot-vlm",
   "pokemon-red-agent",
   "pocket-console",
+] as const;
+
+/** The five indoor gallery pedestals. Donation stars and the Curator's counter use this list. */
+export const galleryExhibits = [
+  "nyc-taxi-ddc",
+  "virtual-economies",
+  "game-teardown",
+  "feature-spec",
+  "user-research",
 ] as const;
 
 /** Smaller builds listed in the museum's archive drawer and on /work. */
@@ -909,6 +1038,92 @@ export const arcadePal = {
     "Welcome to the arcade! These are Tatsat's inspirations, the games that made him want to build games.",
     "Walk up to any cabinet to hear its story!",
   ],
+};
+
+/**
+ * The Museum: Moss the Curator (indoor; not Sol on the lawn) and the five gallery plaques.
+ * Anything starting with PLACEHOLDER is meant to be replaced.
+ */
+export const museumPal = {
+  id: "moss",
+  name: "Moss",
+  role: "Curator",
+  tagColor: "#D4A13A",
+  voice: [340, 500] as [number, number],
+  welcome: [
+    "Welcome to the Museum! Every exhibit here is one of Tatsat's projects. The most important one is waiting at the top of the stairs!",
+  ],
+  progress: "You've seen {n} of 5 exhibits!",
+  thanks: "PLACEHOLDER: a thank-you for seeing every exhibit — something warm, specific, and a little proud.",
+};
+
+export const museumInteriorCopy = {
+  curator: {
+    name: "Moss",
+    verb: "Talk",
+    title: "Museum curator",
+    lines: ["{gallery}"],
+  },
+  exhibit1: {
+    name: "Why taxi drivers drive where they drive",
+    verb: "Read",
+    title: "Why taxi drivers drive where they drive",
+    lines: [
+      "Why taxi drivers drive where they drive",
+      "A Dynamic Discrete Choice model of NYC taxi drivers, estimated from 83,000+ trips, to recover the preferences behind every 'where next?' decision.",
+      "Key result: 83K+ trips, 265 zones folded into 15, a full NFXP model of where drivers search next.",
+    ],
+    href: "/story/nyc-taxi-ddc",
+    hrefLabel: "Read the story",
+  },
+  exhibit2: {
+    name: "Virtual economies, priced like real ones",
+    verb: "Read",
+    title: "Virtual economies, priced like real ones",
+    lines: [
+      "Virtual economies, priced like real ones",
+      "My economics thesis direction: what game economies can learn from real markets, and vice versa.",
+      "PLACEHOLDER: one key result from the virtual-economies thesis.",
+    ],
+    href: "/story/virtual-economies",
+    hrefLabel: "Read the story",
+  },
+  exhibit3: {
+    name: "PLACEHOLDER: game teardown title",
+    verb: "Read",
+    title: "PLACEHOLDER: game teardown title",
+    lines: [
+      "PLACEHOLDER: game teardown title",
+      "PLACEHOLDER: one-line summary of the teardown — core loop, economy, or retention hook.",
+      "PLACEHOLDER: one key result from the game teardown.",
+    ],
+    href: "/story/game-teardown",
+    hrefLabel: "Read the story",
+  },
+  exhibit4: {
+    name: "PLACEHOLDER: feature spec title",
+    verb: "Read",
+    title: "PLACEHOLDER: feature spec title",
+    lines: [
+      "PLACEHOLDER: feature spec title",
+      "PLACEHOLDER: one-line summary of the feature and the player problem it solves.",
+      "PLACEHOLDER: one key result from the feature spec.",
+    ],
+    href: "/story/feature-spec",
+    hrefLabel: "Read the story",
+  },
+  exhibit5: {
+    name: "PLACEHOLDER: user-research / side-project title",
+    verb: "Read",
+    title: "PLACEHOLDER: user-research / side-project title",
+    lines: [
+      "PLACEHOLDER: user-research / side-project title",
+      "PLACEHOLDER: one-line summary of the research or side project and what you were trying to learn.",
+      "PLACEHOLDER: one key result from the user-research project.",
+    ],
+    href: "/story/user-research",
+    hrefLabel: "Read the story",
+  },
 };
 
 export const arcadeInteriorCopy = {

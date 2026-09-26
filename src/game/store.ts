@@ -37,6 +37,8 @@ type Persisted = {
   collected: Record<string, true>;
   arrived: Partial<Record<ResidentId, true>>;
   completed: boolean;
+  museumWelcomed: boolean;
+  galleryCelebrated: boolean;
 };
 
 type State = Persisted & {
@@ -71,6 +73,8 @@ const blank: Persisted = {
   collected: {},
   arrived: { bramble: true },
   completed: false,
+  museumWelcomed: false,
+  galleryCelebrated: false,
 };
 
 export function readSaved(): Persisted {
@@ -86,10 +90,10 @@ export function readSaved(): Persisted {
 
 function save(s: Persisted) {
   try {
-    const { visited, donated, pockets, collected, arrived, completed } = s;
+    const { visited, donated, pockets, collected, arrived, completed, museumWelcomed, galleryCelebrated } = s;
     window.localStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify({ visited, donated, pockets, collected, arrived, completed }),
+      JSON.stringify({ visited, donated, pockets, collected, arrived, completed, museumWelcomed, galleryCelebrated }),
     );
   } catch {
     /* storage can be unavailable (private mode, quota); progress just won't persist */
@@ -139,7 +143,9 @@ export function hydrate() {
       s.pockets !== prev.pockets ||
       s.collected !== prev.collected ||
       s.arrived !== prev.arrived ||
-      s.completed !== prev.completed
+      s.completed !== prev.completed ||
+      s.museumWelcomed !== prev.museumWelcomed ||
+      s.galleryCelebrated !== prev.galleryCelebrated
     )
       save(s);
   });

@@ -1,11 +1,16 @@
 "use client";
 
-import { useLayoutEffect, useMemo } from "react";
-import { useThree } from "@react-three/fiber";
+import { useLayoutEffect, useMemo, useRef } from "react";
+import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
-import { MUSEUM, MUSEUM_COLORS, MUSEUM_PEDESTALS, museumStairSouth } from "@/game/interiors";
+import { museumPal } from "@/content/landmarks";
+import { sfx } from "@/game/audio";
+import { celebrateGalleryIfComplete, galleryDonatedCount } from "@/game/interact";
+import { MUSEUM, MUSEUM_COLORS, MUSEUM_CURATOR, MUSEUM_PEDESTALS, museumStairSouth } from "@/game/interiors";
 import { palette, toon, flat } from "@/game/materials";
+import { player, reducedMotion } from "@/game/player-state";
+import { useGame } from "@/game/store";
 import { ClearColor } from "./Interior";
 import { ExhibitObject } from "./ExhibitObject";
 
@@ -371,13 +376,73 @@ function SpotPool({ r }: { r: number }) {
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.09, 0]} material={flat("#FFF6D2", 0.5, true)}>
         <circleGeometry args={[r * 0.52, 20]} />
       </mesh>
-      <mesh position={[0, 1.28, 0]} material={flat("#FFE6B0", 0.14, true)}>
+      <mesh position={[0, 1.28, 0]} material={flat("#FFE6B0", 0.08, true)}>
         <coneGeometry args={[r * 1.22, 2.45, 22, 1, true]} />
       </mesh>
     </group>
   );
 }
-function Pedestal({ x, z, y, large, geo, slug }: { x: number; z: number; y: number; large: boolean; geo: THREE.BufferGeometry; slug: string }) {
+function PlaqueStar({ p, s = 1 }: { p: V3; s?: number }) {
+  const geo = useMemo(() => {
+    const shape = new THREE.Shape();
+    for (let k = 0; k < 10; k++) {
+      const r = k % 2 ? 0.08 : 0.19;
+      const a = (k / 10) * Math.PI * 2 + Math.PI / 2;
+      if (k === 0) shape.moveTo(Math.cos(a) * r, Math.sin(a) * r);
+      else shape.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+    }
+    const g = new THREE.ExtrudeGeometry(shape, { depth: 0.05, bevelEnabled: true, bevelSize: 0.018, bevelThickness: 0.018, bevelSegments: 1 });
+    g.center();
+    return g;
+  }, []);
+  const ref = useRef<THREE.Mesh>(null);
+  useFrame((st) => {
+    if (ref.current && !reducedMotion.value) ref.current.rotation.y = st.clock.elapsedTime * 1.6;
+  });
+  return <mesh ref={ref} geometry={geo} position={p} scale={s} material={toon(palette.sun, { emissive: "#FFB800" })} castShadow />;
+}
+
+function PlaqueSparkle({ p }: { p: V3 }) {
+  const ref = useRef<THREE.Group>(null);
+  useFrame((st) => {
+    const g = ref.current;
+    if (!g || reducedMotion.value) return;
+    const t = st.clock.elapsedTime;
+    g.children.forEach((child, i) => {
+      const pulse = 0.35 + Math.abs(Math.sin(t * 5 + i * 1.4)) * 0.75;
+      child.scale.setScalar(pulse);
+      child.position.y = 0.02 + Math.sin(t * 3.2 + i * 1.8) * 0.05;
+    });
+  });
+  return (
+    <group ref={ref} position={p}>
+      {[0, 1, 2, 3].map((i) => (
+        <mesh key={i} position={[Math.cos((i / 4) * Math.PI * 2) * 0.11, 0.02, Math.sin((i / 4) * Math.PI * 2) * 0.08]} material={flat("#FFE7A8", 0.85, true)}>
+          <sphereGeometry args={[0.022, 6, 6]} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+function Pedestal({
+  x,
+  z,
+  y,
+  large,
+  geo,
+  slug,
+  toy,
+}: {
+  x: number;
+  z: number;
+  y: number;
+  large: boolean;
+  geo: THREE.BufferGeometry;
+  slug: string;
+  toy: string;
+}) {
+  const donated = useGame((s) => !!s.donated[slug]);
   const padR = large ? 1.08 : 0.78;
   const ring = sandRing(padR * 0.92, large ? 9 : 7, Math.abs(Math.round(x * 10 + z * 3)));
   return (
@@ -403,9 +468,15 @@ function Pedestal({ x, z, y, large, geo, slug }: { x: number; z: number; y: numb
       <Box p={[0, 0.55, 0]} s={[0.66, 0.08, 0.66]} c={C.velvet} />
       <Box p={[0, 0.3, 0.38]} s={[0.22, 0.12, 0.04]} c={C.gold} />
       <Box p={[0, 0.3, 0.4]} s={[0.16, 0.06, 0.02]} c="#C48A55" shadow={false} />
+      {donated && (
+        <>
+          <PlaqueStar p={[0.16, 0.44, 0.44]} s={0.52} />
+          <PlaqueSparkle p={[0.16, 0.46, 0.46]} />
+        </>
+      )}
       <SpotPool r={padR} />
       <group position={[0, 0.59, 0]} scale={1.28}>
-        <ExhibitObject slug={slug} />
+        <ExhibitObject slug={toy} />
       </group>
       <pointLight color="#FFE4B0" intensity={1.4} distance={3.8} position={[0, 1.9, 0.08]} />
     </group>
@@ -416,8 +487,134 @@ function Exhibits({ geo }: { geo: THREE.BufferGeometry }) {
   return (
     <group>
       {MUSEUM_PEDESTALS.map((p) => (
-        <Pedestal key={p.id} x={p.x} z={p.z} y={p.tier === "top" ? MUSEUM.deckH : 0} large={p.tier === "low"} geo={geo} slug={p.slug} />
+        <Pedestal
+          key={p.id}
+          x={p.x}
+          z={p.z}
+          y={p.tier === "top" ? MUSEUM.deckH : 0}
+          large={p.tier === "low"}
+          geo={geo}
+          slug={p.slug}
+          toy={p.toy}
+        />
       ))}
+    </group>
+  );
+}
+
+function CuratorMole() {
+  return (
+    <group>
+      {[-1, 1].map((s) => (
+        <mesh key={s} position={[s * 0.08, 0.045, 0.04]} scale={[1, 0.7, 1.25]} material={toon("#6B4A36")} castShadow>
+          <sphereGeometry args={[0.05, 8, 6]} />
+        </mesh>
+      ))}
+      <mesh position={[0, 0.28, 0]} scale={[1.08, 0.9, 0.98]} material={toon("#8A5A3C")} castShadow>
+        <sphereGeometry args={[0.26, 16, 12]} />
+      </mesh>
+      <mesh position={[0, 0.26, 0.2]} scale={[0.82, 0.68, 1]} material={toon("#E8C9A8")}>
+        <sphereGeometry args={[0.1, 10, 8]} />
+      </mesh>
+      <mesh position={[0, 0.275, 0.3]} material={toon("#C86B7A")}>
+        <sphereGeometry args={[0.032, 8, 6]} />
+      </mesh>
+      {[-1, 1].map((s) => (
+        <mesh key={`ear${s}`} position={[s * 0.17, 0.46, -0.04]} scale={[0.7, 0.88, 0.42]} material={toon("#7A4E34")}>
+          <sphereGeometry args={[0.075, 8, 6]} />
+        </mesh>
+      ))}
+      {[-1, 1].map((s) => (
+        <mesh key={`glass${s}`} position={[s * 0.072, 0.345, 0.205]} rotation={[Math.PI / 2, 0, 0]} material={toon("#F4E8C8")}>
+          <torusGeometry args={[0.052, 0.011, 8, 16]} />
+        </mesh>
+      ))}
+      <Box p={[0, 0.345, 0.205]} s={[0.038, 0.012, 0.012]} c="#F4E8C8" shadow={false} />
+      {[-1, 1].map((s) => (
+        <mesh key={`eye${s}`} position={[s * 0.072, 0.345, 0.21]} material={toon(palette.ink)}>
+          <sphereGeometry args={[0.022, 8, 6]} />
+        </mesh>
+      ))}
+      {[-1, 1].map((s) => (
+        <mesh key={`glint${s}`} position={[s * 0.078, 0.354, 0.226]} material={flat("#FFFFFF")}>
+          <sphereGeometry args={[0.007, 6, 6]} />
+        </mesh>
+      ))}
+      <mesh position={[0, 0.47, -0.02]} material={toon("#B8954A")}>
+        <cylinderGeometry args={[0.26, 0.26, 0.028, 16]} />
+      </mesh>
+      <mesh position={[0, 0.54, -0.02]} material={toon("#C4A35A")} castShadow>
+        <cylinderGeometry args={[0.15, 0.18, 0.12, 12]} />
+      </mesh>
+      <Box p={[0, 0.56, 0.15]} s={[0.07, 0.035, 0.04]} c="#D4A13A" shadow={false} />
+      {[-1, 1].map((s) => (
+        <mesh key={`paw${s}`} position={[s * 0.2, 0.22, 0.12]} material={toon("#6B4A36")}>
+          <sphereGeometry args={[0.045, 8, 6]} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+function CuratorMoss() {
+  const group = useRef<THREE.Group>(null);
+  const st = useRef({ greetAt: performance.now(), greeted: false, facing: Math.PI });
+
+  useFrame(() => {
+    const g = group.current;
+    if (!g) return;
+    const s = st.current;
+    const game = useGame.getState();
+    const now = performance.now();
+    const elapsed = now - s.greetAt;
+    const rm = reducedMotion.value;
+    const { x, z } = MUSEUM_CURATOR;
+
+    if (!s.greeted && !game.transitioning && elapsed > 720) {
+      s.greeted = true;
+      const all = galleryDonatedCount(game.donated) >= 5;
+      if (all && !game.galleryCelebrated) {
+        celebrateGalleryIfComplete();
+        useGame.setState({
+          museumWelcomed: true,
+          dialog: {
+            speaker: museumPal.id,
+            name: museumPal.name,
+            role: museumPal.role,
+            tagColor: museumPal.tagColor,
+            voice: museumPal.voice,
+            lines: [museumPal.thanks],
+            index: 0,
+          },
+        });
+        sfx.open();
+      } else if (!game.museumWelcomed) {
+        useGame.setState({
+          museumWelcomed: true,
+          dialog: {
+            speaker: museumPal.id,
+            name: museumPal.name,
+            role: museumPal.role,
+            tagColor: museumPal.tagColor,
+            voice: museumPal.voice,
+            lines: museumPal.welcome,
+            index: 0,
+          },
+        });
+        sfx.open();
+      }
+    }
+
+    const face = Math.atan2(player.x - x, player.z - z);
+    s.facing += (((face - s.facing + Math.PI * 3) % (Math.PI * 2)) - Math.PI) * 0.16;
+    const hop = !rm && elapsed < 1600 ? Math.abs(Math.sin((elapsed / 1000) * 9)) * 0.12 : 0;
+    g.position.set(x, hop, z);
+    g.rotation.y = s.facing;
+  });
+
+  return (
+    <group ref={group} scale={1.22}>
+      <CuratorMole />
     </group>
   );
 }
@@ -582,6 +779,7 @@ export function MuseumWorld() {
       <StairFlight x={m.sideX} halfW={m.sideHalf} rails />
       <Carpet />
       <Exhibits geo={geos[3]!} />
+      <CuratorMoss />
       <GalleryDecor />
       <Walls />
     </group>

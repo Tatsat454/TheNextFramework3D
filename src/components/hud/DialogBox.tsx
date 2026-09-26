@@ -141,7 +141,9 @@ export function DialogBox() {
                       toast("Add this URL in the content file.", "info");
                       return;
                     }
-                    window.open(dialog.href, "_blank", "noopener");
+                    const href = dialog.href ?? "";
+                    if (href.startsWith("/")) window.location.assign(href);
+                    else window.open(href, "_blank", "noopener");
                     sfx.open();
                   }}
                   className="lift rounded-2xl bg-coral px-4 py-2.5 text-[15px] font-bold text-white"

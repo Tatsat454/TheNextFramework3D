@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowUpRight } from "lucide-react";
-import { copy, getStory, isPlaceholderText, museumExhibits, skills, stories } from "@/content/landmarks";
+import { copy, galleryExhibits, getStory, isPlaceholderText, museumExhibits, skills, stories } from "@/content/landmarks";
 import { DonateOnRead } from "@/components/story/DonateOnRead";
 import { Chip, PageShell } from "@/components/story/PageShell";
 
@@ -108,7 +108,9 @@ export default async function StoryPage({ params }: PageProps<"/story/[slug]">) 
           </div>
         )}
 
-        {story.kind === "case-study" && <DonateOnRead slug={slug} />}
+        {(story.kind === "case-study" || galleryExhibits.includes(slug as (typeof galleryExhibits)[number])) && (
+          <DonateOnRead slug={slug} />
+        )}
 
         <div className="mt-10 flex flex-wrap items-center gap-3">
           <Link href="/" className="lift inline-flex h-12 items-center rounded-2xl bg-ink px-5 text-[15px] font-bold text-white">
