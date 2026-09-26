@@ -506,7 +506,7 @@ export const pickups: PickupSpot[] = [
   pickup("sand-dollar", 36, 41),
   pickup("pink-cowrie", 27, 42),
   pickup("moon-snail", 22, 41),
-  pickup("taxi-token", 31, 29),
+  pickup("taxi-token", 30, 32),
   pickup("lightning-jar", 37, 25),
   pickup("carbon-offcut", 40, 30),
   pickup("tiny-cartridge", 14, 18),
