@@ -10,7 +10,6 @@ export type Emote = "wave" | "cheer" | "thinking" | "clap" | "stretch";
 export type Card =
   | { type: "landmark"; id: LandmarkId }
   | { type: "exhibit"; slug: string }
-  | { type: "skill"; id: string }
   | { type: "item"; id: ItemId };
 
 export type DialogState = {
@@ -36,8 +35,6 @@ type Persisted = {
   donated: Record<string, true>;
   pockets: ItemId[];
   collected: Record<string, true>;
-  watered: Record<string, true>;
-  hasCan: boolean;
   arrived: Partial<Record<ResidentId, true>>;
   completed: boolean;
 };
@@ -58,7 +55,6 @@ type State = Persisted & {
   hopAt: number;
   shakes: Record<string, number>;
   drops: { id: string; item: ItemId; x: number; z: number; y: number; at: number }[];
-  waterAt: { id: string; at: number } | null;
   arrivalAt: Partial<Record<ResidentId, number>>;
   interior: InteriorId | null;
   transitioning: boolean;
@@ -73,8 +69,6 @@ const blank: Persisted = {
   donated: {},
   pockets: [],
   collected: {},
-  watered: {},
-  hasCan: false,
   arrived: { bramble: true },
   completed: false,
 };
@@ -92,10 +86,10 @@ export function readSaved(): Persisted {
 
 function save(s: Persisted) {
   try {
-    const { visited, donated, pockets, collected, watered, hasCan, arrived, completed } = s;
+    const { visited, donated, pockets, collected, arrived, completed } = s;
     window.localStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify({ visited, donated, pockets, collected, watered, hasCan, arrived, completed }),
+      JSON.stringify({ visited, donated, pockets, collected, arrived, completed }),
     );
   } catch {
     /* storage can be unavailable (private mode, quota); progress just won't persist */
@@ -119,7 +113,6 @@ export const useGame = create<State>((set) => ({
   hopAt: 0,
   shakes: {},
   drops: [],
-  waterAt: null,
   arrivalAt: {},
   interior: null,
   transitioning: false,
@@ -145,8 +138,6 @@ export function hydrate() {
       s.donated !== prev.donated ||
       s.pockets !== prev.pockets ||
       s.collected !== prev.collected ||
-      s.watered !== prev.watered ||
-      s.hasCan !== prev.hasCan ||
       s.arrived !== prev.arrived ||
       s.completed !== prev.completed
     )

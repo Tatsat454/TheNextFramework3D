@@ -115,7 +115,7 @@ export function Pockets() {
   );
 }
 
-const landmarkGlyph: Record<string, string> = { house: "#FF8A65", townhall: "#C8373C", museum: "#7B6CF6", market: "#FFC857", arcade: "#4B3FB5", garden: "#7CC49A", dock: "#B98A5E" };
+const landmarkGlyph: Record<string, string> = { house: "#FF8A65", townhall: "#C8373C", museum: "#7B6CF6", market: "#FFC857", arcade: "#4B3FB5", dock: "#B98A5E" };
 
 export function IslandMap() {
   const open = useGame((s) => s.mapOpen);

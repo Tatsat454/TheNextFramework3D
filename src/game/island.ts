@@ -1,5 +1,5 @@
 import type { ItemId, LandmarkId, ResidentId } from "@/content/landmarks";
-import { museumExhibits, skills } from "@/content/landmarks";
+import { museumExhibits } from "@/content/landmarks";
 import { mulberry32, valueNoise } from "./rng";
 
 /** Simulation grid. Land itself is a ~40×36 oval inside this, with void around it so the island floats. */
@@ -245,7 +245,6 @@ paint(32, 20, 33, 13); // stairs top → museum door
 paint(30, 28, 35, 32); // plaza hub
 paint(16, 39, 31, 40); // house door → spine
 paint(24, 29, 31, 29); // town hall front
-paint(18, 33, 24, 33); // garden front
 paint(35, 28, 40, 28); // → arcade
 paint(36, 29, 40, 32); // → market (west approach)
 bridge(16, 39, 24, 40); // across the house pond, on the door line
@@ -299,7 +298,6 @@ export const landmarkPlacements: LandmarkPlacement[] = [
   place("museum", [31, 10, 34, 12], 1.2, 1.8),
   place("arcade", [38, 26, 40, 27], 1.1, 1.6),
   place("market", [41, 31, 42, 32], 1.15, 1.9),
-  place("garden", [18, 30, 23, 32], 1.2, 1.7),
 ];
 {
   const end = tileCenter(32, dock.j1);
@@ -313,15 +311,6 @@ export const landmarkPlacements: LandmarkPlacement[] = [
   });
 }
 
-export const gardenGate = (() => {
-  const g = landmarkPlacements.find((l) => l.id === "garden")!;
-  const [i0, , i1, j1] = g.rect;
-  return tileCenter(Math.round((i0 + i1) / 2), j1);
-})();
-{
-  const g = landmarkPlacements.find((l) => l.id === "garden")!;
-  g.interact = { x: gardenGate.x, z: gardenGate.z + 1.15 };
-}
 {
   const m = landmarkPlacements.find((l) => l.id === "market")!;
   const [i0] = m.rect;
@@ -353,21 +342,6 @@ export const pedestals = museumExhibits.map((slug, k) => {
   block(i, j, i, j);
   const c = tileCenter(i, j);
   return { slug, i, j, x: c.x, z: c.z, level: 2, interact: { x: c.x, z: c.z + 0.95 } };
-});
-
-export const gardenRows = skills.map((skill, k) => {
-  const i = 18 + k;
-  const top = tileCenter(i, 30);
-  const front = tileCenter(i, 32);
-  return {
-    skillId: skill.id,
-    i,
-    x: top.x,
-    z0: top.z - 0.15,
-    z1: front.z + 0.15,
-    level: 1,
-    interact: { x: top.x, z: front.z + 1.2 },
-  };
 });
 
 export type TreeKind = "round" | "blossom" | "pine" | "fruit";

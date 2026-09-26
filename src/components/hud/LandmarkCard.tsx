@@ -11,7 +11,6 @@ import {
   marketGoods,
   museumExhibits,
   profile,
-  skills,
   type Landmark,
 } from "@/content/landmarks";
 import { sfx } from "@/game/audio";
@@ -134,24 +133,6 @@ function Dock() {
   );
 }
 
-function Garden() {
-  const watered = useGame((s) => s.watered);
-  return (
-    <ul className="mt-4 space-y-2">
-      {skills.map((s) => (
-        <li key={s.id} className="flex items-center gap-3">
-          <span className="w-32 shrink-0 text-[14px] font-medium text-ink">{s.name}</span>
-          <span className="flex flex-1 gap-1" aria-label={`${s.level} of 5`}>
-            {Array.from({ length: 5 }).map((_, k) => (
-              <span key={k} className={cn("h-2 flex-1 rounded-full", k < s.level ? (watered[s.id] ? "bg-leaf" : "bg-leaf/45") : "bg-ink/10")} />
-            ))}
-          </span>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
 function LandmarkBody({ lm }: { lm: Landmark }) {
   return (
     <>
@@ -161,7 +142,6 @@ function LandmarkBody({ lm }: { lm: Landmark }) {
       {lm.id === "museum" && <Museum />}
       {lm.id === "market" && <Market />}
       {lm.id === "dock" && <Dock />}
-      {lm.id === "garden" && <Garden />}
       {lm.cta && <PrimaryLink href={lm.cta.href}>{lm.cta.label}</PrimaryLink>}
     </>
   );
@@ -193,23 +173,6 @@ function CardBody({ card }: { card: Card }) {
           </p>
         )}
         <PrimaryLink href={`/story/${card.slug}`}>Read the exhibit</PrimaryLink>
-      </>
-    );
-  }
-  if (card.type === "skill") {
-    const s = skills.find((x) => x.id === card.id)!;
-    return (
-      <>
-        <p className="eyebrow">Garden · Skill</p>
-        <h2 className="mt-1.5 font-serif text-[32px] leading-[1.05] text-ink">{s.name}</h2>
-        <div className="mt-3 flex gap-1" aria-label={`Strength ${s.level} of 5`}>
-          {Array.from({ length: 5 }).map((_, k) => (
-            <span key={k} className={cn("h-2 flex-1 rounded-full", k < s.level ? "bg-leaf" : "bg-ink/10")} />
-          ))}
-        </div>
-        <p className="mt-4 text-[12px] font-bold uppercase tracking-[0.12em] text-indigo">When I used it</p>
-        <p className="mt-1 text-[15px] leading-relaxed text-ink">{s.example}</p>
-        <PrimaryLink href="/story/skills">See every skill</PrimaryLink>
       </>
     );
   }

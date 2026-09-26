@@ -34,7 +34,7 @@ Add `?hq` to the URL to force full quality (shadows, higher resolution) on machi
 
 ## The island
 
-A floating oval about 40×36 tiles across. You arrive on the southern beach, pass the House on its pond islet, and come into a central Plaza with a two-tier cream stone fountain. Arcade, Town Hall, Market and Garden sit in cozy districts around the plaza; the main path runs north up the stairs to the Museum plateau. Pines ring the outer shore. A lighthouse bluff rises in the northeast and a secret grove of blossoms hides in the northwest.
+A floating oval about 40×36 tiles across. You arrive on the southern beach, pass the House on its pond islet, and come into a central Plaza with a two-tier cream stone fountain. Arcade, Town Hall and Market sit in cozy districts around the plaza; the main path runs north up the stairs to the Museum plateau. Pines ring the outer shore. A lighthouse bluff rises in the northeast and a secret grove of blossoms hides in the northwest.
 
 | Landmark | Section |
 |---|---|
@@ -43,7 +43,6 @@ A floating oval about 40×36 tiles across. You arrive on the southern beach, pas
 | Museum (on the plateau) | Projects: six exhibits on pedestals; reading one to the end "donates" it (gold star) |
 | Market Stall | Econ thesis: virtual economies (prices drift while you watch) |
 | Arcade Shack | Game teardowns + games Tatsat built |
-| Garden | Skills: water a crop row to grow it and see a real example |
 | Dock | Contact |
 
 Four original residents move in as you explore: **Bramble** (Greeter), **Drizzle** (Guide), **Pip** (Fan) and **Sol** (Curator). Shells, fruit from shaken trees and hidden items go into your 10-slot Pockets, each with a note about Tatsat. Progress is saved in `localStorage`.
@@ -71,7 +70,7 @@ All copy lives in [`src/content/landmarks.ts`](src/content/landmarks.ts). Compon
 
 1. World, terrain, player, collision, camera ✅
 2. Landmarks, cards, story pages, `/work`, HUD ✅
-3. Residents, dialog, pockets, shaking trees, watering the garden, emotes, map ✅
+3. Residents, dialog, pockets, shaking trees, emotes, map ✅
 4. Ambient life (butterflies, petals, bees, fish shadows, cloud shadows, bending grass, sand footprints) ✅
 5. Night palette + fireflies, occasional rain, "Welcome back" message: not started
 

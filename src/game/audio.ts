@@ -62,9 +62,6 @@ export const sfx = {
     tone(90, 0.16, { type: "sine", gain: 0.08, at: 0.04 });
     tone(520, 0.1, { type: "square", gain: 0.04, at: 0.12 });
   },
-  water() {
-    [1200, 1500, 1800, 2200].forEach((f, k) => tone(f, 0.12, { type: "sine", gain: 0.04, at: k * 0.05 }));
-  },
   shake() {
     for (let k = 0; k < 5; k++) tone(180 + Math.random() * 60, 0.05, { type: "triangle", gain: 0.05, at: k * 0.05 });
   },

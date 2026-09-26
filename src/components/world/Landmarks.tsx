@@ -3,8 +3,7 @@
 import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
-import { skills } from "@/content/landmarks";
-import { boardTile, gardenGate, gardenRows, getPlacement, LEVEL, mailboxTile, pedestals, tileCenter } from "@/game/island";
+import { boardTile, getPlacement, LEVEL, mailboxTile, pedestals, tileCenter } from "@/game/island";
 import { palette, toon } from "@/game/materials";
 import { reducedMotion } from "@/game/player-state";
 import { useGame } from "@/game/store";
@@ -416,121 +415,6 @@ function ArcadeShack() {
   );
 }
 
-function Crop({ kind, grow }: { kind: string; grow: number }) {
-  const s = 0.35 + grow;
-  switch (kind) {
-    case "sunflower":
-      return (
-        <group scale={s}>
-          <Cyl p={[0, 0.5, 0]} r={0.03} h={1.0} c={palette.foliageDeep} seg={5} />
-          <mesh position={[0, 1.02, 0.04]} rotation={[Math.PI / 2 - 0.3, 0, 0]} material={toon(palette.sun)}>
-            <cylinderGeometry args={[0.2, 0.2, 0.05, 10]} />
-          </mesh>
-          <mesh position={[0, 1.02, 0.07]} rotation={[Math.PI / 2 - 0.3, 0, 0]} material={toon(palette.woodDeep)}>
-            <cylinderGeometry args={[0.09, 0.09, 0.05, 10]} />
-          </mesh>
-        </group>
-      );
-    case "wheat":
-      return (
-        <group scale={s}>
-          {[-0.08, 0.08, 0].map((x, k) => (
-            <group key={k} position={[x, 0, (k - 1) * 0.06]}>
-              <Cyl p={[0, 0.35, 0]} r={0.015} h={0.7} c={palette.sun} seg={4} />
-              <mesh position={[0, 0.78, 0]} material={toon(palette.sun)}>
-                <capsuleGeometry args={[0.04, 0.16, 2, 6]} />
-              </mesh>
-            </group>
-          ))}
-        </group>
-      );
-    case "carrot":
-      return (
-        <group scale={s}>
-          <mesh position={[0, 0.08, 0]} rotation={[Math.PI, 0, 0]} material={toon(palette.orange)}>
-            <coneGeometry args={[0.09, 0.22, 8]} />
-          </mesh>
-          {[-0.4, 0, 0.4].map((r) => (
-            <mesh key={r} position={[0, 0.34, 0]} rotation={[0, 0, r]} material={toon(palette.foliage)}>
-              <coneGeometry args={[0.04, 0.36, 4]} />
-            </mesh>
-          ))}
-        </group>
-      );
-    case "berry":
-      return (
-        <group scale={s}>
-          <mesh position={[0, 0.3, 0]} material={toon(palette.foliage, { flatShading: true })} castShadow>
-            <icosahedronGeometry args={[0.28, 1]} />
-          </mesh>
-          {[[0.18, 0.4, 0.14], [-0.16, 0.3, 0.18], [0.02, 0.5, 0.2], [0.2, 0.22, -0.1]].map((p, k) => (
-            <mesh key={k} position={p as V3} material={toon(palette.violet)}>
-              <sphereGeometry args={[0.05, 8, 6]} />
-            </mesh>
-          ))}
-        </group>
-      );
-    case "tulip":
-      return (
-        <group scale={s}>
-          <Cyl p={[0, 0.3, 0]} r={0.02} h={0.6} c={palette.foliageDeep} seg={5} />
-          <mesh position={[0, 0.66, 0]} material={toon(palette.blossom)}>
-            <cylinderGeometry args={[0.1, 0.06, 0.18, 6]} />
-          </mesh>
-          <mesh position={[0.07, 0.2, 0]} rotation={[0, 0, -0.6]} material={toon(palette.foliage)}>
-            <coneGeometry args={[0.05, 0.3, 4]} />
-          </mesh>
-        </group>
-      );
-    default:
-      return (
-        <group scale={s}>
-          {[-0.5, 0.5, 1.6].map((r, k) => (
-            <mesh key={k} position={[0, 0.2, 0]} rotation={[0.6, r, 0]} material={toon(palette.foliage)}>
-              <sphereGeometry args={[0.12, 8, 6, 0, Math.PI]} />
-            </mesh>
-          ))}
-          <Cyl p={[0, 0.1, 0]} r={0.02} h={0.2} c={palette.foliageDeep} seg={5} />
-        </group>
-      );
-  }
-}
-
-function GardenRow({ index }: { index: number }) {
-  const row = gardenRows[index];
-  const skill = skills.find((s) => s.id === row.skillId)!;
-  const watered = useGame((s) => !!s.watered[row.skillId]);
-  const waterAt = useGame((s) => (s.waterAt?.id === row.skillId ? s.waterAt.at : 0));
-  const group = useRef<THREE.Group>(null);
-  const growth = useRef(watered ? 1 : 0);
-  const target = watered ? skill.level * 0.13 : 0.05;
-
-  useFrame(() => {
-    if (!group.current) return;
-    const delay = waterAt ? (performance.now() - waterAt) / 1000 : 10;
-    const goal = delay > 0.35 ? target : 0.05;
-    growth.current += (goal - growth.current) * (reducedMotion.value ? 1 : 0.06);
-    group.current.children.forEach((c) => {
-      c.scale.setScalar((0.35 + growth.current) / 0.4);
-    });
-  });
-
-  const n = 4;
-  const len = row.z1 - row.z0;
-  return (
-    <group position={[row.x, row.level * LEVEL, 0]}>
-      <Box p={[0, 0.06, (row.z0 + row.z1) / 2]} s={[0.72, 0.12, len + 0.4]} c="#8E6443" />
-      <group ref={group}>
-        {Array.from({ length: n }).map((_, k) => (
-          <group key={k} position={[0, 0.1, row.z0 + 0.2 + (k / (n - 1)) * (len - 0.4)]}>
-            <Crop kind={skill.crop} grow={0.05} />
-          </group>
-        ))}
-      </group>
-    </group>
-  );
-}
-
 function Fence({ from, to, y }: { from: [number, number]; to: [number, number]; y: number }) {
   const len = Math.hypot(to[0] - from[0], to[1] - from[1]);
   const angle = Math.atan2(to[1] - from[1], to[0] - from[0]);
@@ -542,53 +426,6 @@ function Fence({ from, to, y }: { from: [number, number]; to: [number, number]; 
       ))}
       <Box p={[len / 2, 0.42, 0]} s={[len, 0.08, 0.06]} c={"#C4976B"} />
       <Box p={[len / 2, 0.22, 0]} s={[len, 0.08, 0.06]} c={"#C4976B"} />
-    </group>
-  );
-}
-
-function Garden() {
-  const pl = getPlacement("garden");
-  const [i0, j0, i1, j1] = pl.rect;
-  const a = tileCenter(i0, j0);
-  const b = tileCenter(i1, j1);
-  const y = pl.level * LEVEL;
-  const x0 = a.x - 0.4;
-  const x1 = b.x + 0.4;
-  const z0 = a.z - 0.4;
-  const z1 = b.z + 0.4;
-  const gate = gardenGate;
-  const hasCan = useGame((s) => s.hasCan);
-  return (
-    <group>
-      <Fence from={[x0, z0]} to={[x1, z0]} y={y} />
-      <Fence from={[x0, z0]} to={[x0, z1]} y={y} />
-      <Fence from={[x1, z0]} to={[x1, z1]} y={y} />
-      <Fence from={[x0, z1]} to={[gate.x - 0.45, z1]} y={y} />
-      <Fence from={[gate.x + 0.45, z1]} to={[x1, z1]} y={y} />
-      {gardenRows.map((_, k) => (
-        <GardenRow key={k} index={k} />
-      ))}
-      {/* Water channel and sign */}
-      <Box p={[a.x + 0.05, y + 0.03, (z0 + z1) / 2]} s={[0.35, 0.06, z1 - z0 - 0.4]} c={palette.water} shadow={false} />
-      <group position={[gate.x - 0.25, y, z1 + 0.35]}>
-        <Cyl p={[0, 0.4, 0]} r={0.05} h={0.8} c={palette.woodDeep} />
-        <Box p={[0, 0.8, 0.02]} s={[0.7, 0.4, 0.08]} c={palette.wood} />
-        <mesh position={[-0.15, 0.82, 0.07]} material={toon(palette.foliage)}>
-          <sphereGeometry args={[0.07, 8, 6]} />
-        </mesh>
-        <mesh position={[0.12, 0.82, 0.07]} material={toon(palette.orange)}>
-          <sphereGeometry args={[0.07, 8, 6]} />
-        </mesh>
-      </group>
-      {!hasCan && (
-        <group position={[gate.x + 0.35, y, z1 + 0.5]} rotation={[0, -0.6, 0]}>
-          <Cyl p={[0, 0.14, 0]} r={0.13} h={0.26} c={palette.water} />
-          <Cyl p={[0.2, 0.2, 0]} r={0.025} h={0.3} c={palette.water} rot={[0, 0, -1]} />
-          <mesh position={[0, 0.3, 0]} rotation={[0, 0, Math.PI / 2]} material={toon(palette.water)}>
-            <torusGeometry args={[0.1, 0.02, 6, 12, Math.PI]} />
-          </mesh>
-        </group>
-      )}
     </group>
   );
 }
@@ -633,7 +470,6 @@ export function Landmarks() {
       <Pedestals />
       <MarketStall />
       <ArcadeShack />
-      <Garden />
       <Dock />
     </group>
   );

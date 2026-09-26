@@ -138,14 +138,6 @@ function Chibi({ parts }: { parts: React.RefObject<Record<string, THREE.Object3D
           </group>
         )}
       </group>
-      <group ref={set("can")} position={[0.24, 0.3, 0.08]} visible={false}>
-        <mesh material={toon(palette.water)}>
-          <cylinderGeometry args={[0.07, 0.07, 0.13, 10]} />
-        </mesh>
-        <mesh position={[0.08, 0.04, 0.04]} rotation={[0.4, 0, -1.1]} material={toon(palette.water)}>
-          <cylinderGeometry args={[0.012, 0.016, 0.16, 6]} />
-        </mesh>
-      </group>
     </group>
   );
 }
@@ -319,8 +311,6 @@ export function Player() {
         }
       }
     }
-
-    if (p.can) p.can.visible = s.hasCan && !!s.nearby?.startsWith("row:");
 
     if (shadow.current) {
       shadow.current.position.set(player.x, ground + 0.015, player.z);

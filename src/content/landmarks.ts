@@ -6,7 +6,7 @@
  * his resume/portfolio but interpret beyond it, so they need a quick review.
  */
 
-export type LandmarkId = "house" | "townhall" | "museum" | "market" | "arcade" | "garden" | "dock";
+export type LandmarkId = "house" | "townhall" | "museum" | "market" | "arcade" | "dock";
 
 export const profile = {
   name: "Tatsat Upadhyay",
@@ -528,9 +528,9 @@ export const stories: Story[] = [
   {
     slug: "skills",
     kind: "page",
-    eyebrow: "Garden · Skills",
-    title: "What grows in the garden",
-    summary: "Each crop row is a skill. Taller crops are the ones I've used most, on real work.",
+    eyebrow: "Skills",
+    title: "What I reach for",
+    summary: "The tools I use most, with a real example of when I used each one.",
     sections: [],
   },
 ];
@@ -609,15 +609,6 @@ export const landmarks: Landmark[] = [
     title: "Insert coin",
     blurb: "How I take games apart (loops, economies, retention), what I'm playing right now, and the games I've built myself.",
     cta: { label: "Play the teardowns", href: "/story/arcade" },
-  },
-  {
-    id: "garden",
-    name: "Garden",
-    section: "Skills",
-    eyebrow: "Garden · Skills",
-    title: "Tend the garden",
-    blurb: "Every crop row is a skill. Grab the watering can and water a row to see it grow, with a real example of when I used it.",
-    cta: { label: "See every skill", href: "/story/skills" },
   },
   {
     id: "dock",
@@ -897,7 +888,6 @@ export const copy = {
   backToIsland: "Back to the island",
   islandComplete: "You found every corner of Pocket Island!",
   pocketsFull: "Your pockets are full",
-  wateringCan: "You got a watering can!",
   insidePrefix: "Inside",
   currentlyPlaying: {
     placeholder: true,

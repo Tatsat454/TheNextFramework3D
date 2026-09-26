@@ -3,12 +3,11 @@
 import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
-import { flowers, gardenRows, LEVEL, pond, tileCenter, trees, WATER_Y, W } from "@/game/island";
+import { flowers, LEVEL, pond, tileCenter, trees, WATER_Y, W } from "@/game/island";
 import { critterSpots } from "@/game/interact";
 import { flat, palette, toon } from "@/game/materials";
 import { player, reducedMotion } from "@/game/player-state";
 import { mulberry32 } from "@/game/rng";
-import { useGame } from "@/game/store";
 
 const rand = mulberry32(99);
 
@@ -219,42 +218,6 @@ function CloudShadows() {
   );
 }
 
-function Sparkles() {
-  const waterAt = useGame((s) => s.waterAt);
-  const ref = useRef<THREE.InstancedMesh>(null);
-  const tmp = useMemo(() => new THREE.Object3D(), []);
-  const seeds = useMemo(() => Array.from({ length: 18 }).map(() => ({ a: rand() * Math.PI * 2, r: rand() * 0.4 + 0.1, v: rand() * 0.8 + 0.6, z: rand() })), []);
-  useFrame(() => {
-    const mesh = ref.current;
-    if (!mesh) return;
-    if (!waterAt) {
-      mesh.visible = false;
-      return;
-    }
-    const row = gardenRows.find((r) => r.skillId === waterAt.id);
-    const k = (performance.now() - waterAt.at) / 1000;
-    if (!row || k > 1.6) {
-      mesh.visible = false;
-      return;
-    }
-    mesh.visible = true;
-    seeds.forEach((s, i) => {
-      const zz = row.z0 + s.z * (row.z1 - row.z0);
-      tmp.position.set(row.x + Math.cos(s.a) * s.r, row.level * LEVEL + 0.3 + k * s.v, zz + Math.sin(s.a) * s.r * 0.4);
-      tmp.scale.setScalar(Math.max(0, 1 - k / 1.6));
-      tmp.rotation.set(k * 3, k * 2, 0);
-      tmp.updateMatrix();
-      mesh.setMatrixAt(i, tmp.matrix);
-    });
-    mesh.instanceMatrix.needsUpdate = true;
-  });
-  return (
-    <instancedMesh ref={ref} args={[undefined, undefined, seeds.length]} frustumCulled={false} material={flat(palette.glow, 0.95, true)}>
-      <octahedronGeometry args={[0.07, 0]} />
-    </instancedMesh>
-  );
-}
-
 export function Ambient() {
   return (
     <group>
@@ -263,7 +226,6 @@ export function Ambient() {
       <Bees />
       <FishShadows />
       <CloudShadows />
-      <Sparkles />
     </group>
   );
 }

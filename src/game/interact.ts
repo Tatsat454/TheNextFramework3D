@@ -1,7 +1,7 @@
 "use client";
 
 import type { ItemId, LandmarkId, ResidentId } from "@/content/landmarks";
-import { arcadePal, copy, getItem, getLandmark, landmarks, museumExhibits, residents, skills, townHallPal } from "@/content/landmarks";
+import { arcadePal, copy, getItem, getLandmark, landmarks, museumExhibits, residents, townHallPal } from "@/content/landmarks";
 import { sfx } from "./audio";
 import {
   armDoorLatch,
@@ -18,11 +18,11 @@ import {
   WIPE_OUT_MS,
   WIPE_OUT_MS_REDUCED,
 } from "./interiors";
-import { gardenRows, getPlacement, landmarkPlacements, LEVEL, pedestals, pickups, trees } from "./island";
+import { getPlacement, landmarkPlacements, LEVEL, pedestals, pickups, trees } from "./island";
 import { playerScreen, reducedMotion } from "./player-state";
 import { checkArrivals, toast, useGame } from "./store";
 
-export type InteractKind = "landmark" | "exhibit" | "row" | "tree" | "pickup" | "resident" | "critter" | "door" | "prop";
+export type InteractKind = "landmark" | "exhibit" | "tree" | "pickup" | "resident" | "critter" | "door" | "prop";
 
 export type Interactable = {
   id: string;
@@ -61,17 +61,6 @@ const staticList: Interactable[] = [
     y: p.level * LEVEL + 2.1,
     r: 0.95,
     ref: p.slug,
-  })),
-  ...gardenRows.map((row) => ({
-    id: `row:${row.skillId}`,
-    kind: "row" as const,
-    label: skills.find((s) => s.id === row.skillId)!.name,
-    verb: "Water",
-    x: row.interact.x,
-    z: row.interact.z,
-    y: row.level * LEVEL + 1.9,
-    r: 0.62,
-    ref: row.skillId,
   })),
   ...trees
     .map((t, k) => ({ t, k }))
@@ -284,10 +273,6 @@ export function interact(it: Interactable, player: { x: number; z: number }) {
   switch (it.kind) {
     case "landmark": {
       const id = it.ref as LandmarkId;
-      if (id === "garden" && !s.hasCan) {
-        useGame.setState({ hasCan: true });
-        toast(copy.wateringCan, "found", "#8FD3E8");
-      }
       visit(id);
       sfx.open();
       useGame.setState({ card: { type: "landmark", id } });
@@ -298,17 +283,6 @@ export function interact(it: Interactable, player: { x: number; z: number }) {
       visit("museum");
       useGame.setState({ card: { type: "exhibit", slug: it.ref } });
       break;
-    case "row": {
-      if (!s.hasCan) {
-        useGame.setState({ hasCan: true });
-        toast(copy.wateringCan, "found", "#8FD3E8");
-      }
-      visit("garden");
-      useGame.setState({ watered: { ...useGame.getState().watered, [it.ref]: true }, waterAt: { id: it.ref, at: performance.now() } });
-      sfx.water();
-      setTimeout(() => useGame.setState({ card: { type: "skill", id: it.ref } }), 900);
-      break;
-    }
     case "tree": {
       const k = Number(it.ref);
       const tree = trees[k];
