@@ -16,3 +16,6 @@ export const player = {
 export const playerScreen = { x: 0.5, y: 0.55 };
 
 export const reducedMotion = { value: false };
+
+/** Dev-only camera override for screenshots (`window.__pocket.debugCam`). */
+export const debugCam = { close: false };

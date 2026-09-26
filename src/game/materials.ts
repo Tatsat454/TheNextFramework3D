@@ -29,6 +29,10 @@ vec4 bendWorld = modelMatrix * mvPosition;
 #ifdef WATER
   bendWorld.y += sin(uTime * 1.4 + bendWorld.x * 0.9) * 0.025 + cos(uTime * 1.1 + bendWorld.z * 1.3) * 0.02;
 #endif
+#ifdef RIPPLE
+  float rippleR = length(transformed.xz);
+  bendWorld.y += sin(uTime * 3.6 - rippleR * 12.0) * 0.016 + cos(uTime * 2.8 + rippleR * 9.0) * 0.01;
+#endif
 float bendDz = bendWorld.z - uBendCenter.z;
 float bendDx = bendWorld.x - uBendCenter.x;
 bendWorld.y -= bendDz * bendDz * uBend + bendDx * bendDx * uBend * 0.25;
@@ -88,7 +92,7 @@ export function toonGradient() {
   return gradient;
 }
 
-type ToonOpts = { noOcclude?: boolean; flatShading?: boolean; sway?: boolean; water?: boolean; transparent?: boolean; opacity?: number; emissive?: string; vertexColors?: boolean; side?: THREE.Side };
+type ToonOpts = { noOcclude?: boolean; flatShading?: boolean; sway?: boolean; water?: boolean; ripple?: boolean; transparent?: boolean; opacity?: number; emissive?: string; vertexColors?: boolean; side?: THREE.Side };
 
 const cache = new Map<string, THREE.MeshToonMaterial>();
 
@@ -113,6 +117,7 @@ export function toon(color: string, opts: ToonOpts = {}) {
   if (opts.sway) defines.push("SWAY");
   if (opts.noOcclude) defines.push("NO_OCCLUDE");
   if (opts.water) defines.push("WATER");
+  if (opts.ripple) defines.push("RIPPLE");
   patch(m, defines);
   cache.set(key, m);
   return m;

@@ -336,6 +336,16 @@ export const boardTile = { i: 28, j: 29 };
 block(mailboxTile.i, mailboxTile.j, mailboxTile.i, mailboxTile.j);
 block(boardTile.i, boardTile.j, boardTile.i, boardTile.j);
 
+/** Plaza hub center — two-tier fountain, ~3 tiles across. */
+export const fountain = (() => {
+  const a = tileCenter(30, 28);
+  const b = tileCenter(35, 32);
+  const x = (a.x + b.x) / 2;
+  const z = (a.z + b.z) / 2;
+  block(31, 29, 34, 31);
+  return { x, z };
+})();
+
 export const pedestals = museumExhibits.map((slug, k) => {
   const left = k < 3;
   const i = left ? 29 + k : 34 + (k - 3);

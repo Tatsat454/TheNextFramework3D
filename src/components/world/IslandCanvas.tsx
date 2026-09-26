@@ -8,6 +8,7 @@ import { presetFromSearch } from "@/game/time-of-day";
 import { useGame } from "@/game/store";
 import { Ambient } from "./Ambient";
 import { ArcadeWorld } from "./ArcadeInterior";
+import { Fountain } from "./Fountain";
 import { ClearColor, InteriorWorld } from "./Interior";
 import { Landmarks } from "./Landmarks";
 import { Nature } from "./Nature";
@@ -111,6 +112,7 @@ export default function IslandCanvas({ onReady, onNoWebGL }: { onReady: () => vo
           <Lights preset={preset} shadows={shadows} />
           <Terrain />
           <Nature />
+          <Fountain />
           <Landmarks />
           <Pickups />
           <Residents />
