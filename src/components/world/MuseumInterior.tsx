@@ -4,7 +4,7 @@ import { useLayoutEffect, useMemo } from "react";
 import { useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
-import { MUSEUM, MUSEUM_COLORS, museumStairSouth } from "@/game/interiors";
+import { MUSEUM, MUSEUM_COLORS, MUSEUM_PEDESTALS, museumStairSouth } from "@/game/interiors";
 import { toon } from "@/game/materials";
 import { ClearColor } from "./Interior";
 
@@ -267,8 +267,6 @@ function floorRocks(): Spot[] {
     { p: [-6.45, 0, 3.05], s: [0.8, 0.75, 0.8], ry: 1.8, geo: 1, c: 0 },
     { p: [-6.95, 0, 1.85], s: [0.7, 0.65, 0.7], ry: 2.4, geo: 2, c: 2 },
     { p: [-6.25, 0, 2.35], s: [0.55, 0.5, 0.55], ry: 0.9, geo: 3, c: 1 },
-    { p: [-4.82, 0, 2.95], s: [0.62, 0.55, 0.6], ry: 1.3, geo: 3, c: 0 },
-    { p: [-4.55, 0, 3.25], s: [0.48, 0.42, 0.48], ry: 2.7, geo: 3, c: 2 },
     // Base of the cliff between west and center stairs
     { p: [-3.15, 0, 0.48], s: [0.7, 0.6, 0.65], ry: 0.4, geo: 2, c: 0 },
     { p: [-2.55, 0, 0.42], s: [0.52, 0.45, 0.5], ry: 1.7, geo: 3, c: 1 },
@@ -278,8 +276,6 @@ function floorRocks(): Spot[] {
     { p: [6.45, 0, 3.05], s: [0.8, 0.75, 0.8], ry: 0.4, geo: 1, c: 2 },
     { p: [6.95, 0, 1.85], s: [0.7, 0.65, 0.7], ry: 1.1, geo: 2, c: 1 },
     { p: [6.25, 0, 2.35], s: [0.55, 0.5, 0.55], ry: 2.8, geo: 3, c: 0 },
-    { p: [4.82, 0, 2.95], s: [0.62, 0.55, 0.6], ry: 0.8, geo: 3, c: 2 },
-    { p: [4.55, 0, 3.25], s: [0.48, 0.42, 0.48], ry: 1.5, geo: 3, c: 1 },
     // Base of the cliff between east and center stairs
     { p: [3.15, 0, 0.48], s: [0.7, 0.6, 0.65], ry: 2.5, geo: 2, c: 2 },
     { p: [2.55, 0, 0.42], s: [0.52, 0.45, 0.5], ry: 0.6, geo: 3, c: 0 },
@@ -344,6 +340,65 @@ function Terrace() {
   );
 }
 
+function sandRing(radius: number, count: number, seed: number) {
+  const rocks: { x: number; z: number; s: number; ry: number; c: number }[] = [];
+  for (let i = 0; i < count; i++) {
+    const a = (i / count) * Math.PI * 2 + seed * 0.31 + 0.18;
+    // Leave a gap on the south face so the plaque stays readable from the aisle.
+    if (Math.cos(a) > 0.78) continue;
+    const jig = 0.04 + ((i * 13 + seed * 7) % 5) * 0.012;
+    rocks.push({
+      x: Math.sin(a) * (radius + jig),
+      z: Math.cos(a) * (radius + jig),
+      s: 0.38 + ((i + seed) % 3) * 0.08,
+      ry: a + i * 0.4,
+      c: (i + seed) % 3,
+    });
+  }
+  return rocks;
+}
+
+function Pedestal({ x, z, y, large, geo }: { x: number; z: number; y: number; large: boolean; geo: THREE.BufferGeometry }) {
+  const padR = large ? 1.08 : 0.78;
+  const ring = sandRing(padR * 0.92, large ? 9 : 7, Math.abs(Math.round(x * 10 + z * 3)));
+  return (
+    <group position={[x, y, z]}>
+      <mesh rotation={[-Math.PI / 2, Math.PI / 8, 0]} position={[0, 0.018, 0]} material={toon(C.sand, { noOcclude: true })} receiveShadow>
+        <circleGeometry args={[padR, 8]} />
+      </mesh>
+      {ring.map((r, i) => (
+        <mesh
+          key={i}
+          geometry={geo}
+          position={[r.x, 0.02, r.z]}
+          scale={[r.s, r.s * 0.9, r.s]}
+          rotation={[0, r.ry, 0]}
+          material={toon(ROCK[r.c]!, { flatShading: true, noOcclude: true })}
+          castShadow
+          receiveShadow
+        />
+      ))}
+      <Box p={[0, 0.2, 0]} s={[0.7, 0.4, 0.7]} c={C.navy} />
+      <Box p={[0, 0.42, 0]} s={[0.78, 0.08, 0.78]} c={C.navy} />
+      <Box p={[0, 0.47, 0]} s={[0.82, 0.03, 0.82]} c={C.gold} />
+      <Box p={[0, 0.52, 0]} s={[0.62, 0.07, 0.62]} c={C.velvet} />
+      <Box p={[0, 0.28, 0.37]} s={[0.22, 0.12, 0.04]} c={C.gold} />
+      <Box p={[0, 0.28, 0.39]} s={[0.16, 0.06, 0.02]} c="#C48A55" shadow={false} />
+      <pointLight color="#FFE6C8" intensity={0.42} distance={2.4} position={[0, 1.15, 0.15]} />
+    </group>
+  );
+}
+
+function Exhibits({ geo }: { geo: THREE.BufferGeometry }) {
+  return (
+    <group>
+      {MUSEUM_PEDESTALS.map((p) => (
+        <Pedestal key={p.id} x={p.x} z={p.z} y={p.tier === "top" ? MUSEUM.deckH : 0} large={p.tier === "low"} geo={geo} />
+      ))}
+    </group>
+  );
+}
+
 function Carpet() {
   const z1 = museumStairSouth();
   const zDoor = 5.35;
@@ -404,6 +459,7 @@ export function MuseumWorld() {
       <StairFlight x={-m.sideX} halfW={m.sideHalf} rails />
       <StairFlight x={m.sideX} halfW={m.sideHalf} rails />
       <Carpet />
+      <Exhibits geo={geos[3]!} />
       <Walls />
     </group>
   );

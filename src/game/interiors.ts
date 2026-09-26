@@ -66,6 +66,9 @@ export const MUSEUM_COLORS = {
   rockA: "#8C6A4F",
   rockB: "#A07C5C",
   rockC: "#6E5240",
+  navy: "#1E1B3A",
+  velvet: "#8B1E2B",
+  sand: "#D9B98A",
 };
 
 /** 16×12 tile gallery. +z is south (door / camera). Raised north tier at deckH. */
@@ -91,6 +94,17 @@ export function museumOnStair(x: number) {
 export function museumStairSouth() {
   return MUSEUM.deckZ + MUSEUM.steps * MUSEUM.stepD;
 }
+
+/** Empty pedestals. Exhibit models land on these in a later step. +z is south (plaque faces the door). */
+export const MUSEUM_PEDESTALS = [
+  { id: "exhibit1", n: 1, x: 0, z: -3.55, tier: "top" as const },
+  { id: "exhibit2", n: 2, x: -3.42, z: -2.38, tier: "top" as const },
+  { id: "exhibit3", n: 3, x: 3.42, z: -2.38, tier: "top" as const },
+  { id: "exhibit4", n: 4, x: -3.22, z: 2.22, tier: "low" as const },
+  { id: "exhibit5", n: 5, x: 3.22, z: 2.22, tier: "low" as const },
+  // Sixth project: open west terrace pad at the top of the side stairs, off the carpet.
+  { id: "exhibit6", n: 6, x: -5.55, z: -3.32, tier: "top" as const },
+] as const;
 
 export function museumHeightAt(x: number, z: number) {
   const m = MUSEUM;
@@ -214,10 +228,9 @@ export const interiors: Record<InteriorId, InteriorDef> = {
       // Lower-floor clusters near future pedestals (keep carpet, stairs, and approaches clear)
       { x0: -7.72, z0: 1.62, x1: -6.05, z1: 3.42 },
       { x0: 6.05, z0: 1.62, x1: 7.72, z1: 3.42 },
-      { x0: -5.15, z0: 2.62, x1: -4.42, z1: 3.38 },
-      { x0: 4.42, z0: 2.62, x1: 5.15, z1: 3.38 },
       { x0: -3.58, z0: 0.18, x1: -2.48, z1: 0.78 },
       { x0: 2.48, z0: 0.18, x1: 3.58, z1: 0.78 },
+      ...MUSEUM_PEDESTALS.map((p) => ({ x0: p.x - 0.4, z0: p.z - 0.4, x1: p.x + 0.4, z1: p.z + 0.4 })),
     ],
   },
 };
