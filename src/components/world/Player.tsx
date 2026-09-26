@@ -6,7 +6,7 @@ import * as THREE from "three";
 import { profile } from "@/content/landmarks";
 import { sfx } from "@/game/audio";
 import { findNearby, interact, requestEnter, requestExit, type Interactable } from "@/game/interact";
-import { canStepInterior, doorZoneAt } from "@/game/interiors";
+import { canStepInterior, doorZoneAt, interiorHeightAt } from "@/game/interiors";
 import { canStep, gazebo, heightAt, inGazeboWalk, plazaBenches, tileAt, worldToTile } from "@/game/island";
 import { input, moveAxes } from "@/game/input";
 import { flat, palette, toon } from "@/game/materials";
@@ -219,7 +219,7 @@ export function Player() {
       player.facing = b.facing;
       player.moving = false;
     }
-    const ground = s.interior ? 0 : heightAt(player.x, player.z);
+    const ground = s.interior ? interiorHeightAt(s.interior, player.x, player.z) : heightAt(player.x, player.z);
     player.y += (ground - player.y) * (1 - Math.pow(0.0001, dt));
     if (s.interior) player.onSand = false;
     else {

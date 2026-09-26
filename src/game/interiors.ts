@@ -4,7 +4,7 @@ import { getPlacement, heightAt, LEVEL } from "./island";
 import { player } from "./player-state";
 import { useGame } from "./store";
 
-export type InteriorId = "house" | "arcade" | "townhall";
+export type InteriorId = "house" | "arcade" | "townhall" | "museum";
 
 export type InteriorObjectId = keyof typeof houseInteriorCopy | keyof typeof arcadeInteriorCopy | keyof typeof townHallInteriorCopy;
 
@@ -53,6 +53,56 @@ export const TOWN_COLORS = {
   rugA: "#7B2D3B",
   rugB: "#E8C07A",
 };
+
+export const MUSEUM_COLORS = {
+  floor: "#B87A4B",
+  floorDeep: "#A56B3E",
+  wall: "#FFF6E6",
+  carpet: "#8B1E2B",
+  gold: "#D4A13A",
+  rail: "#D98A3A",
+  stone: "#D2C4B0",
+  stoneDeep: "#C4B49C",
+};
+
+/** 16×12 tile gallery. +z is south (door / camera). Raised north tier at deckH. */
+export const MUSEUM = {
+  halfW: 8,
+  halfD: 6,
+  deckH: 1.2,
+  /** South face of the raised tier. z <= this is up. */
+  deckZ: -0.32,
+  steps: 5,
+  stepH: 1.2 / 5,
+  stepD: 0.42,
+  centerHalf: 1.22,
+  sideX: 5.1,
+  sideHalf: 0.78,
+};
+
+export function museumOnStair(x: number) {
+  const m = MUSEUM;
+  return Math.abs(x) < m.centerHalf || Math.abs(x - m.sideX) < m.sideHalf || Math.abs(x + m.sideX) < m.sideHalf;
+}
+
+export function museumStairSouth() {
+  return MUSEUM.deckZ + MUSEUM.steps * MUSEUM.stepD;
+}
+
+export function museumHeightAt(x: number, z: number) {
+  const m = MUSEUM;
+  if (z <= m.deckZ) return m.deckH;
+  const z1 = museumStairSouth();
+  if (z <= z1 && museumOnStair(x)) {
+    const i = Math.min(m.steps - 1, Math.max(0, Math.floor((z - m.deckZ) / m.stepD)));
+    return m.deckH - i * m.stepH;
+  }
+  return 0;
+}
+
+export function interiorHeightAt(id: InteriorId, x: number, z: number) {
+  return id === "museum" ? museumHeightAt(x, z) : 0;
+}
 
 const CABINET_X = [-4.5, -1.5, 1.5, 4.5] as const;
 export const TOWN_FRAMES_X = [-5.4, -3.24, -1.08, 1.08, 3.24, 5.4] as const;
@@ -136,6 +186,22 @@ export const interiors: Record<InteriorId, InteriorDef> = {
       { x0: 5.35, z0: -0.55, x1: 6.45, z1: 0.85 }, // east bench
     ],
   },
+  museum: {
+    id: "museum",
+    landmarkId: "museum",
+    name: "The Museum",
+    spawn: { x: 0, z: 4.55, facing: Math.PI },
+    doormat: { x: 0, z: 5.42, w: 1.7, d: 0.88 },
+    outsidePad: { z: 1.62, w: 1.15, d: 0.78 },
+    objects: [],
+    blocked: [
+      // Side-stair rails
+      { x0: -MUSEUM.sideX - MUSEUM.sideHalf - 0.16, z0: MUSEUM.deckZ - 0.08, x1: -MUSEUM.sideX - MUSEUM.sideHalf + 0.02, z1: museumStairSouth() + 0.08 },
+      { x0: -MUSEUM.sideX + MUSEUM.sideHalf - 0.02, z0: MUSEUM.deckZ - 0.08, x1: -MUSEUM.sideX + MUSEUM.sideHalf + 0.16, z1: museumStairSouth() + 0.08 },
+      { x0: MUSEUM.sideX - MUSEUM.sideHalf - 0.16, z0: MUSEUM.deckZ - 0.08, x1: MUSEUM.sideX - MUSEUM.sideHalf + 0.02, z1: museumStairSouth() + 0.08 },
+      { x0: MUSEUM.sideX + MUSEUM.sideHalf - 0.02, z0: MUSEUM.deckZ - 0.08, x1: MUSEUM.sideX + MUSEUM.sideHalf + 0.16, z1: museumStairSouth() + 0.08 },
+    ],
+  },
 };
 
 export const interiorByLandmark = (id: LandmarkId): InteriorDef | undefined =>
@@ -167,6 +233,16 @@ export function canStepInterior(id: InteriorId, x: number, z: number) {
     const inAlcove = Math.abs(x) < 0.92 && z >= 4.72 && z < 5.12;
     if (!inRoom && !inAlcove) return false;
     return !interiors.townhall.blocked.some((b) => overlaps(x, z, b));
+  }
+  if (id === "museum") {
+    const hw = MUSEUM.halfW - 0.28;
+    const hd = MUSEUM.halfD - 0.28;
+    const inRoom = x > -hw && x < hw && z > -hd && z < hd;
+    const inAlcove = Math.abs(x) < 0.92 && z >= hd && z < hd + 0.42;
+    if (!inRoom && !inAlcove) return false;
+    if (interiors.museum.blocked.some((b) => overlaps(x, z, b))) return false;
+    const dh = Math.abs(museumHeightAt(x, z) - museumHeightAt(player.x, player.z));
+    return dh <= 0.28;
   }
   const inRoom = x > -4.62 + RADIUS && x < 4.62 - RADIUS && z > -3.62 + RADIUS && z < 3.52;
   const inAlcove = Math.abs(x) < 0.82 && z >= 3.52 && z < 3.78;
@@ -216,7 +292,7 @@ export function placePlayerInside(id: InteriorId) {
   const room = interiors[id];
   player.x = room.spawn.x;
   player.z = room.spawn.z;
-  player.y = 0;
+  player.y = interiorHeightAt(id, room.spawn.x, room.spawn.z);
   player.facing = room.spawn.facing;
   player.moving = false;
   player.onSand = false;

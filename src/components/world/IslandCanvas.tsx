@@ -22,6 +22,7 @@ import { Residents } from "./Residents";
 import { CameraRig, Lights } from "./Rig";
 import { Sky } from "./Sky";
 import { Terrain } from "./Terrain";
+import { MuseumWorld } from "./MuseumInterior";
 import { TownHallWorld } from "./TownHallInterior";
 
 function FirstFrame({ onReady }: { onReady: () => void }) {
@@ -106,6 +107,8 @@ export default function IslandCanvas({ onReady, onNoWebGL }: { onReady: () => vo
         <ArcadeWorld />
       ) : interior === "townhall" ? (
         <TownHallWorld />
+      ) : interior === "museum" ? (
+        <MuseumWorld />
       ) : interior ? (
         <InteriorWorld />
       ) : (

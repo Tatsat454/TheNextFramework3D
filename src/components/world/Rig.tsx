@@ -14,10 +14,12 @@ const OFFSET = new THREE.Vector3(0, 14.8, 18.4);
 /** Lower and a little to the side so a sit isn't hidden by plaza trees. */
 const SIT_OFFSET = new THREE.Vector3(3.05, 6.2, 8.15);
 const INTERIOR_OFFSET = new THREE.Vector3(-1.4, 18.4, 8.6);
+const MUSEUM_OFFSET = new THREE.Vector3(0, 21.8, 12.6);
 const sitOff = new THREE.Vector3();
 const ARCADE_OFFSET = new THREE.Vector3(0, 19.6, 10.4);
 const TOWN_OFFSET = new THREE.Vector3(0, 17.2, 14.6);
 const HOUSE_LOOK = new THREE.Vector3(-1.45, 0.25, -0.1);
+const MUSEUM_LOOK = new THREE.Vector3(0, 0.55, -0.35);
 const ARCADE_LOOK = new THREE.Vector3(0, 0.22, 0.15);
 const TOWN_LOOK = new THREE.Vector3(0, 0.35, -0.35);
 const tmp = new THREE.Vector3();
@@ -58,12 +60,15 @@ export function CameraRig() {
     const inside = !!s.interior;
     const arcade = s.interior === "arcade";
     const townhall = s.interior === "townhall";
+    const museum = s.interior === "museum";
     const target = inside
       ? arcade
         ? ARCADE_LOOK.clone()
         : townhall
           ? TOWN_LOOK.clone()
-          : HOUSE_LOOK.clone()
+          : museum
+            ? MUSEUM_LOOK.clone()
+            : HOUSE_LOOK.clone()
       : new THREE.Vector3(player.x, player.y, player.z);
     let z = 1;
     if (!inside && s.nearby?.startsWith("landmark:")) {
@@ -88,11 +93,11 @@ export function CameraRig() {
     zoom.current += (z - zoom.current) * k * 0.6;
     sitBlend.current += ((pose.sitting ? 1 : 0) - sitBlend.current) * k;
     sitOff.copy(OFFSET).lerp(SIT_OFFSET, sitBlend.current);
-    const offset = inside ? (arcade ? ARCADE_OFFSET : townhall ? TOWN_OFFSET : INTERIOR_OFFSET) : sitOff;
+    const offset = inside ? (arcade ? ARCADE_OFFSET : townhall ? TOWN_OFFSET : museum ? MUSEUM_OFFSET : INTERIOR_OFFSET) : sitOff;
     camera.position.copy(focus.current).addScaledVector(offset, zoom.current * (inside ? 1 : portrait));
     const persp = camera as THREE.PerspectiveCamera;
     if (persp.isPerspectiveCamera) {
-      persp.fov = inside ? (arcade ? 40 : townhall ? 42 : 38) : 32;
+      persp.fov = inside ? (arcade ? 40 : townhall ? 42 : museum ? 36 : 38) : 32;
       persp.updateProjectionMatrix();
     }
     if (inside) camera.lookAt(focus.current.x, focus.current.y + 0.15, focus.current.z);
