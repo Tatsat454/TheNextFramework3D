@@ -247,7 +247,7 @@ paint(16, 39, 31, 40); // house door → spine
 paint(24, 29, 31, 29); // town hall front
 paint(18, 33, 24, 33); // garden front
 paint(35, 28, 40, 28); // → arcade
-paint(36, 29, 39, 32); // → market
+paint(36, 29, 40, 32); // → market (west approach)
 bridge(16, 39, 24, 40); // across the house pond, on the door line
 
 export const dock = { i0: 32, i1: 33, j0: 43, j1: 47 };
@@ -298,7 +298,7 @@ export const landmarkPlacements: LandmarkPlacement[] = [
   place("townhall", [24, 26, 27, 28], 1.3, 2.3),
   place("museum", [31, 10, 34, 12], 1.2, 1.8),
   place("arcade", [38, 26, 40, 27], 1.1, 1.6),
-  place("market", [38, 31, 39, 32], 1.15, 1.9),
+  place("market", [41, 31, 42, 32], 1.15, 1.9),
   place("garden", [18, 30, 23, 32], 1.2, 1.7),
 ];
 {
