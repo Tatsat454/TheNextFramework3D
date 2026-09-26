@@ -254,7 +254,7 @@ function CoinToss() {
     <>
       <group ref={coin} visible={false}>
         <mesh material={toon("#E8C35A", { emissive: "#E8C35A" })} castShadow>
-          <cylinderGeometry args={[0.07, 0.07, 0.02, 12]} />
+          <cylinderGeometry args={[0.09, 0.09, 0.024, 12]} />
         </mesh>
       </group>
       <instancedMesh ref={sparkRef} args={[undefined, toon("#FFE38A", { emissive: "#FFE38A", noOcclude: true }), SPARK]}>

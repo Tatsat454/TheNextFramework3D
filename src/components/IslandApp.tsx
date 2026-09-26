@@ -8,7 +8,7 @@ import { setAmbient } from "@/game/audio";
 import { input } from "@/game/input";
 import { requestEnter, requestExit, talkTo } from "@/game/interact";
 import { heightAt, isWalkable } from "@/game/island";
-import { debugCam, player, pose, reducedMotion } from "@/game/player-state";
+import { debugCam, lanternPulse, player, pose, reducedMotion } from "@/game/player-state";
 import { hydrate, readPosition, savePosition, useGame } from "@/game/store";
 import { cn } from "@/lib/utils";
 import { DialogBox, dialogControl } from "./hud/DialogBox";
@@ -33,7 +33,7 @@ export default function IslandApp() {
 
   useEffect(() => {
     hydrate();
-    if (process.env.NODE_ENV !== "production") Object.assign(window, { __pocket: { player, useGame, requestEnter, requestExit, debugCam, input, isWalkable, pose } });
+    if (process.env.NODE_ENV !== "production") Object.assign(window, { __pocket: { player, useGame, requestEnter, requestExit, debugCam, input, isWalkable, pose, lanternPulse } });
     const pos = readPosition();
     if (pos && isWalkable(pos.x, pos.z)) {
       player.x = pos.x;

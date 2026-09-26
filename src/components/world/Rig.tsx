@@ -11,7 +11,10 @@ import { useGame } from "@/game/store";
 import type { TimePreset } from "@/game/time-of-day";
 
 const OFFSET = new THREE.Vector3(0, 14.8, 18.4);
+/** Lower and a little to the side so a sit isn't hidden by plaza trees. */
+const SIT_OFFSET = new THREE.Vector3(3.05, 6.2, 8.15);
 const INTERIOR_OFFSET = new THREE.Vector3(-1.4, 18.4, 8.6);
+const sitOff = new THREE.Vector3();
 const ARCADE_OFFSET = new THREE.Vector3(0, 19.6, 10.4);
 const TOWN_OFFSET = new THREE.Vector3(0, 17.2, 14.6);
 const HOUSE_LOOK = new THREE.Vector3(-1.45, 0.25, -0.1);
@@ -25,6 +28,7 @@ export function CameraRig() {
   const portrait = aspect < 0.85 ? 1.28 : aspect < 1.2 ? 1.12 : 1;
   const focus = useRef(new THREE.Vector3(player.x, player.y, player.z));
   const zoom = useRef(1);
+  const sitBlend = useRef(0);
   const init = useRef(false);
   const lastInterior = useRef<string | null>(null);
 
@@ -69,8 +73,7 @@ export function CameraRig() {
       z = 0.85;
     }
     if (s.card || s.dialog) z = Math.min(z, 0.9);
-    if (pose.sitting) z = Math.min(z, 0.62);
-    else if (pose.gazeboFocus) z = Math.min(z, 0.78);
+    if (pose.gazeboFocus && !pose.sitting) z = Math.min(z, 0.78);
     if (!inside) {
       target.x = THREE.MathUtils.clamp(target.x, -18, 18);
       target.z = THREE.MathUtils.clamp(target.z, -20, 18);
@@ -83,7 +86,9 @@ export function CameraRig() {
     }
     focus.current.lerp(target, inside ? 1 : k);
     zoom.current += (z - zoom.current) * k * 0.6;
-    const offset = inside ? (arcade ? ARCADE_OFFSET : townhall ? TOWN_OFFSET : INTERIOR_OFFSET) : OFFSET;
+    sitBlend.current += ((pose.sitting ? 1 : 0) - sitBlend.current) * k;
+    sitOff.copy(OFFSET).lerp(SIT_OFFSET, sitBlend.current);
+    const offset = inside ? (arcade ? ARCADE_OFFSET : townhall ? TOWN_OFFSET : INTERIOR_OFFSET) : sitOff;
     camera.position.copy(focus.current).addScaledVector(offset, zoom.current * (inside ? 1 : portrait));
     const persp = camera as THREE.PerspectiveCamera;
     if (persp.isPerspectiveCamera) {

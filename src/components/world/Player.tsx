@@ -171,8 +171,13 @@ export function Player() {
     let dz = 0;
     const { x: ax, z: az, running } = moveAxes();
     if (pose.sitting && (ax || az || input.tapTarget)) {
+      const b = pose.bench >= 0 ? plazaBenches[pose.bench] : null;
       pose.sitting = false;
       pose.bench = -1;
+      if (b) {
+        player.x = b.x + Math.sin(b.facing) * 0.64;
+        player.z = b.z + Math.cos(b.facing) * 0.64;
+      }
     }
     if (pose.sitting) {
       dx = 0;
@@ -248,7 +253,7 @@ export function Player() {
     const hop = hopT < 0.36 ? Math.sin((hopT / 0.36) * Math.PI) * 0.22 : 0;
     a.sitK += ((pose.sitting ? 1 : 0) - a.sitK) * (1 - Math.pow(0.0008, dt));
 
-    g.position.set(player.x, player.y + hop + a.sitK * 0.14, player.z);
+    g.position.set(player.x, player.y + hop + a.sitK * 0.22, player.z);
     g.rotation.y = player.facing;
 
     const rm = reducedMotion.value;
@@ -300,11 +305,17 @@ export function Player() {
       headTilt = -0.18;
     }
     if (emoteHop && !rm) g.position.y += emoteHop;
+    if (a.sitK > 0.02) {
+      armL = armL * (1 - a.sitK) + -0.62 * a.sitK;
+      armR = armR * (1 - a.sitK) + -0.48 * a.sitK;
+      armLz += -0.18 * a.sitK;
+      armRz += 0.18 * a.sitK;
+    }
     lerpRot(p.armL, armL, armLz);
     lerpRot(p.armR, armR, armRz);
-    lerpRot(p.legL, swing + a.sitK * 1.28);
-    lerpRot(p.legR, -swing + a.sitK * 1.28);
-    if (body) body.rotation.x += (a.sitK * 0.18 - body.rotation.x) * 0.25;
+    lerpRot(p.legL, swing * (1 - a.sitK) + a.sitK * 1.52);
+    lerpRot(p.legR, -swing * (1 - a.sitK) + a.sitK * 1.52);
+    if (body) body.rotation.x += (a.sitK * 0.4 - body.rotation.x) * 0.25;
 
     // Idle breathing, stop squash
     const since = t - a.stopAt;

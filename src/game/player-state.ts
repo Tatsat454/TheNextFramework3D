@@ -31,3 +31,6 @@ export const pose = {
   tossFromY: 0,
   tossFromZ: 0,
 };
+
+/** Per-lantern glow scale, written each frame so tests can see night flicker. */
+export const lanternPulse = { night: false, glow: [1, 1, 1, 1] };
