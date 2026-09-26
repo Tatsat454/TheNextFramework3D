@@ -22,26 +22,23 @@ function Lantern({ x, z, night }: { x: number; z: number; night: boolean }) {
   return (
     <group position={[x, LEVEL, z]} onClick={onTap}>
       <mesh position={[0, 0.06, 0]} material={toon(POST)} castShadow receiveShadow>
-        <boxGeometry args={[0.4, 0.12, 0.4]} />
+        <boxGeometry args={[0.38, 0.12, 0.38]} />
       </mesh>
-      <mesh position={[0, 0.4, 0]} material={toon(POST)} castShadow receiveShadow>
-        <boxGeometry args={[0.26, 0.56, 0.26]} />
-      </mesh>
-      <mesh position={[0, 0.86, 0]} material={toon(CAP)} castShadow>
-        <boxGeometry args={[0.34, 0.34, 0.34]} />
+      <mesh position={[0, 0.42, 0]} material={toon(POST)} castShadow receiveShadow>
+        <boxGeometry args={[0.24, 0.6, 0.24]} />
       </mesh>
       <mesh
-        position={[0, 0.86, 0]}
-        material={toon(GLOW, { emissive: GLOW, emissiveIntensity: night ? 1.15 : 0.4, noOcclude: true })}
+        position={[0, 0.88, 0]}
+        material={toon(GLOW, { emissive: GLOW, emissiveIntensity: night ? 1.15 : 0.42, noOcclude: true })}
         castShadow={false}
       >
-        <boxGeometry args={[0.28, 0.28, 0.28]} />
+        <boxGeometry args={[0.32, 0.32, 0.32]} />
       </mesh>
-      <mesh position={[0, 1.05, 0]} material={toon(CAP)} castShadow>
-        <boxGeometry args={[0.44, 0.06, 0.44]} />
+      <mesh position={[0, 1.06, 0]} material={toon(CAP)} castShadow>
+        <boxGeometry args={[0.4, 0.05, 0.4]} />
       </mesh>
-      <mesh position={[0, 1.18, 0]} rotation={[0, Math.PI / 4, 0]} material={toon(CAP)} castShadow>
-        <coneGeometry args={[0.3, 0.2, 4]} />
+      <mesh position={[0, 1.16, 0]} rotation={[0, Math.PI / 4, 0]} material={toon(CAP)} castShadow>
+        <coneGeometry args={[0.26, 0.16, 4]} />
       </mesh>
       <pointLight position={[0, 0.88, 0]} color={GLOW} intensity={night ? 0.5 : 0} distance={3.5} decay={2} />
     </group>
