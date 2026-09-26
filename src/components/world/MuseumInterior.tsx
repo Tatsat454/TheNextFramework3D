@@ -385,13 +385,13 @@ function Pedestal({ x, z, y, large, geo, slug }: { x: number; z: number; y: numb
       <Box p={[0, 0.55, 0]} s={[0.66, 0.08, 0.66]} c={C.velvet} />
       <Box p={[0, 0.3, 0.38]} s={[0.22, 0.12, 0.04]} c={C.gold} />
       <Box p={[0, 0.3, 0.4]} s={[0.16, 0.06, 0.02]} c="#C48A55" shadow={false} />
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.055, 0]} material={toon("#F4DEAA", { emissive: "#F4DEAA", emissiveIntensity: 0.7, noOcclude: true, transparent: true, opacity: 0.55 })}>
-        <circleGeometry args={[padR * 0.7, 20]} />
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.055, 0]} material={toon("#F4DEAA", { emissive: "#F4DEAA", emissiveIntensity: 0.95, noOcclude: true, transparent: true, opacity: 0.72 })}>
+        <circleGeometry args={[padR * 0.82, 20]} />
       </mesh>
       <group position={[0, 0.59, 0]} scale={1.28}>
         <ExhibitObject slug={slug} />
       </group>
-      <pointLight color="#FFE4B0" intensity={1.35} distance={3.6} position={[0, 1.72, 0.08]} />
+      <pointLight color="#FFE4B0" intensity={1.85} distance={4.2} position={[0, 1.85, 0.08]} />
     </group>
   );
 }
@@ -409,17 +409,17 @@ function Exhibits({ geo }: { geo: THREE.BufferGeometry }) {
 function NorthBanner({ x }: { x: number }) {
   const z = -MUSEUM.halfD + 0.16;
   return (
-    <group position={[x, 2.42, z]}>
-      <Box p={[0, 0.52, 0.02]} s={[0.78, 0.07, 0.07]} c={C.gold} />
-      <Box p={[-0.24, 0.44, 0.04]} s={[0.07, 0.12, 0.04]} c="#E8D5A8" />
-      <Box p={[0.24, 0.44, 0.04]} s={[0.07, 0.12, 0.04]} c="#E8D5A8" />
-      <Box p={[0, 0.02, 0.03]} s={[0.7, 0.88, 0.05]} c={C.gold} />
-      <Box p={[0, 0.02, 0.06]} s={[0.58, 0.76, 0.04]} c={C.carpet} />
-      <Box p={[-0.1, 0.1, 0.09]} s={[0.28, 0.08, 0.03]} c={C.gold} r={[0, 0, 0.72]} />
-      <Box p={[0.1, 0.1, 0.09]} s={[0.28, 0.08, 0.03]} c={C.gold} r={[0, 0, -0.72]} />
-      <Box p={[0, -0.04, 0.09]} s={[0.34, 0.07, 0.03]} c={C.gold} />
-      <Box p={[0, 0.68, 0.1]} s={[0.2, 0.1, 0.16]} c="#E8D5A8" />
-      <Box p={[0, 0.62, 0.16]} s={[0.14, 0.06, 0.1]} c="#FFE7A8" glow />
+    <group position={[x, 2.18, z]}>
+      <Box p={[0, 0.68, 0.02]} s={[1.05, 0.09, 0.09]} c={C.gold} />
+      <Box p={[-0.32, 0.58, 0.05]} s={[0.08, 0.16, 0.05]} c="#E8D5A8" />
+      <Box p={[0.32, 0.58, 0.05]} s={[0.08, 0.16, 0.05]} c="#E8D5A8" />
+      <Box p={[0, 0.02, 0.03]} s={[0.92, 1.18, 0.06]} c={C.gold} />
+      <Box p={[0, 0.02, 0.07]} s={[0.78, 1.04, 0.05]} c={C.carpet} />
+      <Box p={[-0.14, 0.12, 0.11]} s={[0.4, 0.1, 0.03]} c={C.gold} r={[0, 0, 0.72]} />
+      <Box p={[0.14, 0.12, 0.11]} s={[0.4, 0.1, 0.03]} c={C.gold} r={[0, 0, -0.72]} />
+      <Box p={[0, -0.08, 0.11]} s={[0.48, 0.09, 0.03]} c={C.gold} />
+      <Box p={[0, 0.88, 0.12]} s={[0.28, 0.12, 0.2]} c="#E8D5A8" />
+      <Box p={[0, 0.8, 0.2]} s={[0.2, 0.08, 0.14]} c="#FFE7A8" glow />
     </group>
   );
 }
@@ -428,18 +428,24 @@ function SideBanner({ side }: { side: -1 | 1 }) {
   const x = side * (MUSEUM.halfW - 0.14);
   const rotY = side > 0 ? -Math.PI / 2 : Math.PI / 2;
   return (
-    <group position={[x, 1.78, 2.05]} rotation={[0, rotY, 0]}>
-      <Box p={[0, 0.02, 0.02]} s={[0.92, 1.12, 0.06]} c="#8B5A32" />
-      <Box p={[0, 0.02, 0.05]} s={[0.78, 0.98, 0.04]} c={C.gold} />
-      <Box p={[0, 0.02, 0.08]} s={[0.66, 0.86, 0.04]} c={C.carpet} />
-      <mesh position={[0, 0.04, 0.11]} rotation={[Math.PI / 2, 0, 0]} material={toon(C.gold, { noOcclude: true })}>
-        <cylinderGeometry args={[0.2, 0.2, 0.04, 16]} />
+    <group position={[x, 1.72, 2.15]} rotation={[0, rotY, 0]}>
+      <Box p={[0, 0.02, 0.02]} s={[1.08, 1.32, 0.07]} c="#8B5A32" />
+      <Box p={[0, 0.02, 0.06]} s={[0.92, 1.16, 0.05]} c={C.gold} />
+      <Box p={[0, 0.02, 0.09]} s={[0.78, 1.02, 0.05]} c={C.carpet} />
+      <mesh position={[0, 0.06, 0.13]} rotation={[Math.PI / 2, 0, 0]} material={toon(C.gold, { noOcclude: true })}>
+        <cylinderGeometry args={[0.24, 0.24, 0.05, 16]} />
       </mesh>
       {[0, 1, 2, 3, 4, 5, 6, 7].map((k) => (
-        <Box key={k} p={[Math.cos((k / 8) * Math.PI * 2) * 0.28, 0.04 + Math.sin((k / 8) * Math.PI * 2) * 0.28, 0.11]} s={[0.05, 0.16, 0.02]} c={C.gold} r={[0, 0, (k / 8) * Math.PI * 2]} />
+        <Box
+          key={k}
+          p={[Math.cos((k / 8) * Math.PI * 2) * 0.34, 0.06 + Math.sin((k / 8) * Math.PI * 2) * 0.34, 0.13]}
+          s={[0.06, 0.2, 0.03]}
+          c={C.gold}
+          r={[0, 0, (k / 8) * Math.PI * 2]}
+        />
       ))}
-      <Box p={[0, 0.72, 0.12]} s={[0.16, 0.1, 0.18]} c="#8B5A32" />
-      <Box p={[0, 0.72, 0.22]} s={[0.12, 0.08, 0.1]} c="#FFE7A8" glow />
+      <Box p={[0, 0.86, 0.14]} s={[0.2, 0.12, 0.22]} c="#8B5A32" />
+      <Box p={[0, 0.86, 0.26]} s={[0.14, 0.1, 0.12]} c="#FFE7A8" glow />
     </group>
   );
 }
@@ -447,14 +453,14 @@ function SideBanner({ side }: { side: -1 | 1 }) {
 function Bench({ x, z }: { x: number; z: number }) {
   return (
     <group position={[x, 0, z]} rotation={[0, Math.PI, 0]}>
-      <Box p={[-0.58, 0.16, -0.14]} s={[0.1, 0.32, 0.1]} c="#8B5A32" />
-      <Box p={[0.58, 0.16, -0.14]} s={[0.1, 0.32, 0.1]} c="#8B5A32" />
-      <Box p={[-0.58, 0.16, 0.16]} s={[0.1, 0.32, 0.1]} c="#8B5A32" />
-      <Box p={[0.58, 0.16, 0.16]} s={[0.1, 0.32, 0.1]} c="#8B5A32" />
-      <Box p={[0, 0.34, 0.02]} s={[1.38, 0.1, 0.48]} c="#C48A55" />
-      <Box p={[0, 0.54, -0.18]} s={[1.38, 0.38, 0.1]} c="#8B5A32" />
-      <Box p={[-0.64, 0.44, 0.02]} s={[0.08, 0.22, 0.48]} c="#8B5A32" />
-      <Box p={[0.64, 0.44, 0.02]} s={[0.08, 0.22, 0.48]} c="#8B5A32" />
+      <Box p={[-0.62, 0.16, -0.14]} s={[0.1, 0.32, 0.1]} c="#8B5A32" />
+      <Box p={[0.62, 0.16, -0.14]} s={[0.1, 0.32, 0.1]} c="#8B5A32" />
+      <Box p={[-0.62, 0.16, 0.16]} s={[0.1, 0.32, 0.1]} c="#8B5A32" />
+      <Box p={[0.62, 0.16, 0.16]} s={[0.1, 0.32, 0.1]} c="#8B5A32" />
+      <Box p={[0, 0.34, 0.02]} s={[1.55, 0.1, 0.5]} c="#C48A55" />
+      <Box p={[0, 0.54, -0.18]} s={[1.55, 0.38, 0.1]} c="#8B5A32" />
+      <Box p={[-0.72, 0.44, 0.02]} s={[0.08, 0.22, 0.5]} c="#8B5A32" />
+      <Box p={[0.72, 0.44, 0.02]} s={[0.08, 0.22, 0.5]} c="#8B5A32" />
     </group>
   );
 }
@@ -462,12 +468,12 @@ function Bench({ x, z }: { x: number; z: number }) {
 function CornerBush({ x, z }: { x: number; z: number }) {
   return (
     <group position={[x, 0, z]}>
-      <Box p={[0, 0.16, 0]} s={[0.44, 0.32, 0.44]} c="#C48A55" />
-      <mesh position={[0, 0.64, 0]} material={toon(palette.foliage, { flatShading: true, noOcclude: true })} castShadow>
-        <sphereGeometry args={[0.4, 10, 8]} />
+      <Box p={[0, 0.18, 0]} s={[0.5, 0.36, 0.5]} c="#C48A55" />
+      <mesh position={[0, 0.72, 0]} material={toon(palette.foliage, { flatShading: true, noOcclude: true })} castShadow>
+        <sphereGeometry args={[0.48, 10, 8]} />
       </mesh>
-      <mesh position={[0.14, 0.82, 0.08]} material={toon(palette.foliageDeep, { flatShading: true, noOcclude: true })} castShadow>
-        <sphereGeometry args={[0.22, 8, 6]} />
+      <mesh position={[0.16, 0.92, 0.1]} material={toon(palette.foliageDeep, { flatShading: true, noOcclude: true })} castShadow>
+        <sphereGeometry args={[0.26, 8, 6]} />
       </mesh>
     </group>
   );
