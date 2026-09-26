@@ -5,7 +5,7 @@ import { useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { MUSEUM, MUSEUM_COLORS, MUSEUM_PEDESTALS, museumStairSouth } from "@/game/interiors";
-import { toon } from "@/game/materials";
+import { palette, toon } from "@/game/materials";
 import { ClearColor } from "./Interior";
 import { ExhibitObject } from "./ExhibitObject";
 
@@ -385,10 +385,13 @@ function Pedestal({ x, z, y, large, geo, slug }: { x: number; z: number; y: numb
       <Box p={[0, 0.55, 0]} s={[0.66, 0.08, 0.66]} c={C.velvet} />
       <Box p={[0, 0.3, 0.38]} s={[0.22, 0.12, 0.04]} c={C.gold} />
       <Box p={[0, 0.3, 0.4]} s={[0.16, 0.06, 0.02]} c="#C48A55" shadow={false} />
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.055, 0]} material={toon("#F4DEAA", { emissive: "#F4DEAA", emissiveIntensity: 0.7, noOcclude: true, transparent: true, opacity: 0.55 })}>
+        <circleGeometry args={[padR * 0.7, 20]} />
+      </mesh>
       <group position={[0, 0.59, 0]} scale={1.28}>
         <ExhibitObject slug={slug} />
       </group>
-      <pointLight color="#FFE6C8" intensity={0.42} distance={2.4} position={[0, 1.15, 0.15]} />
+      <pointLight color="#FFE4B0" intensity={1.35} distance={3.6} position={[0, 1.72, 0.08]} />
     </group>
   );
 }
@@ -399,6 +402,88 @@ function Exhibits({ geo }: { geo: THREE.BufferGeometry }) {
       {MUSEUM_PEDESTALS.map((p) => (
         <Pedestal key={p.id} x={p.x} z={p.z} y={p.tier === "top" ? MUSEUM.deckH : 0} large={p.tier === "low"} geo={geo} slug={p.slug} />
       ))}
+    </group>
+  );
+}
+
+function NorthBanner({ x }: { x: number }) {
+  const z = -MUSEUM.halfD + 0.16;
+  return (
+    <group position={[x, 2.42, z]}>
+      <Box p={[0, 0.52, 0.02]} s={[0.78, 0.07, 0.07]} c={C.gold} />
+      <Box p={[-0.24, 0.44, 0.04]} s={[0.07, 0.12, 0.04]} c="#E8D5A8" />
+      <Box p={[0.24, 0.44, 0.04]} s={[0.07, 0.12, 0.04]} c="#E8D5A8" />
+      <Box p={[0, 0.02, 0.03]} s={[0.7, 0.88, 0.05]} c={C.gold} />
+      <Box p={[0, 0.02, 0.06]} s={[0.58, 0.76, 0.04]} c={C.carpet} />
+      <Box p={[-0.1, 0.1, 0.09]} s={[0.28, 0.08, 0.03]} c={C.gold} r={[0, 0, 0.72]} />
+      <Box p={[0.1, 0.1, 0.09]} s={[0.28, 0.08, 0.03]} c={C.gold} r={[0, 0, -0.72]} />
+      <Box p={[0, -0.04, 0.09]} s={[0.34, 0.07, 0.03]} c={C.gold} />
+      <Box p={[0, 0.68, 0.1]} s={[0.2, 0.1, 0.16]} c="#E8D5A8" />
+      <Box p={[0, 0.62, 0.16]} s={[0.14, 0.06, 0.1]} c="#FFE7A8" glow />
+    </group>
+  );
+}
+
+function SideBanner({ side }: { side: -1 | 1 }) {
+  const x = side * (MUSEUM.halfW - 0.14);
+  const rotY = side > 0 ? -Math.PI / 2 : Math.PI / 2;
+  return (
+    <group position={[x, 1.78, 2.05]} rotation={[0, rotY, 0]}>
+      <Box p={[0, 0.02, 0.02]} s={[0.92, 1.12, 0.06]} c="#8B5A32" />
+      <Box p={[0, 0.02, 0.05]} s={[0.78, 0.98, 0.04]} c={C.gold} />
+      <Box p={[0, 0.02, 0.08]} s={[0.66, 0.86, 0.04]} c={C.carpet} />
+      <mesh position={[0, 0.04, 0.11]} rotation={[Math.PI / 2, 0, 0]} material={toon(C.gold, { noOcclude: true })}>
+        <cylinderGeometry args={[0.2, 0.2, 0.04, 16]} />
+      </mesh>
+      {[0, 1, 2, 3, 4, 5, 6, 7].map((k) => (
+        <Box key={k} p={[Math.cos((k / 8) * Math.PI * 2) * 0.28, 0.04 + Math.sin((k / 8) * Math.PI * 2) * 0.28, 0.11]} s={[0.05, 0.16, 0.02]} c={C.gold} r={[0, 0, (k / 8) * Math.PI * 2]} />
+      ))}
+      <Box p={[0, 0.72, 0.12]} s={[0.16, 0.1, 0.18]} c="#8B5A32" />
+      <Box p={[0, 0.72, 0.22]} s={[0.12, 0.08, 0.1]} c="#FFE7A8" glow />
+    </group>
+  );
+}
+
+function Bench({ x, z }: { x: number; z: number }) {
+  return (
+    <group position={[x, 0, z]} rotation={[0, Math.PI, 0]}>
+      <Box p={[-0.58, 0.16, -0.14]} s={[0.1, 0.32, 0.1]} c="#8B5A32" />
+      <Box p={[0.58, 0.16, -0.14]} s={[0.1, 0.32, 0.1]} c="#8B5A32" />
+      <Box p={[-0.58, 0.16, 0.16]} s={[0.1, 0.32, 0.1]} c="#8B5A32" />
+      <Box p={[0.58, 0.16, 0.16]} s={[0.1, 0.32, 0.1]} c="#8B5A32" />
+      <Box p={[0, 0.34, 0.02]} s={[1.38, 0.1, 0.48]} c="#C48A55" />
+      <Box p={[0, 0.54, -0.18]} s={[1.38, 0.38, 0.1]} c="#8B5A32" />
+      <Box p={[-0.64, 0.44, 0.02]} s={[0.08, 0.22, 0.48]} c="#8B5A32" />
+      <Box p={[0.64, 0.44, 0.02]} s={[0.08, 0.22, 0.48]} c="#8B5A32" />
+    </group>
+  );
+}
+
+function CornerBush({ x, z }: { x: number; z: number }) {
+  return (
+    <group position={[x, 0, z]}>
+      <Box p={[0, 0.16, 0]} s={[0.44, 0.32, 0.44]} c="#C48A55" />
+      <mesh position={[0, 0.64, 0]} material={toon(palette.foliage, { flatShading: true, noOcclude: true })} castShadow>
+        <sphereGeometry args={[0.4, 10, 8]} />
+      </mesh>
+      <mesh position={[0.14, 0.82, 0.08]} material={toon(palette.foliageDeep, { flatShading: true, noOcclude: true })} castShadow>
+        <sphereGeometry args={[0.22, 8, 6]} />
+      </mesh>
+    </group>
+  );
+}
+
+function GalleryDecor() {
+  return (
+    <group>
+      <NorthBanner x={-1.92} />
+      <NorthBanner x={1.92} />
+      <SideBanner side={-1} />
+      <SideBanner side={1} />
+      <Bench x={-4.35} z={4.22} />
+      <Bench x={4.35} z={4.22} />
+      <CornerBush x={-7.05} z={4.88} />
+      <CornerBush x={7.05} z={4.88} />
     </group>
   );
 }
@@ -430,11 +515,10 @@ function Carpet() {
 function MuseumLights() {
   return (
     <>
-      <hemisphereLight args={["#FFF6E6", "#B87A4B", 0.72]} />
-      <ambientLight intensity={0.44} />
-      <directionalLight color="#FFE7A8" intensity={1.12} position={[6, 10, -8]} />
-      <pointLight color="#FFD9CC" intensity={0.55} distance={16} position={[0, 3.1, 0]} />
-      <pointLight color="#FFE6C8" intensity={0.28} distance={10} position={[0, 2.8, -3.2]} />
+      <hemisphereLight args={["#FFF6E6", "#B87A4B", 0.42]} />
+      <ambientLight intensity={0.26} />
+      <directionalLight color="#FFE7A8" intensity={0.55} position={[6, 10, -8]} />
+      <pointLight color="#FFD9CC" intensity={0.22} distance={14} position={[0, 3.1, 0]} />
     </>
   );
 }
@@ -464,6 +548,7 @@ export function MuseumWorld() {
       <StairFlight x={m.sideX} halfW={m.sideHalf} rails />
       <Carpet />
       <Exhibits geo={geos[3]!} />
+      <GalleryDecor />
       <Walls />
     </group>
   );
