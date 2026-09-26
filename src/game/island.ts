@@ -349,6 +349,68 @@ export const plazaRing = {
   gardenOuter: 4.95,
 };
 
+/** Round cream gazebo on the northeast rim, steps facing the fountain. */
+export const gazebo = (() => {
+  const x = fountain.x + 2.48;
+  const z = fountain.z - 5.08;
+  const facing = Math.atan2(fountain.x - x, fountain.z - z);
+  const columnRing = 1.18;
+  const cf = Math.cos(facing);
+  const sf = Math.sin(facing);
+  const columns = Array.from({ length: 6 }, (_, k) => {
+    const a = Math.PI / 6 + (k * Math.PI) / 3;
+    const lx = Math.sin(a) * columnRing;
+    const lz = Math.cos(a) * columnRing;
+    return { x: x + lx * cf + lz * sf, z: z - lx * sf + lz * cf };
+  });
+  return {
+    x,
+    z,
+    facing,
+    platformR: 1.38,
+    deckH: 0.38,
+    columnRing,
+    columnRad: 0.12,
+    stepHalf: 0.78,
+    steps: [
+      { r: 1.72, h: 0.25 },
+      { r: 2.06, h: 0.13 },
+    ] as const,
+    columns,
+  };
+})();
+
+const angAbs = (a: number, b: number) => Math.abs(Math.atan2(Math.sin(a - b), Math.cos(a - b)));
+
+export function nearGazebo(x: number, z: number, extra = 0) {
+  return Math.hypot(x - gazebo.x, z - gazebo.z) < gazebo.steps[1].r + extra;
+}
+
+export function gazeboColumnHit(x: number, z: number) {
+  return gazebo.columns.some((c) => Math.hypot(x - c.x, z - c.z) < gazebo.columnRad + 0.14);
+}
+
+export function inGazeboWalk(x: number, z: number) {
+  if (gazeboColumnHit(x, z)) return false;
+  const dx = x - gazebo.x;
+  const dz = z - gazebo.z;
+  const d = Math.hypot(dx, dz);
+  if (d <= gazebo.platformR - 0.04) return true;
+  if (d > gazebo.steps[1].r) return false;
+  return angAbs(Math.atan2(dx, dz), gazebo.facing) < gazebo.stepHalf;
+}
+
+export function gazeboHeightAt(x: number, z: number): number | null {
+  const dx = x - gazebo.x;
+  const dz = z - gazebo.z;
+  const d = Math.hypot(dx, dz);
+  if (d <= gazebo.platformR) return LEVEL + gazebo.deckH;
+  if (d > gazebo.steps[1].r) return null;
+  if (angAbs(Math.atan2(dx, dz), gazebo.facing) > gazebo.stepHalf) return null;
+  if (d <= gazebo.steps[0].r) return LEVEL + gazebo.steps[0].h;
+  return LEVEL + gazebo.steps[1].h;
+}
+
 const PLAZA_OPENINGS: [number, number][] = [
   [0, 0.5],
   [Math.PI, 0.5],
@@ -374,6 +436,10 @@ export function inPlazaPathSkip(x: number, z: number) {
   for (const t of grid) {
     if (t.kind === "void" || t.kind === "path" || t.kind === "ramp" || t.kind === "dock") continue;
     const c = tileCenter(t.i, t.j);
+    if (gazeboHeightAt(c.x, c.z) !== null) {
+      t.blocked = false;
+      continue;
+    }
     const d = Math.hypot(c.x - fountain.x, c.z - fountain.z);
     if (d >= plazaRing.gardenInner && d <= plazaRing.gardenOuter && !plazaPathOpening(c.x, c.z, 0.06)) t.blocked = true;
   }
@@ -399,6 +465,7 @@ for (const t of grid) if (t.kind === "path" || t.kind === "ramp" || t.kind === "
 for (const t of grid) {
   const c = tileCenter(t.i, t.j);
   if (Math.hypot(c.x - fountain.x, c.z - fountain.z) < plazaRing.gardenOuter + 0.2) reserve(t.i, t.j, 0);
+  if (nearGazebo(c.x, c.z, 0.35)) reserve(t.i, t.j, 0);
 }
 for (const l of landmarkPlacements) {
   const [i0, j0, i1, j1] = l.rect;
@@ -460,7 +527,7 @@ const plantPlazaBlossom = (i: number, j: number, s: number, seed: number) => {
 plantPlazaBlossom(27, 32, 1.42, 0.21);
 plantPlazaBlossom(37, 32, 1.36, 0.74);
 plantPlazaBlossom(29, 24, 1.5, 0.43);
-plantPlazaBlossom(36, 24, 1.4, 0.58);
+plantPlazaBlossom(38, 22, 1.38, 0.58);
 
 // Lighthouse bluff (northeast): a tight pine stand on the high ground.
 for (const [i, j, s] of [
@@ -561,6 +628,8 @@ export const residentHomes: Record<ResidentId, Vec2[]> = {
 export const tiles = grid;
 
 export function heightAt(x: number, z: number): number {
+  const gz = gazeboHeightAt(x, z);
+  if (gz !== null) return gz;
   const { i, j } = worldToTile(x, z);
   const t = tileAt(i, j);
   if (!t || t.kind === "void") return 0;
@@ -573,6 +642,8 @@ export function heightAt(x: number, z: number): number {
 }
 
 export function isWalkable(x: number, z: number): boolean {
+  if (gazeboColumnHit(x, z)) return false;
+  if (inGazeboWalk(x, z)) return true;
   const { i, j } = worldToTile(x, z);
   const t = tileAt(i, j);
   return !!t && !t.blocked && t.kind !== "water" && t.kind !== "void";
@@ -585,6 +656,7 @@ export function canStep(fromX: number, fromZ: number, toX: number, toZ: number):
   if (!from || !to) return false;
   const dh = Math.abs(heightAt(toX, toZ) - heightAt(fromX, fromZ));
   if (from.kind === "ramp" || to.kind === "ramp") return dh <= LEVEL + 0.25;
+  if (dh > 0.28) return false;
   if (from.h === to.h) return true;
   return dh < 0.5;
 }

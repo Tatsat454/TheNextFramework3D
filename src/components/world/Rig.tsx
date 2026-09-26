@@ -4,7 +4,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import type { LandmarkId } from "@/content/landmarks";
-import { fountain, getPlacement, LEVEL } from "@/game/island";
+import { fountain, gazebo, getPlacement, LEVEL } from "@/game/island";
 import { bend } from "@/game/materials";
 import { debugCam, player, playerScreen, reducedMotion } from "@/game/player-state";
 import { useGame } from "@/game/store";
@@ -29,6 +29,14 @@ export function CameraRig() {
   const lastInterior = useRef<string | null>(null);
 
   useFrame((_, rawDt) => {
+    if (debugCam.gazebo) {
+      camera.position.set(gazebo.x + 0.55, LEVEL + 2.55, gazebo.z + 4.35);
+      camera.lookAt(gazebo.x, LEVEL + 1.15, gazebo.z);
+      bend.uBend.value = 0.0016;
+      bend.uBendCenter.value.set(gazebo.x, LEVEL, gazebo.z);
+      bend.uPlayer.value.set(player.x, player.y + 0.55, player.z);
+      return;
+    }
     if (debugCam.close) {
       camera.position.set(fountain.x + 2.15, LEVEL + 2.35, fountain.z + 3.45);
       camera.lookAt(fountain.x, LEVEL + 0.82, fountain.z);

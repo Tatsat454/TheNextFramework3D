@@ -12,6 +12,7 @@ import { Fountain } from "./Fountain";
 import { ClearColor, InteriorWorld } from "./Interior";
 import { Landmarks } from "./Landmarks";
 import { Nature } from "./Nature";
+import { Gazebo } from "./Gazebo";
 import { Plaza, PlazaPetals } from "./Plaza";
 import { Pickups } from "./Pickups";
 import { Player } from "./Player";
@@ -115,6 +116,7 @@ export default function IslandCanvas({ onReady, onNoWebGL }: { onReady: () => vo
           <Nature />
           <Plaza />
           <Fountain />
+          <Gazebo />
           <PlazaPetals />
           <Landmarks />
           <Pickups />
