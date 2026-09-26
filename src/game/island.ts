@@ -323,15 +323,21 @@ export const getPlacement = (id: LandmarkId) => landmarkPlacements.find((l) => l
 export const mailboxTile = { i: 18, j: 39 };
 block(mailboxTile.i, mailboxTile.j, mailboxTile.i, mailboxTile.j);
 
-/** Plaza hub center — two-tier fountain, ~3 tiles across. */
+/** Plaza hub center — two-tier fountain. Collision is a circle matching the basin, not a tile rect. */
 export const fountain = (() => {
   const a = tileCenter(30, 28);
   const b = tileCenter(35, 32);
   const x = (a.x + b.x) / 2;
   const z = (a.z + b.z) / 2;
-  block(31, 29, 34, 31);
   return { x, z };
 })();
+
+/** Outer cream lip of the basin (lathe r≈1.56). */
+export const fountainRadius = 1.52;
+
+export function fountainHit(x: number, z: number) {
+  return Math.hypot(x - fountain.x, z - fountain.z) < fountainRadius;
+}
 
 /** Circular plaza around the fountain. Terrain hides the square path fill inside this radius. */
 export const plazaRing = {
@@ -702,6 +708,7 @@ export function heightAt(x: number, z: number): number {
 }
 
 export function isWalkable(x: number, z: number): boolean {
+  if (fountainHit(x, z)) return false;
   if (gazeboColumnHit(x, z)) return false;
   if (plazaPropHit(x, z)) return false;
   if (inGazeboWalk(x, z)) return true;
