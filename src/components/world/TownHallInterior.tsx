@@ -6,14 +6,14 @@ import * as THREE from "three";
 import { townHallPal } from "@/content/landmarks";
 import { sfx } from "@/game/audio";
 import { TOWN_COLORS, TOWN_FRAMES_X } from "@/game/interiors";
-import { flat, palette, toon } from "@/game/materials";
+import { palette, toon } from "@/game/materials";
 import { player, reducedMotion } from "@/game/player-state";
 import { useGame } from "@/game/store";
 import { ClearColor } from "./Interior";
 
 type V3 = [number, number, number];
 
-function Box({ p, s, c, r, glow, shadow = true }: { p: V3; s: V3; c: string; r?: V3; glow?: boolean; shadow?: boolean }) {
+function Box({ p, s, c, r, glow, shadow = false }: { p: V3; s: V3; c: string; r?: V3; glow?: boolean; shadow?: boolean }) {
   return (
     <mesh position={p} rotation={r} material={toon(c, { emissive: glow ? c : undefined, noOcclude: true })} castShadow={shadow} receiveShadow={shadow}>
       <boxGeometry args={s} />
@@ -25,10 +25,10 @@ function Plant({ p }: { p: V3 }) {
   return (
     <group position={p}>
       <Box p={[0, 0.16, 0]} s={[0.38, 0.32, 0.38]} c="#C48A55" />
-      <mesh position={[0, 0.62, 0]} material={toon(palette.foliage)} castShadow>
+      <mesh position={[0, 0.62, 0]} material={toon(palette.foliage)}>
         <sphereGeometry args={[0.32, 12, 10]} />
       </mesh>
-      <mesh position={[0.14, 0.78, 0.08]} material={toon(palette.foliageDeep)} castShadow>
+      <mesh position={[0.14, 0.78, 0.08]} material={toon(palette.foliageDeep)}>
         <sphereGeometry args={[0.18, 10, 8]} />
       </mesh>
     </group>
@@ -50,7 +50,7 @@ function HistoryFrame({ x, i }: { x: number; i: number }) {
     <group position={[x, 2.05, -4.88]}>
       <Box p={[0, 0, 0]} s={[1.72, 1.85, 0.12]} c="#8B5A32" shadow={false} />
       <Box p={[0, 0.06, 0.05]} s={[1.46, 1.42, 0.08]} c={art.paper} shadow={false} />
-      <mesh position={[-0.22, 0.18, 0.12]} material={toon(art.a)} castShadow>
+      <mesh position={[-0.22, 0.18, 0.12]} material={toon(art.a)}>
         <sphereGeometry args={[0.22, 10, 8]} />
       </mesh>
       <Box p={[0.28, -0.12, 0.12]} s={[0.42, 0.55, 0.06]} c={art.b} shadow={false} />
@@ -74,18 +74,18 @@ function Timeline() {
 function FrontDesk() {
   return (
     <group position={[0, 0, 1.18]}>
-      <Box p={[0, 0.48, 0]} s={[3.15, 0.96, 1.05]} c="#8B5A32" />
-      <Box p={[0, 0.98, 0.08]} s={[3.28, 0.1, 1.18]} c="#C48A55" />
+      <Box p={[0, 0.48, 0]} s={[3.15, 0.96, 1.05]} c="#1E1B3A" />
+      <Box p={[0, 0.98, 0.08]} s={[3.28, 0.1, 1.18]} c="#2A2748" />
       <Box p={[0, 0.55, 0.54]} s={[3.05, 0.16, 0.08]} c="#4B3FB5" shadow={false} />
       {/* Papers */}
       <Box p={[-0.55, 1.08, 0.12]} s={[0.55, 0.04, 0.42]} c="#FFF6E6" r={[0, 0.12, 0]} shadow={false} />
       <Box p={[-0.52, 1.12, 0.1]} s={[0.52, 0.03, 0.4]} c="#F4E4C4" r={[0, -0.08, 0]} shadow={false} />
       <Box p={[-0.5, 1.16, 0.08]} s={[0.5, 0.03, 0.38]} c="#FFF6E6" r={[0, 0.2, 0]} shadow={false} />
       {/* Bell */}
-      <mesh position={[-1.15, 1.16, 0.18]} material={toon("#D4A017")} castShadow>
+      <mesh position={[-1.15, 1.16, 0.18]} material={toon("#D4A017")}>
         <sphereGeometry args={[0.1, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2]} />
       </mesh>
-      <Box p={[-1.15, 1.08, 0.18]} s={[0.22, 0.04, 0.22]} c="#8B5A32" shadow={false} />
+      <Box p={[-1.15, 1.08, 0.18]} s={[0.22, 0.04, 0.22]} c="#1E1B3A" shadow={false} />
       <mesh position={[-1.15, 1.22, 0.18]} material={toon("#FFF6E6")}>
         <sphereGeometry args={[0.035, 8, 8]} />
       </mesh>
@@ -106,7 +106,7 @@ function MayorDesk() {
       <Box p={[-0.72, 0.2, 0.42]} s={[0.12, 0.4, 0.12]} c="#8B5A32" />
       <Box p={[0.72, 0.2, 0.42]} s={[0.12, 0.4, 0.12]} c="#8B5A32" />
       <Box p={[-0.35, 0.52, 0.1]} s={[0.55, 0.05, 0.4]} c="#FFF6E6" r={[0, 0.2, 0]} shadow={false} />
-      <mesh position={[0.55, 0.62, -0.15]} material={toon("#4B3FB5")} castShadow>
+      <mesh position={[0.55, 0.62, -0.15]} material={toon("#4B3FB5")}>
         <cylinderGeometry args={[0.06, 0.08, 0.22, 10]} />
       </mesh>
       <mesh position={[0.55, 0.78, -0.15]} material={toon("#FFC857", { emissive: "#FFC857" })}>
@@ -135,7 +135,7 @@ function Certificate() {
 
 function NoticeBoard() {
   return (
-    <group position={[-5.45, 1.55, 3.55]} rotation={[0, 0.55, 0]}>
+    <group position={[6.82, 1.55, 2.85]} rotation={[0, Math.PI / 2, 0]}>
       <Box p={[0, 0, 0]} s={[1.55, 1.55, 0.1]} c="#8B5A32" />
       <Box p={[0, 0, 0.04]} s={[1.38, 1.38, 0.06]} c="#C48A55" />
       <Box p={[-0.28, 0.28, 0.1]} s={[0.42, 0.48, 0.02]} c="#FFF6E6" r={[0, 0, 0.08]} shadow={false} />
@@ -160,7 +160,7 @@ function Bench({ p, rotY = 0 }: { p: V3; rotY?: number }) {
 function WallClock() {
   return (
     <group position={[-6.85, 2.45, 0.2]}>
-      <mesh rotation={[0, Math.PI / 2, 0]} material={toon("#FFF6E6")} castShadow>
+      <mesh rotation={[0, Math.PI / 2, 0]} material={toon("#FFF6E6")}>
         <cylinderGeometry args={[0.32, 0.32, 0.08, 20]} />
       </mesh>
       <mesh position={[0.05, 0, 0]} rotation={[0, Math.PI / 2, 0]} material={toon("#4B3FB5")}>
@@ -256,18 +256,7 @@ function TownLights() {
     <>
       <hemisphereLight args={["#FFF6E6", "#C48A55", 0.72]} />
       <ambientLight intensity={0.44} />
-      <directionalLight
-        color="#FFE7A8"
-        intensity={1.12}
-        position={[4, 9, -8]}
-        castShadow
-        shadow-mapSize={[1024, 1024]}
-        shadow-bias={-0.0008}
-        shadow-camera-left={-10}
-        shadow-camera-right={10}
-        shadow-camera-top={10}
-        shadow-camera-bottom={-10}
-      />
+      <directionalLight color="#FFE7A8" intensity={1.12} position={[4, 9, -8]} />
       <pointLight color="#FFF0D0" intensity={0.5} distance={14} position={[0, 2.7, 0]} />
     </>
   );
@@ -276,25 +265,25 @@ function TownLights() {
 function QuillOwl() {
   return (
     <group>
-      <mesh position={[-0.1, 0.08, 0.04]} rotation={[Math.PI / 2, 0, 0]} material={toon("#C48A55")} castShadow>
+      <mesh position={[-0.1, 0.08, 0.04]} rotation={[Math.PI / 2, 0, 0]} material={toon("#C48A55")}>
         <sphereGeometry args={[0.08, 8, 8]} />
       </mesh>
-      <mesh position={[0.1, 0.08, 0.04]} rotation={[Math.PI / 2, 0, 0]} material={toon("#C48A55")} castShadow>
+      <mesh position={[0.1, 0.08, 0.04]} rotation={[Math.PI / 2, 0, 0]} material={toon("#C48A55")}>
         <sphereGeometry args={[0.08, 8, 8]} />
       </mesh>
-      <mesh position={[0, 0.38, 0]} scale={[1, 1.05, 0.9]} material={toon("#E8D5B0")} castShadow>
+      <mesh position={[0, 0.38, 0]} scale={[1, 1.05, 0.9]} material={toon("#E8D5B0")}>
         <sphereGeometry args={[0.28, 16, 14]} />
       </mesh>
       <mesh position={[0, 0.34, 0.08]} scale={[0.72, 0.7, 0.45]} material={toon("#FFF6E6")}>
         <sphereGeometry args={[0.22, 12, 10]} />
       </mesh>
-      <mesh position={[-0.26, 0.42, 0]} rotation={[0, 0, 0.5]} material={toon("#C48A55")} castShadow>
+      <mesh position={[-0.26, 0.42, 0]} rotation={[0, 0, 0.5]} material={toon("#C48A55")}>
         <sphereGeometry args={[0.1, 10, 8]} />
       </mesh>
-      <mesh position={[0.26, 0.42, 0]} rotation={[0, 0, -0.5]} material={toon("#C48A55")} castShadow>
+      <mesh position={[0.26, 0.42, 0]} rotation={[0, 0, -0.5]} material={toon("#C48A55")}>
         <sphereGeometry args={[0.1, 10, 8]} />
       </mesh>
-      <mesh position={[0, 0.68, 0]} material={toon("#E8D5B0")} castShadow>
+      <mesh position={[0, 0.68, 0]} material={toon("#E8D5B0")}>
         <sphereGeometry args={[0.22, 16, 14]} />
       </mesh>
       <mesh position={[-0.1, 0.86, -0.02]} rotation={[0, 0, -0.35]} material={toon("#8B5A32")}>
@@ -365,9 +354,6 @@ function QuillClerk() {
   return (
     <group ref={group} scale={1.35}>
       <QuillOwl />
-      <mesh position={[0, 0.015, 0]} rotation={[-Math.PI / 2, 0, 0]} material={flat("#1E1B3A", 0.22)}>
-        <circleGeometry args={[0.22, 14]} />
-      </mesh>
     </group>
   );
 }
@@ -377,7 +363,7 @@ export function TownHallWorld() {
     <group>
       <ClearColor color="#141022" />
       <TownLights />
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} material={toon(TOWN_COLORS.floor, { noOcclude: true })} receiveShadow>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} material={toon(TOWN_COLORS.floor, { noOcclude: true })}>
         <planeGeometry args={[14, 10]} />
       </mesh>
       <Rug />
