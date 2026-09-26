@@ -4,7 +4,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import type { LandmarkId } from "@/content/landmarks";
-import { MUSEUM, MUSEUM_PEDESTALS } from "@/game/interiors";
+import { MUSEUM, MUSEUM_CURATOR, MUSEUM_PEDESTALS } from "@/game/interiors";
 import { fountain, gazebo, getPlacement, LEVEL } from "@/game/island";
 import { bend } from "@/game/materials";
 import { debugCam, player, playerScreen, pose, reducedMotion } from "@/game/player-state";
@@ -49,6 +49,20 @@ export function CameraRig() {
       camera.lookAt(fountain.x, LEVEL + 0.82, fountain.z);
       bend.uBend.value = 0.0016;
       bend.uBendCenter.value.set(fountain.x, LEVEL, fountain.z);
+      bend.uPlayer.value.set(player.x, player.y + 0.55, player.z);
+      return;
+    }
+    if (debugCam.museumCurator) {
+      const { x, z } = MUSEUM_CURATOR;
+      camera.position.set(0.22, 1.48, 5.52);
+      camera.lookAt(x, 0.52, z);
+      const persp = camera as THREE.PerspectiveCamera;
+      if (persp.isPerspectiveCamera) {
+        persp.fov = 34;
+        persp.updateProjectionMatrix();
+      }
+      bend.uBend.value = 0;
+      bend.uBendCenter.value.set(x, 0, z);
       bend.uPlayer.value.set(player.x, player.y + 0.55, player.z);
       return;
     }

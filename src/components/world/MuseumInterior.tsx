@@ -613,7 +613,7 @@ function CuratorMoss() {
   });
 
   return (
-    <group ref={group} scale={1.22}>
+    <group ref={group} scale={1.72}>
       <CuratorMole />
     </group>
   );
