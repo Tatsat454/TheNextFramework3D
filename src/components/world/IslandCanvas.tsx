@@ -7,8 +7,8 @@ import * as THREE from "three";
 import { presetFromSearch } from "@/game/time-of-day";
 import { useGame } from "@/game/store";
 import { Ambient } from "./Ambient";
-import { ClearColor, InteriorWorld } from "./Interior";
 import { ArcadeWorld } from "./ArcadeInterior";
+import { ClearColor, InteriorWorld } from "./Interior";
 import { Landmarks } from "./Landmarks";
 import { Nature } from "./Nature";
 import { Pickups } from "./Pickups";
@@ -18,6 +18,7 @@ import { Residents } from "./Residents";
 import { CameraRig, Lights } from "./Rig";
 import { Sky } from "./Sky";
 import { Terrain } from "./Terrain";
+import { TownHallWorld } from "./TownHallInterior";
 
 function FirstFrame({ onReady }: { onReady: () => void }) {
   const frames = useRef(0);
@@ -99,6 +100,8 @@ export default function IslandCanvas({ onReady, onNoWebGL }: { onReady: () => vo
       />
       {interior === "arcade" ? (
         <ArcadeWorld />
+      ) : interior === "townhall" ? (
+        <TownHallWorld />
       ) : interior ? (
         <InteriorWorld />
       ) : (

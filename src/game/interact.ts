@@ -1,7 +1,7 @@
 "use client";
 
 import type { ItemId, LandmarkId, ResidentId } from "@/content/landmarks";
-import { arcadePal, copy, getItem, getLandmark, landmarks, museumExhibits, residents, skills } from "@/content/landmarks";
+import { arcadePal, copy, getItem, getLandmark, landmarks, museumExhibits, residents, skills, townHallPal } from "@/content/landmarks";
 import { sfx } from "./audio";
 import {
   armDoorLatch,
@@ -398,6 +398,73 @@ function inspectProp(id: string) {
     });
     return;
   }
+  if (interior === "townhall") {
+    if (id === "clerk") {
+      useGame.setState({
+        dialog: {
+          speaker: townHallPal.id,
+          name: townHallPal.name,
+          role: townHallPal.role,
+          tagColor: townHallPal.tagColor,
+          voice: townHallPal.voice,
+          lines: [townHallPal.ask],
+          index: 0,
+          action: "choices",
+          choices: [
+            { id: "resume", label: "Show me the full resume" },
+            { id: "looking-for", label: "What's Tatsat looking for?" },
+          ],
+        },
+      });
+      return;
+    }
+    if (id === "stamp") {
+      const already = !!useGame.getState().collected["stamp-visitor"];
+      if (already) {
+        useGame.setState({
+          dialog: {
+            speaker: townHallPal.id,
+            name: townHallPal.name,
+            role: townHallPal.role,
+            tagColor: townHallPal.tagColor,
+            voice: townHallPal.voice,
+            lines: [field(o, "already") ?? "This page is already stamped."],
+            index: 0,
+          },
+        });
+        return;
+      }
+      addToPockets("stamp-visitor", "official-visitor");
+      sfx.stamp();
+      useGame.setState({
+        dialog: {
+          speaker: townHallPal.id,
+          name: townHallPal.name,
+          role: townHallPal.role,
+          tagColor: townHallPal.tagColor,
+          voice: townHallPal.voice,
+          lines: o.lines,
+          index: 0,
+        },
+      });
+      return;
+    }
+    useGame.setState({
+      dialog: {
+        speaker: townHallPal.id,
+        name: o.name,
+        role: title,
+        tagColor: townHallPal.tagColor,
+        voice: townHallPal.voice,
+        lines: o.lines,
+        index: 0,
+        action: href ? "link" : undefined,
+        href,
+        hrefLabel,
+      },
+    });
+    return;
+  }
   const tag =
     id === "computer" ? "#D9A066" : id === "tv" ? "#7B6CF6" : id === "bed" ? "#E8513F" : id === "picture" ? "#C48A55" : "#8B5A32";
   useGame.setState({
@@ -415,6 +482,41 @@ function inspectProp(id: string) {
     },
     emote: id === "bed" ? { type: "stretch", at: performance.now() } : useGame.getState().emote,
   });
+}
+
+export function pickDialogChoice(id: string) {
+  if (id === "resume") {
+    useGame.setState({
+      dialog: {
+        speaker: townHallPal.id,
+        name: townHallPal.name,
+        role: townHallPal.role,
+        tagColor: townHallPal.tagColor,
+        voice: townHallPal.voice,
+        lines: townHallPal.resumeLines,
+        index: 0,
+        action: "link",
+        href: townHallPal.resumeHref,
+        hrefLabel: townHallPal.resumeHrefLabel,
+      },
+    });
+    sfx.open();
+    return;
+  }
+  if (id === "looking-for") {
+    useGame.setState({
+      dialog: {
+        speaker: townHallPal.id,
+        name: townHallPal.name,
+        role: townHallPal.role,
+        tagColor: townHallPal.tagColor,
+        voice: townHallPal.voice,
+        lines: townHallPal.lookingFor,
+        index: 0,
+      },
+    });
+    sfx.open();
+  }
 }
 
 export function requestEnter(id: InteriorId) {

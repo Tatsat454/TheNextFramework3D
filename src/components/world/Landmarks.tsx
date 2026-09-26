@@ -109,19 +109,37 @@ function House() {
   );
 }
 
-function Flag({ p, color }: { p: V3; color: string }) {
+function Flagpole({ p }: { p: V3 }) {
   const ref = useRef<THREE.Mesh>(null);
   useFrame((s) => {
-    if (ref.current && !reducedMotion.value) ref.current.rotation.y = Math.sin(s.clock.elapsedTime * 2.2) * 0.25;
+    if (ref.current && !reducedMotion.value) ref.current.rotation.y = Math.sin(s.clock.elapsedTime * 2.4) * 0.28;
   });
   return (
     <group position={p}>
-      <Cyl p={[0, 0.6, 0]} r={0.035} h={1.2} c={palette.cream} />
-      <mesh ref={ref} position={[0, 1.02, 0]}>
-        <mesh position={[0.28, 0, 0]} material={toon(color)} castShadow>
-          <boxGeometry args={[0.56, 0.34, 0.03]} />
+      <Cyl p={[0, 1.45, 0]} r={0.045} h={2.9} c={palette.stone} />
+      <mesh position={[0, 2.92, 0]} material={toon("#D4A017")}>
+        <sphereGeometry args={[0.08, 10, 8]} />
+      </mesh>
+      <mesh ref={ref} position={[0, 2.45, 0]}>
+        <mesh position={[0.42, 0, 0]} material={toon("#4B3FB5")} castShadow>
+          <boxGeometry args={[0.84, 0.48, 0.04]} />
         </mesh>
       </mesh>
+    </group>
+  );
+}
+
+function FlowerBox({ p }: { p: V3 }) {
+  const blooms = ["#FF8A65", "#FFC857", "#FFB7C8", "#7B6CF6"];
+  return (
+    <group position={p}>
+      <Box p={[0, 0.12, 0]} s={[0.72, 0.24, 0.32]} c={palette.woodDeep} />
+      <Box p={[0, 0.26, 0]} s={[0.64, 0.08, 0.24]} c={palette.dirt} shadow={false} />
+      {[-0.18, 0, 0.18].map((x, k) => (
+        <mesh key={x} position={[x, 0.4, 0]} material={toon(blooms[k]!)} castShadow>
+          <sphereGeometry args={[0.08, 8, 8]} />
+        </mesh>
+      ))}
     </group>
   );
 }
@@ -147,12 +165,14 @@ function TownHall() {
       <Window p={[1.45, 1.35, 1.52]} s={0.55} />
       <Window p={[2.11, 1.35, 0]} rotY={Math.PI / 2} s={0.55} />
       <Window p={[-2.11, 1.35, 0]} rotY={-Math.PI / 2} s={0.55} />
+      <FlowerBox p={[-1.45, 0.72, 1.62]} />
+      <FlowerBox p={[1.45, 0.72, 1.62]} />
       {/* Clock */}
       <mesh position={[0, 2.72, 2.42]} rotation={[Math.PI / 2, 0, 0]} material={toon(palette.sun)}>
         <cylinderGeometry args={[0.24, 0.24, 0.08, 20]} />
       </mesh>
       <Box p={[0, 2.78, 2.47]} s={[0.03, 0.14, 0.02]} c={palette.ink} shadow={false} />
-      <Flag p={[0, 3.4, -0.2]} color={palette.indigo} />
+      <Flagpole p={[-1.95, 0, 2.38]} />
       {/* Notice board */}
       <group position={[board.x - pl.center.x, 0, board.z - pl.center.z]} rotation={[0, -0.2, 0]}>
         <Cyl p={[-0.38, 0.5, 0]} r={0.05} h={1.0} c={palette.woodDeep} />

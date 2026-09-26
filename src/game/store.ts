@@ -21,9 +21,10 @@ export type DialogState = {
   voice: [number, number];
   lines: string[];
   index: number;
-  action?: "museum" | "link";
+  action?: "museum" | "link" | "choices";
   href?: string;
   hrefLabel?: string;
+  choices?: { id: string; label: string }[];
 };
 
 export type Wipe = { phase: "out" | "in"; x: number; y: number; at: number };

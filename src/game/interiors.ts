@@ -1,12 +1,12 @@
 import type { LandmarkId } from "@/content/landmarks";
-import { arcadeInteriorCopy, houseInteriorCopy } from "@/content/landmarks";
+import { arcadeInteriorCopy, houseInteriorCopy, townHallInteriorCopy } from "@/content/landmarks";
 import { getPlacement, heightAt, LEVEL } from "./island";
 import { player } from "./player-state";
 import { useGame } from "./store";
 
-export type InteriorId = "house" | "arcade";
+export type InteriorId = "house" | "arcade" | "townhall";
 
-export type InteriorObjectId = keyof typeof houseInteriorCopy | keyof typeof arcadeInteriorCopy;
+export type InteriorObjectId = keyof typeof houseInteriorCopy | keyof typeof arcadeInteriorCopy | keyof typeof townHallInteriorCopy;
 
 type Rect = { x0: number; z0: number; x1: number; z1: number };
 
@@ -46,7 +46,16 @@ export const ARCADE_COLORS = {
   wall: "#1E1B3A",
 };
 
+export const TOWN_COLORS = {
+  floor: "#C48A55",
+  wall: "#FFF6E6",
+  wainscot: "#4B3FB5",
+  rugA: "#7B2D3B",
+  rugB: "#E8C07A",
+};
+
 const CABINET_X = [-4.5, -1.5, 1.5, 4.5] as const;
+export const TOWN_FRAMES_X = [-5.4, -3.24, -1.08, 1.08, 3.24, 5.4] as const;
 
 /** 10×8 tile bedroom, origin at the room center. +z is south (toward the door / camera). */
 export const interiors: Record<InteriorId, InteriorDef> = {
@@ -99,6 +108,34 @@ export const interiors: Record<InteriorId, InteriorDef> = {
       { x0: -5.35, z0: 2.15, x1: -3.55, z1: 3.55 }, // beanbag corner
     ],
   },
+  townhall: {
+    id: "townhall",
+    landmarkId: "townhall",
+    name: "The Island Records",
+    spawn: { x: 0, z: 3.55, facing: Math.PI },
+    doormat: { x: 0, z: 4.42, w: 1.65, d: 0.88 },
+    outsidePad: { z: 2.12, w: 1.15, d: 0.78 },
+    objects: [
+      ...TOWN_FRAMES_X.map((x, i) => ({
+        id: `frame${i + 1}`,
+        x,
+        z: -4.15,
+        y: 2.05,
+        r: 1.05,
+      })),
+      { id: "clerk", x: 0, z: 1.15, y: 1.55, r: 1.55 },
+      { id: "stamp", x: 0.55, z: 1.55, y: 1.25, r: 0.85 },
+      { id: "certificate", x: 5.35, z: -4.15, y: 2.15, r: 1.1 },
+      { id: "notices", x: -5.35, z: 3.55, y: 1.7, r: 1.15 },
+    ],
+    blocked: [
+      { x0: -1.62, z0: 0.62, x1: 1.62, z1: 1.72 }, // front desk
+      { x0: 4.05, z0: -4.55, x1: 6.55, z1: -2.55 }, // mayor desk
+      { x0: -6.55, z0: 2.85, x1: -4.15, z1: 4.15 }, // notice board
+      { x0: -6.45, z0: -0.55, x1: -5.35, z1: 0.85 }, // west bench
+      { x0: 5.35, z0: -0.55, x1: 6.45, z1: 0.85 }, // east bench
+    ],
+  },
 };
 
 export const interiorByLandmark = (id: LandmarkId): InteriorDef | undefined =>
@@ -108,6 +145,7 @@ export const getInterior = (id: InteriorId) => interiors[id];
 
 export function propCopy(interior: InteriorId, id: string) {
   if (interior === "arcade") return arcadeInteriorCopy[id as keyof typeof arcadeInteriorCopy];
+  if (interior === "townhall") return townHallInteriorCopy[id as keyof typeof townHallInteriorCopy];
   return houseInteriorCopy[id as keyof typeof houseInteriorCopy];
 }
 
@@ -123,6 +161,12 @@ export function canStepInterior(id: InteriorId, x: number, z: number) {
     const inAlcove = Math.abs(x) < 0.88 && z >= 4.12 && z < 4.38;
     if (!inRoom && !inAlcove) return false;
     return !interiors.arcade.blocked.some((b) => overlaps(x, z, b));
+  }
+  if (id === "townhall") {
+    const inRoom = x > -6.72 && x < 6.72 && z > -4.72 && z < 4.72;
+    const inAlcove = Math.abs(x) < 0.92 && z >= 4.72 && z < 5.12;
+    if (!inRoom && !inAlcove) return false;
+    return !interiors.townhall.blocked.some((b) => overlaps(x, z, b));
   }
   const inRoom = x > -4.62 + RADIUS && x < 4.62 - RADIUS && z > -3.62 + RADIUS && z < 3.52;
   const inAlcove = Math.abs(x) < 0.82 && z >= 3.52 && z < 3.78;

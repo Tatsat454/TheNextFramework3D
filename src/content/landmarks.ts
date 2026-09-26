@@ -697,7 +697,8 @@ export type ItemId =
   | "lightning-jar"
   | "carbon-offcut"
   | "tiny-cartridge"
-  | "pixel-petal";
+  | "pixel-petal"
+  | "official-visitor";
 
 export type Item = {
   id: ItemId;
@@ -794,6 +795,13 @@ export const items: Item[] = [
     kind: "hidden",
     color: "#FFC4D6",
     flavor: "From Petal Quest, the pixel RPG he wrote from scratch on HTML5 Canvas.",
+  },
+  {
+    id: "official-visitor",
+    name: "Official Visitor certificate",
+    kind: "hidden",
+    color: "#FFF6E6",
+    flavor: "Stamped at Town Hall. The Island Records recognize you as an official visitor.",
   },
 ];
 
@@ -965,6 +973,156 @@ export const arcadeInteriorCopy = {
     ],
     href: "PLACEHOLDER Horizon write-up URL",
     hrefLabel: "Read the full write-up",
+  },
+};
+
+/**
+ * The Island Records (Town Hall): clerk lines, history-wall frames, notices, certificate.
+ * Anything starting with PLACEHOLDER is meant to be replaced.
+ */
+export const townHallPal = {
+  id: "quill",
+  name: "Quill",
+  role: "Clerk",
+  tagColor: "#4B3FB5",
+  voice: [270, 410] as [number, number],
+  welcome: [
+    "Welcome to Town Hall! These are the official records of Tatsat's journey. Walk along the history wall to see every chapter, or ask me for the full resume!",
+  ],
+  ask: "How can the records office help you today?",
+  resumeLines: [
+    "The full resume is on file. I'll stamp the envelope — you can open it from here.",
+  ],
+  resumeHref: "PLACEHOLDER resume URL",
+  resumeHrefLabel: "Open resume",
+  lookingFor: [
+    "Tatsat is looking for product roles in games and entertainment — live ops, economy, and systems that make a world feel alive.",
+    "PLACEHOLDER: one more sentence on the kind of team, studio, or problem he wants next.",
+  ],
+};
+
+export const townHallInteriorCopy = {
+  clerk: {
+    name: "Quill",
+    verb: "Talk",
+    title: "Records clerk",
+    lines: ["How can the records office help you today?"],
+  },
+  frame1: {
+    name: "2020 · Founder",
+    verb: "Read",
+    title: "Founder & CEO",
+    year: "2020",
+    lines: [
+      "Founder & CEO — Divinity Supply & Co.",
+      "Mar 2020 – Sep 2024",
+      "Owned an apparel and design brand end to end: discovery, design, launch, iteration.",
+      "Result: ~$100K in sales, two revenue streams, a 2–3 person remote team.",
+    ],
+    href: "/story/experience",
+    hrefLabel: "Read the full record",
+  },
+  frame2: {
+    name: "2024 · Internship",
+    verb: "Read",
+    title: "Business & Analytics Intern",
+    year: "2024",
+    lines: [
+      "Business & Analytics Intern — WellomyTech",
+      "Apr 2024 – Mar 2025",
+      "Turned AWS, CRM, and hiring data into decisions for the CEO.",
+      "Result: recommendations that cut operating expenses 20% and saved ~32 hours of reporting.",
+    ],
+    href: "/story/experience",
+    hrefLabel: "Read the full record",
+  },
+  frame3: {
+    name: "2025 · Education",
+    verb: "Read",
+    title: "B.A. Business Economics",
+    year: "2025",
+    lines: [
+      "B.A. Business Economics — University of California, Riverside",
+      "Jan 2025 – May 2026 · GPA 3.93",
+      "PLACEHOLDER: one line on what this chapter taught him.",
+      "Result: a foundation in markets, then straight into graduate economics.",
+    ],
+    href: "/story/experience",
+    hrefLabel: "Read the full record",
+  },
+  frame4: {
+    name: "2025 · Partnerships",
+    verb: "Read",
+    title: "Website & Sponsorship Lead",
+    year: "2025",
+    lines: [
+      "Website & Sponsorship Lead — UCR Formula SAE",
+      "Feb 2025 – May 2025",
+      "Ran a 50+ prospect pipeline and turned engineering needs into partnership asks.",
+      "Result: ~$134K across ~13 partners, plus a redesigned team site.",
+    ],
+    href: "/story/experience",
+    hrefLabel: "Read the full record",
+  },
+  frame5: {
+    name: "2026 · Graduate school",
+    verb: "Read",
+    title: "M.S. Economics",
+    year: "2026",
+    lines: [
+      "M.S. Economics — Georgia Institute of Technology",
+      "Aug 2026 – Apr 2027 · GPA 4.0",
+      "PhD-level micro sequence while running student orgs and writing every week.",
+      "Result: PLACEHOLDER: the question this degree is helping him answer.",
+    ],
+    href: "/story/experience",
+    hrefLabel: "Read the full record",
+  },
+  frame6: {
+    name: "2026 · Leadership",
+    verb: "Read",
+    title: "President, M.S. Economics Organization",
+    year: "2026",
+    lines: [
+      "President — M.S. Economics Organization, Georgia Tech",
+      "2026 – present",
+      "Leading and representing the graduate economics community.",
+      "Result: PLACEHOLDER: one concrete thing the org shipped under his watch.",
+    ],
+    href: "/story/experience",
+    hrefLabel: "Read the full record",
+  },
+  certificate: {
+    name: "Mayor's certificate",
+    verb: "Look",
+    title: "Degree on file",
+    lines: [
+      "Issued by the Island Records office.",
+      "Georgia Institute of Technology — M.S. Economics, Aug 2026 – Apr 2027 · GPA 4.0",
+      "University of California, Riverside — B.A. Business Economics, Jan 2025 – May 2026 · GPA 3.93",
+      "PLACEHOLDER: a line you'd want on a diploma wall, in your own words.",
+    ],
+  },
+  notices: {
+    name: "Notice board",
+    verb: "Read",
+    title: "Announcements",
+    lines: [
+      "Town Hall announcements — pin a note, leave a note.",
+      "PLACEHOLDER: a recent award, publication, or talk.",
+      "PLACEHOLDER: a club, org, or community win.",
+      "PLACEHOLDER: news you'd put on a fridge: shipping, a launch, a yes.",
+    ],
+  },
+  stamp: {
+    name: "Official stamp",
+    verb: "Stamp",
+    title: "Records stamp",
+    lines: [
+      "THUNK. The clerk's stamp bites the paper.",
+      "You're on file now — an Official Visitor certificate slides into your pockets.",
+    ],
+    already: "This page is already stamped. Check your pockets for the Official Visitor certificate.",
   },
 };
 

@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { isPlaceholderText, residents } from "@/content/landmarks";
 import { sfx } from "@/game/audio";
+import { pickDialogChoice } from "@/game/interact";
 import { toast, useGame, type DialogState } from "@/game/store";
 import { cn } from "@/lib/utils";
 
@@ -117,6 +118,19 @@ export function DialogBox() {
                 <button type="button" onClick={() => set({ dialog: null })} className="rounded-2xl bg-white px-4 py-2.5 text-[15px] font-bold text-ink">
                   Maybe later
                 </button>
+              </div>
+            ) : done && last && dialog.action === "choices" && dialog.choices?.length ? (
+              <div className="mt-3 flex flex-col gap-2 sm:flex-row" onClick={(e) => e.stopPropagation()}>
+                {dialog.choices.map((choice) => (
+                  <button
+                    key={choice.id}
+                    type="button"
+                    onClick={() => pickDialogChoice(choice.id)}
+                    className="lift rounded-2xl bg-coral px-4 py-2.5 text-[15px] font-bold text-white sm:flex-1"
+                  >
+                    {choice.label}
+                  </button>
+                ))}
               </div>
             ) : done && last && dialog.action === "link" && dialog.href ? (
               <div className="mt-3 flex gap-2" onClick={(e) => e.stopPropagation()}>
