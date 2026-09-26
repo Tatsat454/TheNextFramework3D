@@ -7,6 +7,7 @@ import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js
 import { MUSEUM, MUSEUM_COLORS, MUSEUM_PEDESTALS, museumStairSouth } from "@/game/interiors";
 import { toon } from "@/game/materials";
 import { ClearColor } from "./Interior";
+import { ExhibitObject } from "./ExhibitObject";
 
 type V3 = [number, number, number];
 const C = MUSEUM_COLORS;
@@ -358,7 +359,7 @@ function sandRing(radius: number, count: number, seed: number) {
   return rocks;
 }
 
-function Pedestal({ x, z, y, large, geo }: { x: number; z: number; y: number; large: boolean; geo: THREE.BufferGeometry }) {
+function Pedestal({ x, z, y, large, geo, slug }: { x: number; z: number; y: number; large: boolean; geo: THREE.BufferGeometry; slug: string }) {
   const padR = large ? 1.08 : 0.78;
   const ring = sandRing(padR * 0.92, large ? 9 : 7, Math.abs(Math.round(x * 10 + z * 3)));
   return (
@@ -384,6 +385,9 @@ function Pedestal({ x, z, y, large, geo }: { x: number; z: number; y: number; la
       <Box p={[0, 0.55, 0]} s={[0.66, 0.08, 0.66]} c={C.velvet} />
       <Box p={[0, 0.3, 0.38]} s={[0.22, 0.12, 0.04]} c={C.gold} />
       <Box p={[0, 0.3, 0.4]} s={[0.16, 0.06, 0.02]} c="#C48A55" shadow={false} />
+      <group position={[0, 0.59, 0]} scale={1.28}>
+        <ExhibitObject slug={slug} />
+      </group>
       <pointLight color="#FFE6C8" intensity={0.42} distance={2.4} position={[0, 1.15, 0.15]} />
     </group>
   );
@@ -393,7 +397,7 @@ function Exhibits({ geo }: { geo: THREE.BufferGeometry }) {
   return (
     <group>
       {MUSEUM_PEDESTALS.map((p) => (
-        <Pedestal key={p.id} x={p.x} z={p.z} y={p.tier === "top" ? MUSEUM.deckH : 0} large={p.tier === "low"} geo={geo} />
+        <Pedestal key={p.id} x={p.x} z={p.z} y={p.tier === "top" ? MUSEUM.deckH : 0} large={p.tier === "low"} geo={geo} slug={p.slug} />
       ))}
     </group>
   );

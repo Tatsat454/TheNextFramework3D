@@ -1,5 +1,5 @@
 import type { LandmarkId } from "@/content/landmarks";
-import { arcadeInteriorCopy, houseInteriorCopy, townHallInteriorCopy } from "@/content/landmarks";
+import { arcadeInteriorCopy, houseInteriorCopy, museumExhibits, townHallInteriorCopy } from "@/content/landmarks";
 import { getPlacement, heightAt, LEVEL } from "./island";
 import { player } from "./player-state";
 import { useGame } from "./store";
@@ -95,13 +95,13 @@ export function museumStairSouth() {
   return MUSEUM.deckZ + MUSEUM.steps * MUSEUM.stepD;
 }
 
-/** Five empty pedestals matching the gallery layout. Exhibit models land on these later. +z is south (plaque faces the door). */
+/** Five gallery pedestals. +z is south (plaque faces the door). */
 export const MUSEUM_PEDESTALS = [
-  { id: "exhibit1", n: 1, x: 0, z: -3.55, tier: "top" as const },
-  { id: "exhibit2", n: 2, x: -3.42, z: -2.38, tier: "top" as const },
-  { id: "exhibit3", n: 3, x: 3.42, z: -2.38, tier: "top" as const },
-  { id: "exhibit4", n: 4, x: -3.22, z: 2.22, tier: "low" as const },
-  { id: "exhibit5", n: 5, x: 3.22, z: 2.22, tier: "low" as const },
+  { id: "exhibit1", n: 1, x: 0, z: -3.55, tier: "top" as const, slug: museumExhibits[0] },
+  { id: "exhibit2", n: 2, x: -3.42, z: -2.38, tier: "top" as const, slug: museumExhibits[1] },
+  { id: "exhibit3", n: 3, x: 3.42, z: -2.38, tier: "top" as const, slug: museumExhibits[2] },
+  { id: "exhibit4", n: 4, x: -3.22, z: 2.22, tier: "low" as const, slug: museumExhibits[3] },
+  { id: "exhibit5", n: 5, x: 3.22, z: 2.22, tier: "low" as const, slug: museumExhibits[4] },
 ] as const;
 
 export function museumHeightAt(x: number, z: number) {
