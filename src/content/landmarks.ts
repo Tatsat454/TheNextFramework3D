@@ -1176,6 +1176,27 @@ export const houseInteriorCopy = {
   },
 };
 
+/** Marks invented filler so Tatsat can find and replace it. */
+export const PLACEHOLDER = (s: string) => `PLACEHOLDER: ${s}`;
+
+/** Copy for plaza props. Wish lines are placeholders until Tatsat writes real ones. */
+export const plazaCopy = {
+  fountain: {
+    name: "Fountain",
+    verb: "Toss a coin?",
+    wishes: [
+      PLACEHOLDER("A quiet wish about the next paper, the next game, or the next yes."),
+      PLACEHOLDER("Something you'd only tell a fountain — small, specific, and a little greedy."),
+      PLACEHOLDER("A wish for the team you haven't met yet."),
+      PLACEHOLDER("One true launch, and someone who notices."),
+    ],
+  },
+  bench: {
+    name: "Bench",
+    verb: "Sit",
+  },
+};
+
 export const getStory = (slug: string) => stories.find((s) => s.slug === slug);
 export const getLandmark = (id: LandmarkId) => landmarks.find((l) => l.id === id)!;
 export const getItem = (id: ItemId) => items.find((i) => i.id === id)!;

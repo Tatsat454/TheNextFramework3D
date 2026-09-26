@@ -19,3 +19,15 @@ export const reducedMotion = { value: false };
 
 /** Dev-only camera override for screenshots (`window.__pocket.debugCam`). */
 export const debugCam = { close: false, gazebo: false };
+
+/** Plaza pose: sitting, gazebo photo-spot, coin toss. */
+export const pose = {
+  sitting: false,
+  bench: -1,
+  gazeboFocus: false,
+  gazeboChimed: false,
+  tossAt: 0,
+  tossFromX: 0,
+  tossFromY: 0,
+  tossFromZ: 0,
+};

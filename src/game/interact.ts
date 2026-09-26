@@ -1,7 +1,7 @@
 "use client";
 
 import type { ItemId, LandmarkId, ResidentId } from "@/content/landmarks";
-import { arcadePal, copy, getItem, getLandmark, landmarks, museumExhibits, residents, townHallPal } from "@/content/landmarks";
+import { arcadePal, copy, getItem, getLandmark, landmarks, museumExhibits, plazaCopy, residents, townHallPal } from "@/content/landmarks";
 import { sfx } from "./audio";
 import {
   armDoorLatch,
@@ -18,11 +18,11 @@ import {
   WIPE_OUT_MS,
   WIPE_OUT_MS_REDUCED,
 } from "./interiors";
-import { getPlacement, landmarkPlacements, LEVEL, pedestals, pickups, trees } from "./island";
-import { playerScreen, reducedMotion } from "./player-state";
+import { fountain, getPlacement, landmarkPlacements, LEVEL, pedestals, pickups, plazaBenches, trees } from "./island";
+import { player, playerScreen, pose, reducedMotion } from "./player-state";
 import { checkArrivals, toast, useGame } from "./store";
 
-export type InteractKind = "landmark" | "exhibit" | "tree" | "pickup" | "resident" | "critter" | "door" | "prop";
+export type InteractKind = "landmark" | "exhibit" | "tree" | "pickup" | "resident" | "critter" | "door" | "prop" | "plaza";
 
 export type Interactable = {
   id: string;
@@ -175,6 +175,31 @@ export function currentInteractables(): Interactable[] {
       ref: `enter:${room.id}`,
     });
   }
+  list.push({
+    id: "plaza:fountain",
+    kind: "plaza",
+    label: plazaCopy.fountain.name,
+    verb: plazaCopy.fountain.verb,
+    x: fountain.x,
+    z: fountain.z,
+    y: LEVEL + 1.55,
+    r: 2.2,
+    ref: "fountain",
+  });
+  plazaBenches.forEach((b, i) => {
+    if (pose.sitting && pose.bench === i) return;
+    list.push({
+      id: `plaza:bench-${i}`,
+      kind: "plaza",
+      label: plazaCopy.bench.name,
+      verb: plazaCopy.bench.verb,
+      x: b.x,
+      z: b.z,
+      y: LEVEL + 1.15,
+      r: 1.05,
+      ref: `bench-${i}`,
+    });
+  });
   return list;
 }
 
@@ -268,6 +293,26 @@ function fillTemplate(line: string, px: number, pz: number): string {
   return line;
 }
 
+function tossCoin(from: { x: number; z: number }) {
+  pose.tossAt = performance.now();
+  pose.tossFromX = from.x;
+  pose.tossFromY = player.y + 0.85;
+  pose.tossFromZ = from.z;
+}
+
+function sitOnBench(i: number) {
+  const b = plazaBenches[i];
+  if (!b) return;
+  pose.sitting = true;
+  pose.bench = i;
+  pose.gazeboFocus = false;
+  player.x = b.x + Math.sin(b.facing) * 0.04;
+  player.z = b.z + Math.cos(b.facing) * 0.04;
+  player.facing = b.facing;
+  player.moving = false;
+  sfx.sigh();
+}
+
 export function interact(it: Interactable, player: { x: number; z: number }) {
   const s = useGame.getState();
   switch (it.kind) {
@@ -332,6 +377,11 @@ export function interact(it: Interactable, player: { x: number; z: number }) {
     case "door": {
       if (it.ref.startsWith("enter:")) requestEnter(it.ref.slice(6) as InteriorId);
       else requestExit();
+      break;
+    }
+    case "plaza": {
+      if (it.ref === "fountain") tossCoin(player);
+      else if (it.ref.startsWith("bench-")) sitOnBench(Number(it.ref.slice(6)));
       break;
     }
     case "prop": {

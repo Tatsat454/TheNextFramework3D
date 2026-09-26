@@ -3,9 +3,12 @@
 import { useFrame } from "@react-three/fiber";
 import { useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
+import { plazaCopy } from "@/content/landmarks";
+import { sfx } from "@/game/audio";
 import { fountain, LEVEL } from "@/game/island";
 import { toon } from "@/game/materials";
-import { reducedMotion } from "@/game/player-state";
+import { pose, reducedMotion } from "@/game/player-state";
+import { useGame } from "@/game/store";
 
 const STONE = "#F2E6D0";
 const STONE_RIM = "#FAF0DC";
@@ -177,6 +180,86 @@ export function Fountain() {
       })}
       <instancedMesh ref={sprayRef} args={[sprayGeo, sprayMat, SPRAY]} />
       <instancedMesh ref={dropRef} args={[dropGeo, dropMat, DROP]} />
+      <CoinToss />
     </group>
+  );
+}
+
+const SPARK = 12;
+const tmpSpark = new THREE.Object3D();
+
+function CoinToss() {
+  const coin = useRef<THREE.Group>(null);
+  const sparkRef = useRef<THREE.InstancedMesh>(null);
+  const state = useRef({ shown: 0, spark: 0, landed: false });
+
+  useFrame(() => {
+    const now = performance.now();
+    const age = (now - pose.tossAt) / 1000;
+    const active = pose.tossAt > 0 && age < 2.4;
+    const g = coin.current;
+    if (g) g.visible = active && age < 0.72;
+
+    if (active && age < 0.72 && g) {
+      const u = reducedMotion.value ? 1 : Math.min(1, age / 0.7);
+      const tx = fountain.x;
+      const tz = fountain.z;
+      const x = pose.tossFromX + (tx - pose.tossFromX) * u;
+      const z = pose.tossFromZ + (tz - pose.tossFromZ) * u;
+      const y = pose.tossFromY + (LEVEL + 0.42 - pose.tossFromY) * u + Math.sin(u * Math.PI) * 1.45;
+      g.position.set(x - fountain.x, y - LEVEL, z - fountain.z);
+      g.rotation.set(u * 6.2, u * 9.1, u * 3.4);
+    }
+
+    if (active && age >= 0.7 && state.current.shown !== pose.tossAt) {
+      state.current.shown = pose.tossAt;
+      state.current.spark = now;
+      state.current.landed = true;
+      sfx.plink();
+      const wishes = plazaCopy.fountain.wishes;
+      const line = wishes[Math.floor(Math.random() * wishes.length)]!;
+      useGame.setState({
+        dialog: {
+          speaker: "fountain",
+          name: "Fountain",
+          role: "Wish",
+          tagColor: "#7FD3F0",
+          voice: [280, 380],
+          lines: [line],
+          index: 0,
+        },
+      });
+    }
+
+    const spark = sparkRef.current;
+    if (!spark) return;
+    const st = state.current.spark;
+    const su = st ? (now - st) / 700 : 2;
+    for (let k = 0; k < SPARK; k++) {
+      if (su >= 1) {
+        tmpSpark.scale.setScalar(0);
+      } else {
+        const a = (k / SPARK) * Math.PI * 2;
+        const r = 0.12 + su * 0.42;
+        tmpSpark.position.set(Math.cos(a) * r, 0.44 + su * 0.35, Math.sin(a) * r);
+        tmpSpark.scale.setScalar((1 - su) * 0.045);
+      }
+      tmpSpark.updateMatrix();
+      spark.setMatrixAt(k, tmpSpark.matrix);
+    }
+    spark.instanceMatrix.needsUpdate = true;
+  });
+
+  return (
+    <>
+      <group ref={coin} visible={false}>
+        <mesh material={toon("#E8C35A", { emissive: "#E8C35A" })} castShadow>
+          <cylinderGeometry args={[0.07, 0.07, 0.02, 12]} />
+        </mesh>
+      </group>
+      <instancedMesh ref={sparkRef} args={[undefined, toon("#FFE38A", { emissive: "#FFE38A", noOcclude: true }), SPARK]}>
+        <octahedronGeometry args={[1, 0]} />
+      </instancedMesh>
+    </>
   );
 }

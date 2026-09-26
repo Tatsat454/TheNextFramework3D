@@ -78,6 +78,20 @@ export const sfx = {
     notes.forEach((f, k) => tone(f, 0.22, { type: "triangle", gain: 0.09, at: k * 0.11 }));
     tone(262, 0.8, { type: "sine", gain: 0.05, at: 0 });
   },
+  plink() {
+    tone(1560, 0.07, { type: "sine", gain: 0.09 });
+    tone(1180, 0.12, { type: "triangle", gain: 0.05, at: 0.03 });
+    tone(240, 0.16, { type: "sine", gain: 0.045, at: 0.02, slide: 0.7 });
+    tone(2100, 0.05, { type: "sine", gain: 0.03, at: 0.08 });
+  },
+  sigh() {
+    tone(190, 0.38, { type: "sine", gain: 0.045, slide: 0.62 });
+    tone(130, 0.42, { type: "triangle", gain: 0.03, at: 0.06, slide: 0.7 });
+  },
+  chime() {
+    [659, 831, 988].forEach((f, k) => tone(f, 0.55, { type: "sine", gain: 0.055, at: k * 0.14 }));
+    tone(330, 0.9, { type: "sine", gain: 0.03, at: 0 });
+  },
 };
 
 /** A quiet breeze plus the odd bird chirp. Starts when sound is turned on. */

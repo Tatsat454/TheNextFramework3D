@@ -8,6 +8,7 @@ import { currentInteractables } from "@/game/interact";
 import { input } from "@/game/input";
 import { bend } from "@/game/materials";
 import { isPaused, useGame } from "@/game/store";
+import { pose } from "@/game/player-state";
 
 /** Floating "Press E / Tap" bubble over whatever the player can interact with. */
 export function Prompt() {
@@ -26,7 +27,7 @@ export function Prompt() {
     group.current.position.set(live.x, live.y - drop, live.z);
   });
 
-  if (!it || paused) return null;
+  if (!it || paused || pose.sitting) return null;
   return (
     <group ref={group} position={[it.x, it.y, it.z]}>
       <Html center zIndexRange={[20, 10]} style={{ pointerEvents: "none" }}>

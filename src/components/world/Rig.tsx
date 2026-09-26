@@ -6,7 +6,7 @@ import * as THREE from "three";
 import type { LandmarkId } from "@/content/landmarks";
 import { fountain, gazebo, getPlacement, LEVEL } from "@/game/island";
 import { bend } from "@/game/materials";
-import { debugCam, player, playerScreen, reducedMotion } from "@/game/player-state";
+import { debugCam, player, playerScreen, pose, reducedMotion } from "@/game/player-state";
 import { useGame } from "@/game/store";
 import type { TimePreset } from "@/game/time-of-day";
 
@@ -69,6 +69,8 @@ export function CameraRig() {
       z = 0.85;
     }
     if (s.card || s.dialog) z = Math.min(z, 0.9);
+    if (pose.sitting) z = Math.min(z, 0.62);
+    else if (pose.gazeboFocus) z = Math.min(z, 0.78);
     if (!inside) {
       target.x = THREE.MathUtils.clamp(target.x, -18, 18);
       target.z = THREE.MathUtils.clamp(target.z, -20, 18);
@@ -89,7 +91,7 @@ export function CameraRig() {
       persp.updateProjectionMatrix();
     }
     if (inside) camera.lookAt(focus.current.x, focus.current.y + 0.15, focus.current.z);
-    else camera.lookAt(focus.current.x, focus.current.y + 0.6, focus.current.z - 1.6);
+    else camera.lookAt(focus.current.x, focus.current.y + (pose.sitting ? 0.38 : 0.6), focus.current.z - 1.6);
     bend.uBend.value = inside ? 0 : 0.0016;
     bend.uBendCenter.value.copy(focus.current);
     bend.uPlayer.value.set(player.x, player.y + 0.55, player.z);

@@ -1,6 +1,8 @@
 "use client";
 
-import type { ThreeEvent } from "@react-three/fiber";
+import { useFrame, type ThreeEvent } from "@react-three/fiber";
+import { useRef } from "react";
+import type * as THREE from "three";
 import { input } from "@/game/input";
 import { boardTile, LEVEL, plazaBenches, plazaLanterns, plazaSign } from "@/game/island";
 import { palette, toon } from "@/game/materials";
@@ -18,7 +20,20 @@ function onTap(e: ThreeEvent<MouseEvent>) {
   input.tapTarget = { x: e.point.x, z: e.point.z };
 }
 
-function Lantern({ x, z, night }: { x: number; z: number; night: boolean }) {
+function Lantern({ x, z, night, phase }: { x: number; z: number; night: boolean; phase: number }) {
+  const glow = useRef<THREE.Mesh>(null);
+  const light = useRef<THREE.PointLight>(null);
+  useFrame((st) => {
+    if (!night) {
+      if (light.current) light.current.intensity = 0;
+      if (glow.current) glow.current.scale.setScalar(1);
+      return;
+    }
+    const t = st.clock.elapsedTime;
+    const f = 0.82 + Math.sin(t * 3.4 + phase) * 0.14 + Math.sin(t * 8.1 + phase * 1.7) * 0.07;
+    if (light.current) light.current.intensity = 0.38 + f * 0.22;
+    if (glow.current) glow.current.scale.setScalar(0.9 + f * 0.14);
+  });
   return (
     <group position={[x, LEVEL, z]} onClick={onTap}>
       <mesh position={[0, 0.06, 0]} material={toon(POST)} castShadow receiveShadow>
@@ -28,6 +43,7 @@ function Lantern({ x, z, night }: { x: number; z: number; night: boolean }) {
         <boxGeometry args={[0.24, 0.6, 0.24]} />
       </mesh>
       <mesh
+        ref={glow}
         position={[0, 0.88, 0]}
         material={toon(GLOW, { emissive: GLOW, emissiveIntensity: night ? 1.15 : 0.42, noOcclude: true })}
         castShadow={false}
@@ -40,7 +56,7 @@ function Lantern({ x, z, night }: { x: number; z: number; night: boolean }) {
       <mesh position={[0, 1.16, 0]} rotation={[0, Math.PI / 4, 0]} material={toon(CAP)} castShadow>
         <coneGeometry args={[0.26, 0.16, 4]} />
       </mesh>
-      <pointLight position={[0, 0.88, 0]} color={GLOW} intensity={night ? 0.5 : 0} distance={3.5} decay={2} />
+      <pointLight ref={light} position={[0, 0.88, 0]} color={GLOW} intensity={night ? 0.5 : 0} distance={3.5} decay={2} />
     </group>
   );
 }
@@ -131,7 +147,7 @@ export function PlazaFurniture({ night }: { night: boolean }) {
   return (
     <group>
       {plazaLanterns.map((p) => (
-        <Lantern key={p.a} x={p.x} z={p.z} night={night} />
+        <Lantern key={p.a} x={p.x} z={p.z} night={night} phase={p.a * 3.1} />
       ))}
       {plazaBenches.map((b) => (
         <Bench key={b.a} x={b.x} z={b.z} facing={b.facing} />

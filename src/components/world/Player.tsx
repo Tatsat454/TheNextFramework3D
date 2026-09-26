@@ -7,10 +7,10 @@ import { profile } from "@/content/landmarks";
 import { sfx } from "@/game/audio";
 import { findNearby, interact, requestEnter, requestExit, type Interactable } from "@/game/interact";
 import { canStepInterior, doorZoneAt } from "@/game/interiors";
-import { canStep, heightAt, tileAt, worldToTile } from "@/game/island";
+import { canStep, gazebo, heightAt, inGazeboWalk, plazaBenches, tileAt, worldToTile } from "@/game/island";
 import { input, moveAxes } from "@/game/input";
 import { flat, palette, toon } from "@/game/materials";
-import { player, reducedMotion } from "@/game/player-state";
+import { player, pose, reducedMotion } from "@/game/player-state";
 import { isPaused, useGame } from "@/game/store";
 
 const RADIUS = 0.26;
@@ -26,7 +26,7 @@ export function triggerInteract() {
   if (!it) return;
   nearbyInteractable = it;
   interact(it, player);
-  if (it.kind !== "door") {
+  if (it.kind !== "door" && it.kind !== "plaza") {
     useGame.setState({ hopAt: performance.now() });
     sfx.hop();
   }
@@ -150,7 +150,7 @@ export function Player() {
   const puffGroup = useRef<THREE.Group>(null);
   const printGroup = useRef<THREE.Group>(null);
   const shadow = useRef<THREE.Mesh>(null);
-  const anim = useRef({ phase: 0, wasMoving: false, stopAt: -10, blinkAt: 2, puffT: 0, printT: 0, printSide: 1, nearbyT: 0, tiltAt: 5, lastNearby: "" });
+  const anim = useRef({ phase: 0, wasMoving: false, stopAt: -10, blinkAt: 2, puffT: 0, printT: 0, printSide: 1, nearbyT: 0, tiltAt: 5, lastNearby: "", sitK: 0 });
   const puffs = useRef<Puff[]>([]);
   const prints = useRef<Puff[]>([]);
   const puffGeo = useMemo(() => new THREE.IcosahedronGeometry(0.07, 1), []);
@@ -170,7 +170,15 @@ export function Player() {
     let dx = 0;
     let dz = 0;
     const { x: ax, z: az, running } = moveAxes();
-    if (!paused) {
+    if (pose.sitting && (ax || az || input.tapTarget)) {
+      pose.sitting = false;
+      pose.bench = -1;
+    }
+    if (pose.sitting) {
+      dx = 0;
+      dz = 0;
+      input.tapTarget = null;
+    } else if (!paused) {
       if (ax || az) {
         input.tapTarget = null;
         const len = Math.hypot(ax, az);
@@ -199,8 +207,13 @@ export function Player() {
       player.z = nz;
       player.facing = angleLerp(player.facing, Math.atan2(dx, dz), 1 - Math.pow(0.001, dt));
     }
-    player.moving = moving;
-    player.running = moving && running;
+    if (pose.sitting && pose.bench >= 0) {
+      const b = plazaBenches[pose.bench]!;
+      player.x = b.x + Math.sin(b.facing) * 0.04;
+      player.z = b.z + Math.cos(b.facing) * 0.04;
+      player.facing = b.facing;
+      player.moving = false;
+    }
     const ground = s.interior ? 0 : heightAt(player.x, player.z);
     player.y += (ground - player.y) * (1 - Math.pow(0.0001, dt));
     if (s.interior) player.onSand = false;
@@ -209,10 +222,22 @@ export function Player() {
       player.onSand = !!tile && tile.kind === "sand";
     }
 
-    if (!paused) {
+    if (!paused && !pose.sitting) {
       const zone = doorZoneAt(player.x, player.z);
       if (zone?.kind === "enter") requestEnter(zone.id);
       else if (zone?.kind === "exit") requestExit();
+    }
+
+    const inPhoto = !s.interior && inGazeboWalk(player.x, player.z) && Math.hypot(player.x - gazebo.x, player.z - gazebo.z) < 0.62;
+    if (inPhoto && !pose.sitting) {
+      pose.gazeboFocus = true;
+      if (!pose.gazeboChimed) {
+        pose.gazeboChimed = true;
+        sfx.chime();
+      }
+    } else {
+      pose.gazeboFocus = false;
+      if (!inPhoto) pose.gazeboChimed = false;
     }
 
     if (a.wasMoving && !moving) a.stopAt = t;
@@ -221,8 +246,9 @@ export function Player() {
     // Hop (interact / pickup)
     const hopT = (now - s.hopAt) / 1000;
     const hop = hopT < 0.36 ? Math.sin((hopT / 0.36) * Math.PI) * 0.22 : 0;
+    a.sitK += ((pose.sitting ? 1 : 0) - a.sitK) * (1 - Math.pow(0.0008, dt));
 
-    g.position.set(player.x, player.y + hop, player.z);
+    g.position.set(player.x, player.y + hop + a.sitK * 0.14, player.z);
     g.rotation.y = player.facing;
 
     const rm = reducedMotion.value;
@@ -276,8 +302,9 @@ export function Player() {
     if (emoteHop && !rm) g.position.y += emoteHop;
     lerpRot(p.armL, armL, armLz);
     lerpRot(p.armR, armR, armRz);
-    lerpRot(p.legL, swing);
-    lerpRot(p.legR, -swing);
+    lerpRot(p.legL, swing + a.sitK * 1.28);
+    lerpRot(p.legR, -swing + a.sitK * 1.28);
+    if (body) body.rotation.x += (a.sitK * 0.18 - body.rotation.x) * 0.25;
 
     // Idle breathing, stop squash
     const since = t - a.stopAt;
