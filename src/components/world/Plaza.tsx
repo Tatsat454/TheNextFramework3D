@@ -51,10 +51,10 @@ function layout() {
   const y = LEVEL;
 
   const stones: Inst[] = [];
-  const nStone = 20;
+  const nStone = 24;
   for (let k = 0; k < nStone; k++) {
-    const a = (k / nStone) * Math.PI * 2 + (rand() - 0.5) * 0.18;
-    const r = sandInner + 0.38 + rand() * 0.52;
+    const a = (k / nStone) * Math.PI * 2 + (rand() - 0.5) * 0.14;
+    const r = sandInner + 0.32 + rand() * 0.62;
     stones.push({
       x: cx + Math.cos(a) * r,
       y: y + 0.055,
@@ -130,8 +130,8 @@ function layout() {
   const connectors: { dx: number; dz: number; ry: number; sx: number; sz: number }[] = [
     { dx: 0, dz: 1, ry: 0, sx: 1.85, sz: 1.15 },
     { dx: 0, dz: -1, ry: 0, sx: 1.85, sz: 1.15 },
-    { dx: 2.5, dz: -2.0, ry: Math.atan2(2.5, -2.0), sx: 1.5, sz: 1.2 },
-    { dx: -2.5, dz: -1.0, ry: Math.atan2(-2.5, -1.0), sx: 1.55, sz: 1.15 },
+    { dx: 2.6, dz: -1.6, ry: Math.atan2(2.6, -1.6), sx: 1.9, sz: 1.55 },
+    { dx: -2.4, dz: -0.9, ry: Math.atan2(-2.4, -0.9), sx: 1.8, sz: 1.35 },
   ];
 
   return { stones, blooms, lupines, tufts, connectors, cx, cz, y, grassInner, grassOuter, sandInner, sandOuter };

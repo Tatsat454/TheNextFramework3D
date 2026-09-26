@@ -245,6 +245,7 @@ paint(32, 20, 33, 13); // stairs top → museum door
 paint(16, 39, 31, 40); // house door → spine
 paint(24, 29, 30, 29); // town hall front (meets the plaza ring)
 paint(35, 28, 40, 28); // → arcade
+paint(35, 28, 35, 31); // arcade walk drops south to the ring
 paint(36, 29, 40, 32); // → market (west approach)
 bridge(16, 39, 24, 40); // across the house pond, on the door line
 
@@ -341,12 +342,17 @@ export const plazaRing = {
   grassInner: 1.58,
   grassOuter: 2.14,
   sandInner: 2.02,
-  sandOuter: 3.22,
-  skipPath: 2.92,
+  sandOuter: 3.38,
+  skipPath: 2.88,
 };
 
 export function inPlazaPathSkip(x: number, z: number) {
-  return Math.hypot(x - plazaRing.x, z - plazaRing.z) < plazaRing.skipPath;
+  const d = Math.hypot(x - plazaRing.x, z - plazaRing.z);
+  if (d >= plazaRing.skipPath) return false;
+  const { i } = worldToTile(x, z);
+  // Keep the east/west district walks beige so they meet the ring instead of stopping short.
+  if (i >= 35 || i <= 29) return false;
+  return true;
 }
 
 export const pedestals = museumExhibits.map((slug, k) => {
