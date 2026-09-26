@@ -6,7 +6,7 @@ import type { ThreeEvent } from "@react-three/fiber";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { input } from "@/game/input";
-import { LEVEL, plazaRing } from "@/game/island";
+import { LEVEL, plazaPathOpening, plazaRing } from "@/game/island";
 import { palette, toon } from "@/game/materials";
 import { mulberry32 } from "@/game/rng";
 import { isPaused, useGame } from "@/game/store";
@@ -18,6 +18,8 @@ const WHITE = "#FFFFFF";
 const YELLOW = "#FFD23F";
 const RED = "#FF6B6B";
 const LUPINE = "#8A6BE0";
+const BUSH = "#4DB35E";
+const ROCK = "#B8B8C0";
 
 const tmp = new THREE.Object3D();
 
@@ -134,7 +136,128 @@ function layout() {
     { dx: -2.4, dz: -0.9, ry: Math.atan2(-2.4, -0.9), sx: 1.8, sz: 1.35 },
   ];
 
-  return { stones, blooms, lupines, tufts, connectors, cx, cz, y, grassInner, grassOuter, sandInner, sandOuter };
+  const { gardenInner, gardenOuter } = plazaRing;
+  const bushColors = [PINK, WHITE, RED, PINK, WHITE];
+  // Sit just outside the stepping stones, in the gaps between N/S/E/W path wedges.
+  const bushSpecs = [
+    { a: 0.58, r: 3.82 },
+    { a: 0.98, r: 3.96 },
+    { a: 1.36, r: 3.78 },
+    { a: 2.68, r: 4.12 },
+    { a: -2.52, r: 4.06 },
+    { a: -1.42, r: 3.88 },
+    { a: -1.02, r: 3.74 },
+    { a: -0.6, r: 3.94 },
+    { a: 1.58, r: 4.18 },
+  ];
+  const bushes: Inst[] = [];
+  bushSpecs.forEach((spec, i) => {
+    const a = spec.a + (rand() - 0.5) * 0.06;
+    const r = spec.r + (rand() - 0.5) * 0.08;
+    const x = cx + Math.cos(a) * r;
+    const z = cz + Math.sin(a) * r;
+    if (plazaPathOpening(x, z, -0.12)) return;
+    const s = 0.95 + rand() * 0.28;
+    bushes.push({ x, y, z, sx: s, sy: 0.9 + rand() * 0.22, sz: s, ry: a + rand() });
+    const nDot = 6 + Math.floor(rand() * 3);
+    for (let d = 0; d < nDot; d++) {
+      const da = a + (rand() - 0.5) * 1.5;
+      const dr = 0.14 + rand() * 0.3;
+      const c = bushColors[(i + d) % bushColors.length]!;
+      blooms[c]!.push({
+        x: x + Math.cos(da) * dr,
+        y: y + 0.3 + rand() * 0.24,
+        z: z + Math.sin(da) * dr,
+        sx: 0.9 + rand() * 0.4,
+        sy: 0.9 + rand() * 0.35,
+        sz: 0.9 + rand() * 0.4,
+        ry: rand() * Math.PI * 2,
+      });
+    }
+    // Tall lupine cluster tucked against each bush.
+    const nLup = 2 + Math.floor(rand() * 2);
+    for (let d = 0; d < nLup; d++) {
+      const da = a + (d - 0.4) * 0.28 + (rand() - 0.5) * 0.12;
+      const dr = 0.38 + rand() * 0.22;
+      lupines.push({
+        x: x + Math.cos(da) * dr,
+        y: y + 0.04,
+        z: z + Math.sin(da) * dr,
+        sx: 1.05 + rand() * 0.35,
+        sy: 1.2 + rand() * 0.5,
+        sz: 1.05 + rand() * 0.35,
+        ry: rand() * Math.PI,
+      });
+    }
+  });
+
+  const rocks: Inst[] = [
+    { a: 0.82, r: 3.66 },
+    { a: -0.84, r: 3.7 },
+    { a: -2.38, r: 3.78 },
+  ].map((o, i) => ({
+    x: cx + Math.cos(o.a) * o.r,
+    y: y + 0.14,
+    z: cz + Math.sin(o.a) * o.r,
+    sx: 0.85 + i * 0.1,
+    sy: 0.62 + (i % 2) * 0.08,
+    sz: 0.74 + (i % 2) * 0.12,
+    ry: o.a * 0.55,
+  }));
+
+  for (let k = 0; k < 20; k++) {
+    const a = k * 0.41 + 0.2;
+    const r = gardenInner + 0.22 + rand() * (gardenOuter - gardenInner - 0.5);
+    const x = cx + Math.cos(a) * r;
+    const z = cz + Math.sin(a) * r;
+    if (plazaPathOpening(x, z, 0.04)) continue;
+    lupines.push({
+      x,
+      y: y + 0.04,
+      z,
+      sx: 0.95 + rand() * 0.4,
+      sy: 1.1 + rand() * 0.5,
+      sz: 0.95 + rand() * 0.4,
+      ry: rand() * Math.PI,
+    });
+  }
+
+  for (let k = 0; k < 36; k++) {
+    const a = k * 0.33 + 0.07;
+    const r = gardenInner + 0.15 + rand() * (gardenOuter - gardenInner - 0.35);
+    const x = cx + Math.cos(a) * r;
+    const z = cz + Math.sin(a) * r;
+    if (plazaPathOpening(x, z, 0.08)) continue;
+    tufts.push({
+      x,
+      y: y + 0.04,
+      z,
+      sx: 0.8 + rand() * 0.55,
+      sy: 0.65 + rand() * 0.45,
+      sz: 0.8 + rand() * 0.55,
+      ry: rand() * Math.PI,
+    });
+  }
+
+  for (let k = 0; k < 40; k++) {
+    const a = k * 2.399 + 0.4;
+    const r = gardenInner + 0.22 + rand() * 0.72;
+    const x = cx + Math.cos(a) * r;
+    const z = cz + Math.sin(a) * r;
+    if (plazaPathOpening(x, z, 0.04)) continue;
+    const c = bushColors[k % bushColors.length]!;
+    blooms[c]!.push({
+      x,
+      y: y + 0.04,
+      z,
+      sx: 0.75 + rand() * 0.4,
+      sy: 0.75 + rand() * 0.35,
+      sz: 0.75 + rand() * 0.4,
+      ry: rand() * Math.PI * 2,
+    });
+  }
+
+  return { stones, blooms, lupines, tufts, connectors, bushes, rocks, cx, cz, y, grassInner, grassOuter, sandInner, sandOuter };
 }
 
 export function Plaza() {
@@ -142,6 +265,8 @@ export function Plaza() {
   const stoneRef = useRef<THREE.InstancedMesh>(null);
   const tuftRef = useRef<THREE.InstancedMesh>(null);
   const lupineRef = useRef<THREE.InstancedMesh>(null);
+  const bushRef = useRef<THREE.InstancedMesh>(null);
+  const rockRef = useRef<THREE.InstancedMesh>(null);
   const bloomRefs = useRef<Record<string, THREE.InstancedMesh | null>>({});
   const stoneGeo = useMemo(() => new RoundedBoxGeometry(1, 1, 1, 1, 0.16), []);
   const tuftGeo = useMemo(
@@ -172,10 +297,31 @@ export function Plaza() {
       ]),
     [],
   );
+  const bushGeo = useMemo(() => {
+    const blob = (r: number, x: number, y: number, z: number) => new THREE.IcosahedronGeometry(r, 1).translate(x, y, z);
+    return mergeGeometries([
+      blob(0.4, 0, 0.34, 0),
+      blob(0.3, 0.28, 0.28, 0.1),
+      blob(0.28, -0.26, 0.26, -0.08),
+      blob(0.24, 0.08, 0.5, -0.1),
+      blob(0.22, -0.1, 0.3, 0.22),
+      blob(0.2, 0.18, 0.38, -0.2),
+    ]);
+  }, []);
+  const rockGeo = useMemo(
+    () =>
+      mergeGeometries([
+        new THREE.IcosahedronGeometry(0.34, 1).scale(1.08, 0.62, 0.9),
+        new THREE.IcosahedronGeometry(0.2, 1).translate(0.14, -0.02, 0.08).scale(1, 0.68, 0.95),
+      ]),
+    [],
+  );
 
   useInstances(stoneRef, data.stones);
   useInstances(tuftRef, data.tufts);
   useInstances(lupineRef, data.lupines);
+  useInstances(bushRef, data.bushes);
+  useInstances(rockRef, data.rocks);
 
   const bloomEntries = useMemo(() => Object.entries(data.blooms).filter(([, list]) => list.length), [data.blooms]);
 
@@ -221,6 +367,8 @@ export function Plaza() {
         );
       })}
       <instancedMesh ref={stoneRef} args={[stoneGeo, toon(STONE), data.stones.length]} receiveShadow castShadow />
+      <instancedMesh ref={bushRef} args={[bushGeo, toon(BUSH, { flatShading: true }), data.bushes.length]} castShadow receiveShadow />
+      <instancedMesh ref={rockRef} args={[rockGeo, toon(ROCK, { flatShading: true }), data.rocks.length]} castShadow receiveShadow />
       <instancedMesh ref={tuftRef} args={[tuftGeo, toon(palette.foliage), data.tufts.length]} />
       {bloomEntries.map(([color, list]) => (
         <instancedMesh

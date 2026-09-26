@@ -241,7 +241,8 @@ for (const t of grid) {
 
 // Spine: spawn / plaza / stairs / museum. District spokes stay short.
 paint(32, 42, 33, 23); // beach → stairs
-paint(32, 20, 33, 13); // stairs top → museum door
+paint(32, 20, 33, 13); // stairs top → museum approach
+paint(28, 13, 33, 13); // west along the plateau to the museum door
 paint(16, 39, 31, 40); // house door → spine
 paint(24, 29, 30, 29); // town hall front (meets the plaza ring)
 paint(35, 28, 40, 28); // → arcade
@@ -295,7 +296,7 @@ const place = (id: LandmarkId, rect: [number, number, number, number], interactO
 export const landmarkPlacements: LandmarkPlacement[] = [
   place("house", [15, 36, 17, 38]),
   place("townhall", [24, 26, 27, 28], 1.3, 2.3),
-  place("museum", [31, 10, 34, 12], 1.2, 1.8),
+  place("museum", [28, 10, 31, 12], 1.2, 1.8),
   place("arcade", [38, 26, 40, 27], 1.1, 1.6),
   place("market", [41, 31, 42, 32], 1.15, 1.9),
 ];
@@ -344,7 +345,21 @@ export const plazaRing = {
   sandInner: 2.02,
   sandOuter: 3.38,
   skipPath: 2.88,
+  gardenInner: 3.52,
+  gardenOuter: 4.95,
 };
+
+const PLAZA_OPENINGS: [number, number][] = [
+  [0, 0.5],
+  [Math.PI, 0.5],
+  [Math.atan2(2.6, -1.6), 0.55],
+  [Math.atan2(-2.4, -0.9), 0.52],
+];
+
+export function plazaPathOpening(x: number, z: number, extra = 0) {
+  const a = Math.atan2(x - plazaRing.x, z - plazaRing.z);
+  return PLAZA_OPENINGS.some(([oa, w]) => Math.abs(Math.atan2(Math.sin(a - oa), Math.cos(a - oa))) < w + extra);
+}
 
 export function inPlazaPathSkip(x: number, z: number) {
   const d = Math.hypot(x - plazaRing.x, z - plazaRing.z);
@@ -355,9 +370,18 @@ export function inPlazaPathSkip(x: number, z: number) {
   return true;
 }
 
+{
+  for (const t of grid) {
+    if (t.kind === "void" || t.kind === "path" || t.kind === "ramp" || t.kind === "dock") continue;
+    const c = tileCenter(t.i, t.j);
+    const d = Math.hypot(c.x - fountain.x, c.z - fountain.z);
+    if (d >= plazaRing.gardenInner && d <= plazaRing.gardenOuter && !plazaPathOpening(c.x, c.z, 0.06)) t.blocked = true;
+  }
+}
+
 export const pedestals = museumExhibits.map((slug, k) => {
   const left = k < 3;
-  const i = left ? 29 + k : 34 + (k - 3);
+  const i = left ? 26 + k : 31 + (k - 3);
   const j = 14;
   block(i, j, i, j);
   const c = tileCenter(i, j);
@@ -374,7 +398,7 @@ const reserve = (i: number, j: number, r = 1) => {
 for (const t of grid) if (t.kind === "path" || t.kind === "ramp" || t.kind === "dock" || t.kind === "sand") reserve(t.i, t.j, 1);
 for (const t of grid) {
   const c = tileCenter(t.i, t.j);
-  if (Math.hypot(c.x - fountain.x, c.z - fountain.z) < plazaRing.sandOuter + 0.35) reserve(t.i, t.j, 0);
+  if (Math.hypot(c.x - fountain.x, c.z - fountain.z) < plazaRing.gardenOuter + 0.2) reserve(t.i, t.j, 0);
 }
 for (const l of landmarkPlacements) {
   const [i0, j0, i1, j1] = l.rect;
@@ -520,7 +544,7 @@ export const residentHomes: Record<ResidentId, Vec2[]> = {
   bramble: [tileCenter(34, 36), tileCenter(30, 34), tileCenter(35, 32)],
   drizzle: [tileCenter(32, 27), tileCenter(28, 30), tileCenter(25, 32)],
   pip: [tileCenter(37, 28), tileCenter(41, 28), tileCenter(39, 25)],
-  sol: [tileCenter(32, 16), tileCenter(35, 14), tileCenter(30, 15)],
+  sol: [tileCenter(30, 16), tileCenter(32, 14), tileCenter(27, 15)],
 };
 
 export const tiles = grid;
