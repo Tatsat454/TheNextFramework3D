@@ -2,9 +2,12 @@
 
 import { useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
+import type { ThreeEvent } from "@react-three/fiber";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
+import { input } from "@/game/input";
 import { gazebo, LEVEL } from "@/game/island";
 import { toon } from "@/game/materials";
+import { isPaused, useGame } from "@/game/store";
 
 const CREAM = "#F2E6D0";
 const CREAM_RIM = "#FAF0DC";
@@ -17,6 +20,12 @@ const WISTERIA = "#9B6ED4";
 const WISTERIA_DEEP = "#7A4CB8";
 
 const tmp = new THREE.Object3D();
+
+function onTap(e: ThreeEvent<MouseEvent>) {
+  if (isPaused(useGame.getState())) return;
+  e.stopPropagation();
+  input.tapTarget = { x: e.point.x, z: e.point.z };
+}
 
 function sectorCylinder(r: number, h: number, half: number) {
   return new THREE.CylinderGeometry(r, r, h, 12, 1, false, Math.PI / 2 - half, half * 2);
@@ -84,7 +93,7 @@ export function Gazebo() {
   const deck = gazebo.deckH;
 
   return (
-    <group position={[gazebo.x, LEVEL, gazebo.z]} rotation={[0, gazebo.facing, 0]}>
+    <group position={[gazebo.x, LEVEL, gazebo.z]} rotation={[0, gazebo.facing, 0]} onClick={onTap}>
       <mesh position={[0, deck / 2, 0]} material={toon(CREAM)} castShadow receiveShadow>
         <cylinderGeometry args={[gazebo.platformR, gazebo.platformR, deck, 20]} />
       </mesh>

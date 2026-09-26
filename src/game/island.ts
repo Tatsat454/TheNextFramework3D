@@ -241,8 +241,7 @@ for (const t of grid) {
 
 // Spine: spawn / plaza / stairs / museum. District spokes stay short.
 paint(32, 42, 33, 23); // beach → stairs
-paint(32, 20, 33, 13); // stairs top → museum approach
-paint(28, 13, 33, 13); // west along the plateau to the museum door
+paint(32, 20, 33, 13); // stairs top → museum door
 paint(16, 39, 31, 40); // house door → spine
 paint(24, 29, 30, 29); // town hall front (meets the plaza ring)
 paint(35, 28, 40, 28); // → arcade
@@ -296,7 +295,7 @@ const place = (id: LandmarkId, rect: [number, number, number, number], interactO
 export const landmarkPlacements: LandmarkPlacement[] = [
   place("house", [15, 36, 17, 38]),
   place("townhall", [24, 26, 27, 28], 1.3, 2.3),
-  place("museum", [28, 10, 31, 12], 1.2, 1.8),
+  place("museum", [31, 10, 34, 12], 1.2, 1.8),
   place("arcade", [38, 26, 40, 27], 1.1, 1.6),
   place("market", [41, 31, 42, 32], 1.15, 1.9),
 ];
@@ -370,11 +369,11 @@ export const gazebo = (() => {
     platformR: 1.38,
     deckH: 0.38,
     columnRing,
-    columnRad: 0.12,
-    stepHalf: 0.78,
+    columnRad: 0.11,
+    stepHalf: 0.92,
     steps: [
-      { r: 1.72, h: 0.25 },
-      { r: 2.06, h: 0.13 },
+      { r: 1.78, h: 0.24 },
+      { r: 2.28, h: 0.12 },
     ] as const,
     columns,
   };
@@ -387,7 +386,7 @@ export function nearGazebo(x: number, z: number, extra = 0) {
 }
 
 export function gazeboColumnHit(x: number, z: number) {
-  return gazebo.columns.some((c) => Math.hypot(x - c.x, z - c.z) < gazebo.columnRad + 0.14);
+  return gazebo.columns.some((c) => Math.hypot(x - c.x, z - c.z) < gazebo.columnRad + 0.08);
 }
 
 export function inGazeboWalk(x: number, z: number) {
@@ -395,9 +394,9 @@ export function inGazeboWalk(x: number, z: number) {
   const dx = x - gazebo.x;
   const dz = z - gazebo.z;
   const d = Math.hypot(dx, dz);
-  if (d <= gazebo.platformR - 0.04) return true;
-  if (d > gazebo.steps[1].r) return false;
-  return angAbs(Math.atan2(dx, dz), gazebo.facing) < gazebo.stepHalf;
+  if (d <= gazebo.platformR - 0.02) return true;
+  if (d > gazebo.steps[1].r + 0.55) return false;
+  return angAbs(Math.atan2(dx, dz), gazebo.facing) < gazebo.stepHalf + 0.12;
 }
 
 export function gazeboHeightAt(x: number, z: number): number | null {
@@ -416,6 +415,7 @@ const PLAZA_OPENINGS: [number, number][] = [
   [Math.PI, 0.5],
   [Math.atan2(2.6, -1.6), 0.55],
   [Math.atan2(-2.4, -0.9), 0.52],
+  [Math.atan2(gazebo.x - plazaRing.x, gazebo.z - plazaRing.z), 0.48],
 ];
 
 export function plazaPathOpening(x: number, z: number, extra = 0) {
@@ -436,7 +436,7 @@ export function inPlazaPathSkip(x: number, z: number) {
   for (const t of grid) {
     if (t.kind === "void" || t.kind === "path" || t.kind === "ramp" || t.kind === "dock") continue;
     const c = tileCenter(t.i, t.j);
-    if (gazeboHeightAt(c.x, c.z) !== null) {
+    if (gazeboHeightAt(c.x, c.z) !== null || inGazeboWalk(c.x, c.z)) {
       t.blocked = false;
       continue;
     }
@@ -447,7 +447,7 @@ export function inPlazaPathSkip(x: number, z: number) {
 
 export const pedestals = museumExhibits.map((slug, k) => {
   const left = k < 3;
-  const i = left ? 26 + k : 31 + (k - 3);
+  const i = left ? 29 + k : 34 + (k - 3);
   const j = 14;
   block(i, j, i, j);
   const c = tileCenter(i, j);
@@ -622,7 +622,7 @@ export const residentHomes: Record<ResidentId, Vec2[]> = {
   bramble: [tileCenter(34, 36), tileCenter(30, 34), tileCenter(35, 32)],
   drizzle: [tileCenter(32, 27), tileCenter(28, 30), tileCenter(25, 32)],
   pip: [tileCenter(37, 28), tileCenter(41, 28), tileCenter(39, 25)],
-  sol: [tileCenter(30, 16), tileCenter(32, 14), tileCenter(27, 15)],
+  sol: [tileCenter(32, 16), tileCenter(35, 14), tileCenter(30, 15)],
 };
 
 export const tiles = grid;
@@ -651,10 +651,11 @@ export function isWalkable(x: number, z: number): boolean {
 
 export function canStep(fromX: number, fromZ: number, toX: number, toZ: number): boolean {
   if (!isWalkable(toX, toZ)) return false;
+  const dh = Math.abs(heightAt(toX, toZ) - heightAt(fromX, fromZ));
+  if (inGazeboWalk(fromX, fromZ) || inGazeboWalk(toX, toZ)) return dh <= 0.28;
   const from = tileAt(worldToTile(fromX, fromZ).i, worldToTile(fromX, fromZ).j);
   const to = tileAt(worldToTile(toX, toZ).i, worldToTile(toX, toZ).j);
   if (!from || !to) return false;
-  const dh = Math.abs(heightAt(toX, toZ) - heightAt(fromX, fromZ));
   if (from.kind === "ramp" || to.kind === "ramp") return dh <= LEVEL + 0.25;
   if (dh > 0.28) return false;
   if (from.h === to.h) return true;
