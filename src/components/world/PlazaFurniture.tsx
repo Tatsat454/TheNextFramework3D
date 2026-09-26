@@ -21,29 +21,29 @@ function onTap(e: ThreeEvent<MouseEvent>) {
 function Lantern({ x, z, night }: { x: number; z: number; night: boolean }) {
   return (
     <group position={[x, LEVEL, z]} onClick={onTap}>
-      <mesh position={[0, 0.055, 0]} material={toon(POST)} castShadow receiveShadow>
-        <boxGeometry args={[0.34, 0.11, 0.34]} />
+      <mesh position={[0, 0.06, 0]} material={toon(POST)} castShadow receiveShadow>
+        <boxGeometry args={[0.4, 0.12, 0.4]} />
       </mesh>
-      <mesh position={[0, 0.36, 0]} material={toon(POST)} castShadow receiveShadow>
-        <boxGeometry args={[0.22, 0.5, 0.22]} />
+      <mesh position={[0, 0.4, 0]} material={toon(POST)} castShadow receiveShadow>
+        <boxGeometry args={[0.26, 0.56, 0.26]} />
       </mesh>
-      <mesh position={[0, 0.78, 0]} material={toon(CAP)} castShadow>
-        <boxGeometry args={[0.3, 0.3, 0.3]} />
+      <mesh position={[0, 0.86, 0]} material={toon(CAP)} castShadow>
+        <boxGeometry args={[0.34, 0.34, 0.34]} />
       </mesh>
       <mesh
-        position={[0, 0.78, 0]}
-        material={toon(GLOW, { emissive: GLOW, emissiveIntensity: night ? 1.15 : 0.38, noOcclude: true })}
+        position={[0, 0.86, 0]}
+        material={toon(GLOW, { emissive: GLOW, emissiveIntensity: night ? 1.15 : 0.4, noOcclude: true })}
         castShadow={false}
       >
-        <boxGeometry args={[0.24, 0.24, 0.24]} />
+        <boxGeometry args={[0.28, 0.28, 0.28]} />
       </mesh>
-      <mesh position={[0, 0.94, 0]} material={toon(CAP)} castShadow>
-        <boxGeometry args={[0.38, 0.05, 0.38]} />
+      <mesh position={[0, 1.05, 0]} material={toon(CAP)} castShadow>
+        <boxGeometry args={[0.44, 0.06, 0.44]} />
       </mesh>
-      <mesh position={[0, 1.05, 0]} rotation={[0, Math.PI / 4, 0]} material={toon(CAP)} castShadow>
-        <coneGeometry args={[0.26, 0.18, 4]} />
+      <mesh position={[0, 1.18, 0]} rotation={[0, Math.PI / 4, 0]} material={toon(CAP)} castShadow>
+        <coneGeometry args={[0.3, 0.2, 4]} />
       </mesh>
-      <pointLight position={[0, 0.8, 0]} color={GLOW} intensity={night ? 0.5 : 0} distance={3.5} decay={2} />
+      <pointLight position={[0, 0.88, 0]} color={GLOW} intensity={night ? 0.5 : 0} distance={3.5} decay={2} />
     </group>
   );
 }
@@ -87,6 +87,9 @@ function Signpost() {
         <boxGeometry args={[0.62, 0.4, 0.08]} />
       </mesh>
       <mesh position={[0, 1.03, 0.1]} material={toon(palette.cream)} castShadow={false}>
+        <boxGeometry args={[0.5, 0.26, 0.02]} />
+      </mesh>
+      <mesh position={[0, 1.03, 0]} material={toon(palette.cream)} castShadow={false}>
         <boxGeometry args={[0.5, 0.26, 0.02]} />
       </mesh>
       <mesh position={[-0.1, 1.06, 0.12]} material={toon(palette.woodDeep)} castShadow={false}>

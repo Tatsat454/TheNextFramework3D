@@ -391,15 +391,15 @@ const ringPt = (a: number, r: number) => ({
 
 /** Stone lanterns sit on the four diagonals of the paving ring. NE is shifted east of the gazebo steps. */
 export const plazaLanterns = [
-  ringPt(Math.PI / 4, 3.48),
-  ringPt((3 * Math.PI) / 4, 3.48),
-  ringPt((5 * Math.PI) / 4, 3.5),
-  ringPt(-0.5, 3.58),
+  ringPt(Math.PI / 4, 3.5),
+  ringPt((3 * Math.PI) / 4, 3.5),
+  ringPt((5 * Math.PI) / 4, 3.52),
+  ringPt(-0.48, 3.6),
 ];
 
 /** Garden benches on the west and east of the ring, facing the fountain. */
-export const plazaBenches = [Math.PI, 0.08].map((a) => {
-  const p = ringPt(a, 4.06);
+export const plazaBenches = [Math.PI, 0.16].map((a) => {
+  const p = ringPt(a, a < 1 ? 3.68 : 4.06);
   return { ...p, facing: Math.atan2(fountain.x - p.x, fountain.z - p.z) };
 });
 
@@ -420,10 +420,10 @@ export const boardTile = (() => {
 })();
 
 export function nearPlazaProp(x: number, z: number, extra = 0) {
-  if (plazaLanterns.some((p) => Math.hypot(x - p.x, z - p.z) < 0.58 + extra)) return true;
-  if (plazaBenches.some((p) => Math.hypot(x - p.x, z - p.z) < 0.82 + extra)) return true;
-  if (Math.hypot(x - plazaSign.x, z - plazaSign.z) < 0.5 + extra) return true;
-  if (Math.hypot(x - boardTile.x, z - boardTile.z) < 0.72 + extra) return true;
+  if (plazaLanterns.some((p) => Math.hypot(x - p.x, z - p.z) < 1.05 + extra)) return true;
+  if (plazaBenches.some((p) => Math.hypot(x - p.x, z - p.z) < 1.0 + extra)) return true;
+  if (Math.hypot(x - plazaSign.x, z - plazaSign.z) < 0.55 + extra) return true;
+  if (Math.hypot(x - boardTile.x, z - boardTile.z) < 0.85 + extra) return true;
   return false;
 }
 
