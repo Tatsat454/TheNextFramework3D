@@ -393,10 +393,10 @@ const PETAL = "#FFB7D2";
 const WATER_R = 1.08;
 const WATER_Y = LEVEL + 0.39;
 const GROUND_Y = LEVEL + 0.045;
-const PER_TREE = 26;
+const PER_TREE = 32;
 
 function blob(r: number, x: number, y: number, z: number) {
-  return new THREE.IcosahedronGeometry(r, 0).translate(x, y, z);
+  return new THREE.IcosahedronGeometry(r, 1).translate(x, y, z);
 }
 
 function PlazaBlossoms() {
@@ -469,7 +469,7 @@ function seedPetal(p: Petal, k: number, rand: () => number) {
   p.spin = rand() * 6;
   p.sway = 1.2 + rand() * 1.1;
   p.wind = 0.08 + rand() * 0.18;
-  p.seek = k % 5 === 0 || rand() < 0.22;
+  p.seek = k % 3 === 0 || rand() < 0.28;
   p.waterA = rand() * Math.PI * 2;
   p.waterR = 0.28 + rand() * 0.72;
   p.waterSp = 0.08 + rand() * 0.1;
@@ -490,6 +490,16 @@ export function PlazaPetals() {
       const p = {} as Petal;
       seedPetal(p, k, rand);
       p.t = rand() * p.dur;
+      if (k % 5 === 0) {
+        p.mode = 2;
+        p.rest = rand() * 2.5;
+      } else if (k % 6 === 1) {
+        p.mode = 1;
+        p.rest = rand() * 0.8;
+        const tree = plazaBlossoms[p.tree]!;
+        p.rx = tree.x + p.ox * 1.2;
+        p.rz = tree.z + p.oz * 1.2;
+      }
       return p;
     });
   }, [count]);
@@ -571,8 +581,8 @@ export function PlazaPetals() {
 
   if (!count) return null;
   return (
-    <instancedMesh ref={ref} args={[undefined, undefined, count]} frustumCulled={false} material={toon(PETAL, { side: THREE.DoubleSide, noOcclude: true, transparent: true, opacity: 0.92 })}>
-      <circleGeometry args={[0.055, 5]} />
+    <instancedMesh ref={ref} args={[undefined, undefined, count]} frustumCulled={false} material={toon(PETAL, { side: THREE.DoubleSide, noOcclude: true, transparent: true, opacity: 0.95, emissive: "#FFD0E0" })}>
+      <circleGeometry args={[0.078, 5]} />
     </instancedMesh>
   );
 }
