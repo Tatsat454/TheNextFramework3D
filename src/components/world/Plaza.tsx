@@ -157,8 +157,8 @@ function layout() {
     const x = cx + Math.cos(a) * r;
     const z = cz + Math.sin(a) * r;
     if (plazaPathOpening(x, z, -0.12)) return;
-    const s = 0.95 + rand() * 0.28;
-    bushes.push({ x, y, z, sx: s, sy: 0.9 + rand() * 0.22, sz: s, ry: a + rand() });
+    const s = 1.22 + rand() * 0.32;
+    bushes.push({ x, y, z, sx: s, sy: 1.08 + rand() * 0.2, sz: s, ry: a + rand() });
     const nDot = 6 + Math.floor(rand() * 3);
     for (let d = 0; d < nDot; d++) {
       const da = a + (rand() - 0.5) * 1.5;
@@ -192,16 +192,16 @@ function layout() {
   });
 
   const rocks: Inst[] = [
-    { a: 0.82, r: 3.66 },
-    { a: -0.84, r: 3.7 },
-    { a: -2.38, r: 3.78 },
+    { a: 0.8, r: 3.62 },
+    { a: -0.82, r: 3.66 },
+    { a: 2.72, r: 3.92 },
   ].map((o, i) => ({
     x: cx + Math.cos(o.a) * o.r,
-    y: y + 0.14,
+    y: y + 0.18,
     z: cz + Math.sin(o.a) * o.r,
-    sx: 0.85 + i * 0.1,
-    sy: 0.62 + (i % 2) * 0.08,
-    sz: 0.74 + (i % 2) * 0.12,
+    sx: 1.22 + i * 0.12,
+    sy: 0.92 + (i % 2) * 0.1,
+    sz: 1.08 + (i % 2) * 0.14,
     ry: o.a * 0.55,
   }));
 
