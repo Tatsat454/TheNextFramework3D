@@ -350,7 +350,7 @@ function sandRing(radius: number, count: number, seed: number) {
     rocks.push({
       x: Math.sin(a) * (radius + jig),
       z: Math.cos(a) * (radius + jig),
-      s: 0.38 + ((i + seed) % 3) * 0.08,
+      s: 0.48 + ((i + seed) % 3) * 0.1,
       ry: a + i * 0.4,
       c: (i + seed) % 3,
     });
@@ -363,14 +363,14 @@ function Pedestal({ x, z, y, large, geo }: { x: number; z: number; y: number; la
   const ring = sandRing(padR * 0.92, large ? 9 : 7, Math.abs(Math.round(x * 10 + z * 3)));
   return (
     <group position={[x, y, z]}>
-      <mesh rotation={[-Math.PI / 2, Math.PI / 8, 0]} position={[0, 0.018, 0]} material={toon(C.sand, { noOcclude: true })} receiveShadow>
-        <circleGeometry args={[padR, 8]} />
+      <mesh rotation={[0, Math.PI / 8, 0]} position={[0, 0.03, 0]} material={toon(C.sand, { noOcclude: true })} receiveShadow>
+        <cylinderGeometry args={[padR, padR, 0.06, 8]} />
       </mesh>
       {ring.map((r, i) => (
         <mesh
           key={i}
           geometry={geo}
-          position={[r.x, 0.02, r.z]}
+          position={[r.x, 0.04, r.z]}
           scale={[r.s, r.s * 0.9, r.s]}
           rotation={[0, r.ry, 0]}
           material={toon(ROCK[r.c]!, { flatShading: true, noOcclude: true })}
@@ -378,12 +378,12 @@ function Pedestal({ x, z, y, large, geo }: { x: number; z: number; y: number; la
           receiveShadow
         />
       ))}
-      <Box p={[0, 0.2, 0]} s={[0.7, 0.4, 0.7]} c={C.navy} />
-      <Box p={[0, 0.42, 0]} s={[0.78, 0.08, 0.78]} c={C.navy} />
-      <Box p={[0, 0.47, 0]} s={[0.82, 0.03, 0.82]} c={C.gold} />
-      <Box p={[0, 0.52, 0]} s={[0.62, 0.07, 0.62]} c={C.velvet} />
-      <Box p={[0, 0.28, 0.37]} s={[0.22, 0.12, 0.04]} c={C.gold} />
-      <Box p={[0, 0.28, 0.39]} s={[0.16, 0.06, 0.02]} c="#C48A55" shadow={false} />
+      <Box p={[0, 0.22, 0]} s={[0.72, 0.44, 0.72]} c={C.navy} />
+      <Box p={[0, 0.46, 0]} s={[0.8, 0.08, 0.8]} c={C.navy} />
+      <Box p={[0, 0.505, 0]} s={[0.84, 0.022, 0.84]} c={C.gold} />
+      <Box p={[0, 0.55, 0]} s={[0.66, 0.08, 0.66]} c={C.velvet} />
+      <Box p={[0, 0.3, 0.38]} s={[0.22, 0.12, 0.04]} c={C.gold} />
+      <Box p={[0, 0.3, 0.4]} s={[0.16, 0.06, 0.02]} c="#C48A55" shadow={false} />
       <pointLight color="#FFE6C8" intensity={0.42} distance={2.4} position={[0, 1.15, 0.15]} />
     </group>
   );
