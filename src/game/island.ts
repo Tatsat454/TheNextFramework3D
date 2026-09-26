@@ -447,7 +447,7 @@ for (const [i, j, s] of [
   if (free(tileAt(i, j))) plant("blossom", i, j, s);
 }
 
-/** Three big cherry trees that frame the plaza (west, east, northwest). */
+/** Cherry trees that frame the plaza (west, east, northwest, northeast). */
 export const plazaBlossoms: { x: number; z: number; y: number; s: number; seed: number }[] = [];
 const plantPlazaBlossom = (i: number, j: number, s: number, seed: number) => {
   const t = tileAt(i, j);
@@ -460,6 +460,7 @@ const plantPlazaBlossom = (i: number, j: number, s: number, seed: number) => {
 plantPlazaBlossom(27, 32, 1.42, 0.21);
 plantPlazaBlossom(37, 32, 1.36, 0.74);
 plantPlazaBlossom(29, 24, 1.5, 0.43);
+plantPlazaBlossom(36, 24, 1.4, 0.58);
 
 // Lighthouse bluff (northeast): a tight pine stand on the high ground.
 for (const [i, j, s] of [
@@ -482,7 +483,6 @@ for (const t of grid) {
 
 for (const [i, j, s] of [
   [22, 24, 1],
-  [36, 24, 1],
   [40, 34, 0.95],
   [29, 16, 0.85],
   [36, 12, 0.9],
