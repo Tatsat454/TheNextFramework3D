@@ -95,15 +95,13 @@ export function museumStairSouth() {
   return MUSEUM.deckZ + MUSEUM.steps * MUSEUM.stepD;
 }
 
-/** Empty pedestals. Exhibit models land on these in a later step. +z is south (plaque faces the door). */
+/** Five empty pedestals matching the gallery layout. Exhibit models land on these later. +z is south (plaque faces the door). */
 export const MUSEUM_PEDESTALS = [
   { id: "exhibit1", n: 1, x: 0, z: -3.55, tier: "top" as const },
   { id: "exhibit2", n: 2, x: -3.42, z: -2.38, tier: "top" as const },
   { id: "exhibit3", n: 3, x: 3.42, z: -2.38, tier: "top" as const },
   { id: "exhibit4", n: 4, x: -3.22, z: 2.22, tier: "low" as const },
   { id: "exhibit5", n: 5, x: 3.22, z: 2.22, tier: "low" as const },
-  // Sixth project: open west terrace pad at the top of the side stairs, off the carpet.
-  { id: "exhibit6", n: 6, x: -5.55, z: -3.32, tier: "top" as const },
 ] as const;
 
 export function museumHeightAt(x: number, z: number) {
