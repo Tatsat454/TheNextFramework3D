@@ -109,6 +109,7 @@ function StairFlight({ x, halfW, rails }: { x: number; halfW: number; rails: boo
   });
   return (
     <group>
+      <Box p={[x, m.deckH - TH / 2, m.deckZ - 0.06]} s={[halfW * 2, TH, 0.28]} c={C.stone} />
       {treads.map((t) => (
         <Box key={t.i} p={[x, t.top - TH / 2, t.z]} s={[halfW * 2, TH, m.stepD + 0.04]} c={t.i % 2 ? C.stoneDeep : C.stone} />
       ))}
