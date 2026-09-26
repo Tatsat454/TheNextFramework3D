@@ -1,13 +1,16 @@
 "use client";
 
-import { useLayoutEffect } from "react";
+import { useLayoutEffect, useMemo } from "react";
 import { useThree } from "@react-three/fiber";
+import * as THREE from "three";
+import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { MUSEUM, MUSEUM_COLORS, museumStairSouth } from "@/game/interiors";
 import { toon } from "@/game/materials";
 import { ClearColor } from "./Interior";
 
 type V3 = [number, number, number];
 const C = MUSEUM_COLORS;
+const ROCK = [C.rockA, C.rockB, C.rockC] as const;
 
 function Box({ p, s, c, r, glow, shadow = true }: { p: V3; s: V3; c: string; r?: V3; glow?: boolean; shadow?: boolean }) {
   return (
@@ -77,59 +80,254 @@ function Walls() {
   );
 }
 
+function StairRail({ x }: { x: number }) {
+  const m = MUSEUM;
+  const z0 = m.deckZ + 0.05;
+  const z1 = museumStairSouth() - 0.02;
+  const run = z1 - z0;
+  const pitch = Math.atan2(m.deckH, run);
+  const len = Math.hypot(run, m.deckH) + 0.12;
+  const hand = 0.5;
+  const midZ = (z0 + z1) / 2;
+  const midY = m.deckH / 2 + hand;
+  return (
+    <group>
+      <Box p={[x, (m.deckH + 0.1) / 2, z0]} s={[0.1, m.deckH + 0.1, 0.1]} c={C.rail} />
+      <Box p={[x, (hand + 0.1) / 2, z1]} s={[0.1, hand + 0.1, 0.1]} c={C.rail} />
+      <Box p={[x, midY, midZ]} s={[0.08, 0.08, len]} c={C.rail} r={[pitch, 0, 0]} />
+    </group>
+  );
+}
+
 function StairFlight({ x, halfW, rails }: { x: number; halfW: number; rails: boolean }) {
   const m = MUSEUM;
-  const z1 = museumStairSouth();
-  const run = m.steps * m.stepD;
+  const TH = 0.11;
   const treads = Array.from({ length: m.steps }, (_, i) => {
-    const h = m.deckH - i * m.stepH;
+    const top = m.deckH - i * m.stepH;
     const z = m.deckZ + (i + 0.5) * m.stepD;
-    return { i, h, z };
+    return { i, top, z };
   });
-  const railX = [x - halfW - 0.07, x + halfW + 0.07];
-  const pitch = Math.atan2(m.deckH, run);
-  const railLen = Math.hypot(run, m.deckH) + 0.12;
-  const railZ = (m.deckZ + z1) / 2;
-  const railY = m.deckH / 2 + 0.42;
   return (
     <group>
       {treads.map((t) => (
-        <Box key={t.i} p={[x, t.h / 2, t.z]} s={[halfW * 2, t.h, m.stepD + 0.02]} c={t.i % 2 ? C.stone : C.stoneDeep} />
+        <Box key={t.i} p={[x, t.top - TH / 2, t.z]} s={[halfW * 2, TH, m.stepD + 0.06]} c={t.i % 2 ? C.stoneDeep : C.stone} />
       ))}
-      {rails &&
-        railX.map((rx) => (
-          <group key={rx}>
-            <Box p={[rx, railY, railZ]} s={[0.1, 0.1, railLen]} c={C.rail} r={[-pitch, 0, 0]} />
-            <Box p={[rx, m.deckH / 2 + 0.12, m.deckZ + 0.04]} s={[0.12, m.deckH + 0.24, 0.12]} c={C.rail} />
-            <Box p={[rx, 0.28, z1 - 0.06]} s={[0.12, 0.56, 0.12]} c={C.rail} />
+      {rails && (
+        <>
+          <StairRail x={x - halfW - 0.08} />
+          <StairRail x={x + halfW + 0.08} />
+        </>
+      )}
+    </group>
+  );
+}
+
+function blob(r: number, x: number, y: number, z: number, sx = 1, sy = 1, sz = 1) {
+  const g = new THREE.IcosahedronGeometry(r, 0);
+  g.scale(sx, sy, sz);
+  g.translate(x, y, z);
+  return g;
+}
+
+function useBoulderGeos() {
+  return useMemo(() => {
+    const big = mergeGeometries([
+      blob(0.44, 0, 0.3, 0, 1.18, 0.72, 1.02),
+      blob(0.3, 0.24, 0.24, 0.1, 1.05, 0.68, 0.92),
+      blob(0.28, -0.22, 0.22, -0.12, 1.12, 0.62, 0.95),
+      blob(0.22, 0.04, 0.46, -0.06, 0.95, 0.7, 0.9),
+    ])!;
+    const mid = mergeGeometries([
+      blob(0.36, 0, 0.24, 0, 1.08, 0.68, 1.05),
+      blob(0.22, 0.18, 0.18, -0.12, 1.15, 0.58, 0.88),
+      blob(0.2, -0.16, 0.16, 0.1, 1, 0.6, 0.95),
+    ])!;
+    const squat = mergeGeometries([
+      blob(0.4, 0, 0.22, 0, 1.35, 0.55, 1.1),
+      blob(0.24, 0.2, 0.16, 0.08, 1.1, 0.5, 0.9),
+      blob(0.2, -0.18, 0.14, -0.1, 1.05, 0.48, 0.95),
+    ])!;
+    const small = mergeGeometries([
+      blob(0.22, 0, 0.15, 0, 1.12, 0.62, 1),
+      blob(0.14, 0.12, 0.12, 0.06, 1.05, 0.55, 0.9),
+    ])!;
+    const face = mergeGeometries([
+      blob(0.38, 0, 0.42, 0, 1.25, 1.15, 0.52),
+      blob(0.28, 0.22, 0.62, 0.04, 1.05, 0.95, 0.48),
+      blob(0.26, -0.2, 0.28, 0.05, 1.15, 0.9, 0.5),
+      blob(0.2, 0.04, 0.88, -0.02, 0.95, 0.7, 0.45),
+    ])!;
+    return [big, mid, squat, small, face];
+  }, []);
+}
+
+type Spot = { p: V3; s: V3; ry: number; geo: number; c: number };
+
+function cliffSpots(x0: number, x1: number): Spot[] {
+  const m = MUSEUM;
+  const spots: Spot[] = [];
+  const w = x1 - x0;
+  const n = Math.max(2, Math.round(w / 0.5));
+  for (let i = 0; i < n; i++) {
+    const t = (i + 0.48) / n;
+    const x = x0 + t * w;
+    const jig = ((i * 5 + 3) % 7) * 0.045 - 0.14;
+    spots.push({
+      p: [x + jig * 0.4, 0, m.deckZ + 0.08],
+      s: [0.95 + (i % 3) * 0.08, 1.28 + (i % 2) * 0.12, 0.82],
+      ry: i * 0.73,
+      geo: 4,
+      c: i % 3,
+    });
+    spots.push({
+      p: [x - jig, 0.08, m.deckZ + 0.16],
+      s: [0.72 + (i % 2) * 0.1, 0.95, 0.7],
+      ry: i * 1.1 + 0.4,
+      geo: i % 3,
+      c: (i + 1) % 3,
+    });
+  }
+  return spots;
+}
+
+function terraceRocks(): Spot[] {
+  const y = MUSEUM.deckH;
+  const back: Spot[] = [
+    // NW corner mound
+    { p: [-6.85, y, -5.35], s: [1.45, 1.35, 1.35], ry: 0.4, geo: 0, c: 0 },
+    { p: [-6.15, y, -5.55], s: [1.15, 1.05, 1.1], ry: 1.8, geo: 2, c: 2 },
+    { p: [-7.25, y, -4.55], s: [1.05, 0.95, 1.0], ry: 2.4, geo: 1, c: 1 },
+    { p: [-6.45, y, -4.75], s: [0.85, 0.8, 0.85], ry: 0.9, geo: 1, c: 2 },
+    { p: [-7.35, y, -5.55], s: [0.7, 0.65, 0.7], ry: 3.1, geo: 3, c: 0 },
+    // North wall, west of center
+    { p: [-4.55, y, -5.52], s: [1.05, 0.95, 0.95], ry: 0.2, geo: 0, c: 1 },
+    { p: [-3.55, y, -5.58], s: [0.9, 0.85, 0.85], ry: 1.4, geo: 2, c: 0 },
+    { p: [-2.55, y, -5.48], s: [0.8, 0.75, 0.8], ry: 2.2, geo: 1, c: 2 },
+    // Behind the center exhibit pad
+    { p: [-0.85, y, -5.55], s: [1.0, 0.95, 0.9], ry: 0.6, geo: 0, c: 2 },
+    { p: [0.15, y, -5.62], s: [0.95, 1.05, 0.9], ry: 2.0, geo: 2, c: 0 },
+    { p: [0.95, y, -5.48], s: [0.85, 0.8, 0.85], ry: 1.1, geo: 1, c: 1 },
+    // North wall, east of center
+    { p: [2.55, y, -5.48], s: [0.8, 0.75, 0.8], ry: 0.5, geo: 1, c: 0 },
+    { p: [3.55, y, -5.58], s: [0.9, 0.85, 0.85], ry: 2.6, geo: 2, c: 2 },
+    { p: [4.55, y, -5.52], s: [1.05, 0.95, 0.95], ry: 1.7, geo: 0, c: 1 },
+    // NE corner mound
+    { p: [6.85, y, -5.35], s: [1.45, 1.35, 1.35], ry: 2.1, geo: 0, c: 2 },
+    { p: [6.15, y, -5.55], s: [1.15, 1.05, 1.1], ry: 0.3, geo: 2, c: 0 },
+    { p: [7.25, y, -4.55], s: [1.05, 0.95, 1.0], ry: 1.2, geo: 1, c: 1 },
+    { p: [6.45, y, -4.75], s: [0.85, 0.8, 0.85], ry: 2.8, geo: 1, c: 0 },
+    { p: [7.35, y, -5.55], s: [0.7, 0.65, 0.7], ry: 0.8, geo: 3, c: 2 },
+    // West terrace edge
+    { p: [-7.38, y, -3.35], s: [0.85, 0.8, 0.9], ry: 0.4, geo: 1, c: 0 },
+    { p: [-7.42, y, -2.15], s: [0.75, 0.7, 0.8], ry: 1.9, geo: 2, c: 2 },
+    { p: [-7.35, y, -1.05], s: [0.7, 0.65, 0.75], ry: 2.5, geo: 3, c: 1 },
+    { p: [-7.28, y, -0.62], s: [0.8, 0.7, 0.7], ry: 0.15, geo: 0, c: 0 },
+    // East terrace edge
+    { p: [7.38, y, -3.35], s: [0.85, 0.8, 0.9], ry: 2.8, geo: 1, c: 2 },
+    { p: [7.42, y, -2.15], s: [0.75, 0.7, 0.8], ry: 0.6, geo: 2, c: 0 },
+    { p: [7.35, y, -1.05], s: [0.7, 0.65, 0.75], ry: 1.4, geo: 3, c: 1 },
+    { p: [7.28, y, -0.62], s: [0.8, 0.7, 0.7], ry: 2.2, geo: 0, c: 2 },
+    // Rocky lip on the terrace, between stair landings
+    { p: [-3.55, y, -0.58], s: [0.7, 0.6, 0.65], ry: 0.8, geo: 2, c: 1 },
+    { p: [-2.55, y, -0.52], s: [0.62, 0.55, 0.6], ry: 1.6, geo: 3, c: 0 },
+    { p: [2.55, y, -0.52], s: [0.62, 0.55, 0.6], ry: 0.3, geo: 3, c: 2 },
+    { p: [3.55, y, -0.58], s: [0.7, 0.6, 0.65], ry: 2.1, geo: 2, c: 1 },
+    { p: [-7.05, y, -0.55], s: [0.65, 0.55, 0.6], ry: 1.1, geo: 3, c: 2 },
+    { p: [7.05, y, -0.55], s: [0.65, 0.55, 0.6], ry: 2.4, geo: 3, c: 0 },
+  ];
+  const m = MUSEUM;
+  const gaps = [
+    { x0: -m.halfW + 0.2, x1: -m.sideX - m.sideHalf - 0.06 },
+    { x0: -m.sideX + m.sideHalf + 0.06, x1: -m.centerHalf - 0.06 },
+    { x0: m.centerHalf + 0.06, x1: m.sideX - m.sideHalf - 0.06 },
+    { x0: m.sideX + m.sideHalf + 0.06, x1: m.halfW - 0.2 },
+  ];
+  return [...back, ...gaps.flatMap((g) => cliffSpots(g.x0, g.x1))];
+}
+
+function floorRocks(): Spot[] {
+  return [
+    // West wall, south of the west stairs — near the future fish pad
+    { p: [-7.15, 0, 2.45], s: [0.95, 0.9, 0.95], ry: 0.5, geo: 0, c: 1 },
+    { p: [-6.45, 0, 3.05], s: [0.8, 0.75, 0.8], ry: 1.8, geo: 1, c: 0 },
+    { p: [-6.95, 0, 1.85], s: [0.7, 0.65, 0.7], ry: 2.4, geo: 2, c: 2 },
+    { p: [-6.25, 0, 2.35], s: [0.55, 0.5, 0.55], ry: 0.9, geo: 3, c: 1 },
+    { p: [-4.82, 0, 2.95], s: [0.62, 0.55, 0.6], ry: 1.3, geo: 3, c: 0 },
+    { p: [-4.55, 0, 3.25], s: [0.48, 0.42, 0.48], ry: 2.7, geo: 3, c: 2 },
+    // Base of the cliff between west and center stairs
+    { p: [-3.15, 0, 0.48], s: [0.7, 0.6, 0.65], ry: 0.4, geo: 2, c: 0 },
+    { p: [-2.55, 0, 0.42], s: [0.52, 0.45, 0.5], ry: 1.7, geo: 3, c: 1 },
+    { p: [-6.55, 0, 0.62], s: [0.58, 0.5, 0.55], ry: 0.2, geo: 3, c: 2 },
+    // East wall, south of the east stairs — near the future crystal pad
+    { p: [7.15, 0, 2.45], s: [0.95, 0.9, 0.95], ry: 2.1, geo: 0, c: 0 },
+    { p: [6.45, 0, 3.05], s: [0.8, 0.75, 0.8], ry: 0.4, geo: 1, c: 2 },
+    { p: [6.95, 0, 1.85], s: [0.7, 0.65, 0.7], ry: 1.1, geo: 2, c: 1 },
+    { p: [6.25, 0, 2.35], s: [0.55, 0.5, 0.55], ry: 2.8, geo: 3, c: 0 },
+    { p: [4.82, 0, 2.95], s: [0.62, 0.55, 0.6], ry: 0.8, geo: 3, c: 2 },
+    { p: [4.55, 0, 3.25], s: [0.48, 0.42, 0.48], ry: 1.5, geo: 3, c: 1 },
+    // Base of the cliff between east and center stairs
+    { p: [3.15, 0, 0.48], s: [0.7, 0.6, 0.65], ry: 2.5, geo: 2, c: 2 },
+    { p: [2.55, 0, 0.42], s: [0.52, 0.45, 0.5], ry: 0.6, geo: 3, c: 0 },
+    { p: [6.55, 0, 0.62], s: [0.58, 0.5, 0.55], ry: 1.9, geo: 3, c: 1 },
+  ];
+}
+
+function DigSite({ geos }: { geos: THREE.BufferGeometry[] }) {
+  const spots = useMemo(() => [...terraceRocks(), ...floorRocks()], []);
+  return (
+    <group>
+      {spots.map((s, i) => (
+        <mesh
+          key={i}
+          geometry={geos[s.geo]}
+          position={s.p}
+          scale={s.s}
+          rotation={[0, s.ry, 0]}
+          material={toon(ROCK[s.c]!, { flatShading: true, noOcclude: true })}
+          castShadow
+          receiveShadow
+        />
+      ))}
+    </group>
+  );
+}
+
+function CliffFill() {
+  const m = MUSEUM;
+  const gaps = [
+    { x0: -m.halfW + 0.12, x1: -m.sideX - m.sideHalf },
+    { x0: -m.sideX + m.sideHalf, x1: -m.centerHalf },
+    { x0: m.centerHalf, x1: m.sideX - m.sideHalf },
+    { x0: m.sideX + m.sideHalf, x1: m.halfW - 0.12 },
+  ];
+  return (
+    <group>
+      {gaps.map((g) => {
+        const w = g.x1 - g.x0;
+        if (w < 0.1) return null;
+        const cx = (g.x0 + g.x1) / 2;
+        return (
+          <group key={`${g.x0}:${g.x1}`}>
+            <Box p={[cx, 0.34, m.deckZ + 0.1]} s={[w, 0.68, 0.42]} c={C.rockC} />
+            <Box p={[cx, 0.78, m.deckZ + 0.04]} s={[w * 0.97, 0.52, 0.36]} c={C.rockA} />
+            <Box p={[cx, 1.08, m.deckZ - 0.02]} s={[w * 0.92, 0.22, 0.3]} c={C.rockB} />
           </group>
-        ))}
+        );
+      })}
     </group>
   );
 }
 
 function Terrace() {
   const m = MUSEUM;
-  const depth = m.deckZ - -m.halfD;
-  const cz = (-m.halfD + m.deckZ) / 2;
-  const gaps = [
-    { x0: -m.sideX - m.sideHalf, x1: -m.sideX + m.sideHalf },
-    { x0: -m.centerHalf, x1: m.centerHalf },
-    { x0: m.sideX - m.sideHalf, x1: m.sideX + m.sideHalf },
-  ];
-  const face = (x0: number, x1: number) => {
-    const w = x1 - x0;
-    if (w < 0.08) return null;
-    return <Box key={`${x0}:${x1}`} p={[(x0 + x1) / 2, m.deckH / 2, m.deckZ]} s={[w, m.deckH, 0.16]} c={C.floorDeep} />;
-  };
-  const xs = [-m.halfW + 0.12, ...gaps.flatMap((g) => [g.x0, g.x1]), m.halfW - 0.12];
-  const faces = [];
-  for (let i = 0; i < xs.length; i += 2) faces.push(face(xs[i]!, xs[i + 1]!));
+  const front = m.deckZ - 0.14;
+  const depth = front - -m.halfD;
+  const cz = (-m.halfD + front) / 2;
   return (
     <group>
-      <Box p={[0, m.deckH / 2, cz]} s={[m.halfW * 2 - 0.22, m.deckH, depth]} c={C.floor} />
-      <Box p={[0, m.deckH + 0.015, cz]} s={[m.halfW * 2 - 0.28, 0.03, depth - 0.08]} c={C.floorDeep} shadow={false} />
-      {faces}
+      <Box p={[0, m.deckH / 2, cz]} s={[m.halfW * 2 - 0.22, m.deckH, depth]} c={C.rockA} />
+      <Box p={[0, m.deckH + 0.015, cz]} s={[m.halfW * 2 - 0.28, 0.03, depth - 0.06]} c={C.rockB} shadow={false} />
+      <CliffFill />
     </group>
   );
 }
@@ -172,6 +370,7 @@ function MuseumLights() {
 
 export function MuseumWorld() {
   const { scene } = useThree();
+  const geos = useBoulderGeos();
   useLayoutEffect(() => {
     const prev = scene.fog;
     scene.fog = null;
@@ -188,6 +387,7 @@ export function MuseumWorld() {
         <planeGeometry args={[m.halfW * 2, m.halfD * 2]} />
       </mesh>
       <Terrace />
+      <DigSite geos={geos} />
       <StairFlight x={0} halfW={m.centerHalf} rails={false} />
       <StairFlight x={-m.sideX} halfW={m.sideHalf} rails />
       <StairFlight x={m.sideX} halfW={m.sideHalf} rails />

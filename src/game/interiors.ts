@@ -61,8 +61,11 @@ export const MUSEUM_COLORS = {
   carpet: "#8B1E2B",
   gold: "#D4A13A",
   rail: "#D98A3A",
-  stone: "#D2C4B0",
-  stoneDeep: "#C4B49C",
+  stone: "#C6C0B4",
+  stoneDeep: "#AFA89C",
+  rockA: "#8C6A4F",
+  rockB: "#A07C5C",
+  rockC: "#6E5240",
 };
 
 /** 16×12 tile gallery. +z is south (door / camera). Raised north tier at deckH. */
@@ -72,9 +75,9 @@ export const MUSEUM = {
   deckH: 1.2,
   /** South face of the raised tier. z <= this is up. */
   deckZ: -0.32,
-  steps: 5,
-  stepH: 1.2 / 5,
-  stepD: 0.42,
+  steps: 8,
+  stepH: 1.2 / 8,
+  stepD: 0.22,
   centerHalf: 1.22,
   sideX: 5.1,
   sideHalf: 0.78,
@@ -200,6 +203,21 @@ export const interiors: Record<InteriorId, InteriorDef> = {
       { x0: -MUSEUM.sideX + MUSEUM.sideHalf - 0.02, z0: MUSEUM.deckZ - 0.08, x1: -MUSEUM.sideX + MUSEUM.sideHalf + 0.16, z1: museumStairSouth() + 0.08 },
       { x0: MUSEUM.sideX - MUSEUM.sideHalf - 0.16, z0: MUSEUM.deckZ - 0.08, x1: MUSEUM.sideX - MUSEUM.sideHalf + 0.02, z1: museumStairSouth() + 0.08 },
       { x0: MUSEUM.sideX + MUSEUM.sideHalf - 0.02, z0: MUSEUM.deckZ - 0.08, x1: MUSEUM.sideX + MUSEUM.sideHalf + 0.16, z1: museumStairSouth() + 0.08 },
+      // Terrace boulders — back wall and corners (leave exhibit pads and stair landings open)
+      { x0: -7.72, z0: -5.85, x1: -5.55, z1: -4.28 },
+      { x0: 5.55, z0: -5.85, x1: 7.72, z1: -4.28 },
+      { x0: -5.2, z0: -5.85, x1: -2.15, z1: -5.02 },
+      { x0: -1.35, z0: -5.85, x1: 1.35, z1: -5.08 },
+      { x0: 2.15, z0: -5.85, x1: 5.2, z1: -5.02 },
+      { x0: -7.72, z0: -4.35, x1: -7.12, z1: -0.55 },
+      { x0: 7.12, z0: -4.35, x1: 7.72, z1: -0.55 },
+      // Lower-floor clusters near future pedestals (keep carpet, stairs, and approaches clear)
+      { x0: -7.72, z0: 1.62, x1: -6.05, z1: 3.42 },
+      { x0: 6.05, z0: 1.62, x1: 7.72, z1: 3.42 },
+      { x0: -5.15, z0: 2.62, x1: -4.42, z1: 3.38 },
+      { x0: 4.42, z0: 2.62, x1: 5.15, z1: 3.38 },
+      { x0: -3.58, z0: 0.18, x1: -2.48, z1: 0.78 },
+      { x0: 2.48, z0: 0.18, x1: 3.58, z1: 0.78 },
     ],
   },
 };
