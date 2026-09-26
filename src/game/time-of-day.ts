@@ -57,3 +57,11 @@ export function presetFromSearch(search: string, hour = new Date().getHours()): 
   if (id === "morning" || id === "afternoon" || id === "golden") return presets[id];
   return presetForHour(hour);
 }
+
+/** Lantern point lights: URL `tod=night`, or the clock when no preset is forced. */
+export function isNightTime(search: string, hour = new Date().getHours()) {
+  const id = new URLSearchParams(search).get("tod");
+  if (id === "night") return true;
+  if (id === "morning" || id === "afternoon" || id === "golden") return false;
+  return hour >= 19 || hour < 6;
+}

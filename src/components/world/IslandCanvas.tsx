@@ -4,7 +4,7 @@ import { PerformanceMonitor } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
-import { presetFromSearch } from "@/game/time-of-day";
+import { isNightTime, presetFromSearch } from "@/game/time-of-day";
 import { useGame } from "@/game/store";
 import { Ambient } from "./Ambient";
 import { ArcadeWorld } from "./ArcadeInterior";
@@ -14,6 +14,7 @@ import { Landmarks } from "./Landmarks";
 import { Nature } from "./Nature";
 import { Gazebo } from "./Gazebo";
 import { Plaza, PlazaPetals } from "./Plaza";
+import { PlazaFurniture } from "./PlazaFurniture";
 import { Pickups } from "./Pickups";
 import { Player } from "./Player";
 import { Prompt } from "./Prompt";
@@ -115,6 +116,7 @@ export default function IslandCanvas({ onReady, onNoWebGL }: { onReady: () => vo
           <Terrain />
           <Nature />
           <Plaza />
+          <PlazaFurniture night={isNightTime(search, h)} />
           <Fountain />
           <Gazebo />
           <PlazaPetals />

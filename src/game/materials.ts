@@ -92,7 +92,7 @@ export function toonGradient() {
   return gradient;
 }
 
-type ToonOpts = { noOcclude?: boolean; flatShading?: boolean; sway?: boolean; water?: boolean; ripple?: boolean; transparent?: boolean; opacity?: number; emissive?: string; vertexColors?: boolean; side?: THREE.Side };
+type ToonOpts = { noOcclude?: boolean; flatShading?: boolean; sway?: boolean; water?: boolean; ripple?: boolean; transparent?: boolean; opacity?: number; emissive?: string; emissiveIntensity?: number; vertexColors?: boolean; side?: THREE.Side };
 
 const cache = new Map<string, THREE.MeshToonMaterial>();
 
@@ -107,7 +107,7 @@ export function toon(color: string, opts: ToonOpts = {}) {
     transparent: opts.transparent ?? false,
     opacity: opts.opacity ?? 1,
     emissive: opts.emissive ? new THREE.Color(opts.emissive) : new THREE.Color(0, 0, 0),
-    emissiveIntensity: opts.emissive ? (opts.water ? 0.45 : 0.9) : 0,
+    emissiveIntensity: opts.emissive ? (opts.emissiveIntensity ?? (opts.water ? 0.45 : 0.9)) : 0,
     vertexColors: opts.vertexColors ?? false,
     side: opts.side ?? THREE.FrontSide,
   });

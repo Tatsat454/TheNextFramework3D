@@ -321,9 +321,7 @@ export const landmarkPlacements: LandmarkPlacement[] = [
 export const getPlacement = (id: LandmarkId) => landmarkPlacements.find((l) => l.id === id)!;
 
 export const mailboxTile = { i: 18, j: 39 };
-export const boardTile = { i: 28, j: 29 };
 block(mailboxTile.i, mailboxTile.j, mailboxTile.i, mailboxTile.j);
-block(boardTile.i, boardTile.j, boardTile.i, boardTile.j);
 
 /** Plaza hub center — two-tier fountain, ~3 tiles across. */
 export const fountain = (() => {
@@ -385,6 +383,72 @@ export function nearGazebo(x: number, z: number, extra = 0) {
   return Math.hypot(x - gazebo.x, z - gazebo.z) < gazebo.steps[1].r + extra;
 }
 
+const ringPt = (a: number, r: number) => ({
+  x: fountain.x + Math.cos(a) * r,
+  z: fountain.z + Math.sin(a) * r,
+  a,
+});
+
+/** Stone lanterns sit on the four diagonals of the paving ring. NE is shifted east of the gazebo steps. */
+export const plazaLanterns = [
+  ringPt(Math.PI / 4, 3.48),
+  ringPt((3 * Math.PI) / 4, 3.48),
+  ringPt((5 * Math.PI) / 4, 3.5),
+  ringPt(-0.5, 3.58),
+];
+
+/** Garden benches on the west and east of the ring, facing the fountain. */
+export const plazaBenches = [Math.PI, 0.08].map((a) => {
+  const p = ringPt(a, 4.06);
+  return { ...p, facing: Math.atan2(fountain.x - p.x, fountain.z - p.z) };
+});
+
+/** Wooden signpost just west of the south path as it meets the plaza. */
+export const plazaSign = (() => {
+  const c = tileCenter(31, 35);
+  return { i: 31, j: 35, x: c.x, z: c.z, facing: 0.12 };
+})();
+
+/** Bulletin board flanking the gazebo steps, east of the walk. */
+export const boardTile = (() => {
+  const a = gazebo.facing + gazebo.stepHalf + 0.4;
+  const r = 2.08;
+  const x = gazebo.x + Math.sin(a) * r;
+  const z = gazebo.z + Math.cos(a) * r;
+  const { i, j } = worldToTile(x, z);
+  return { i, j, x, z, facing: Math.atan2(fountain.x - x, fountain.z - z) };
+})();
+
+export function nearPlazaProp(x: number, z: number, extra = 0) {
+  if (plazaLanterns.some((p) => Math.hypot(x - p.x, z - p.z) < 0.58 + extra)) return true;
+  if (plazaBenches.some((p) => Math.hypot(x - p.x, z - p.z) < 0.82 + extra)) return true;
+  if (Math.hypot(x - plazaSign.x, z - plazaSign.z) < 0.5 + extra) return true;
+  if (Math.hypot(x - boardTile.x, z - boardTile.z) < 0.72 + extra) return true;
+  return false;
+}
+
+export function plazaPropHit(x: number, z: number) {
+  if (plazaLanterns.some((p) => Math.hypot(x - p.x, z - p.z) < 0.28)) return true;
+  for (const b of plazaBenches) {
+    const dx = x - b.x;
+    const dz = z - b.z;
+    const c = Math.cos(-b.facing);
+    const s = Math.sin(-b.facing);
+    const lx = dx * c - dz * s;
+    const lz = dx * s + dz * c;
+    if (Math.abs(lx) < 0.52 && Math.abs(lz) < 0.28) return true;
+  }
+  if (Math.hypot(x - plazaSign.x, z - plazaSign.z) < 0.2) return true;
+  const bdx = x - boardTile.x;
+  const bdz = z - boardTile.z;
+  const bc = Math.cos(-boardTile.facing);
+  const bs = Math.sin(-boardTile.facing);
+  const blx = bdx * bc - bdz * bs;
+  const blz = bdx * bs + bdz * bc;
+  if (Math.abs(blx) < 0.52 && Math.abs(blz) < 0.18) return true;
+  return false;
+}
+
 export function gazeboColumnHit(x: number, z: number) {
   return gazebo.columns.some((c) => Math.hypot(x - c.x, z - c.z) < gazebo.columnRad + 0.05);
 }
@@ -443,6 +507,8 @@ export function inPlazaPathSkip(x: number, z: number) {
     const d = Math.hypot(c.x - fountain.x, c.z - fountain.z);
     if (d >= plazaRing.gardenInner && d <= plazaRing.gardenOuter && !plazaPathOpening(c.x, c.z, 0.06)) t.blocked = true;
   }
+  block(plazaSign.i, plazaSign.j, plazaSign.i, plazaSign.j);
+  block(boardTile.i, boardTile.j, boardTile.i, boardTile.j);
 }
 
 export const pedestals = museumExhibits.map((slug, k) => {
@@ -643,6 +709,7 @@ export function heightAt(x: number, z: number): number {
 
 export function isWalkable(x: number, z: number): boolean {
   if (gazeboColumnHit(x, z)) return false;
+  if (plazaPropHit(x, z)) return false;
   if (inGazeboWalk(x, z)) return true;
   const { i, j } = worldToTile(x, z);
   const t = tileAt(i, j);

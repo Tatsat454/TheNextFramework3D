@@ -3,7 +3,7 @@
 import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
-import { boardTile, getPlacement, LEVEL, mailboxTile, pedestals, tileCenter } from "@/game/island";
+import { getPlacement, LEVEL, mailboxTile, pedestals, tileCenter } from "@/game/island";
 import { palette, toon } from "@/game/materials";
 import { reducedMotion } from "@/game/player-state";
 import { useGame } from "@/game/store";
@@ -145,7 +145,6 @@ function FlowerBox({ p }: { p: V3 }) {
 
 function TownHall() {
   const pl = getPlacement("townhall");
-  const board = tileCenter(boardTile.i, boardTile.j);
   return (
     <group position={[pl.center.x, pl.level * LEVEL, pl.center.z]}>
       <Box p={[0, 0.1, 0.1]} s={[4.2, 0.2, 3.2]} c={palette.stone} />
@@ -172,15 +171,6 @@ function TownHall() {
       </mesh>
       <Box p={[0, 2.78, 2.47]} s={[0.03, 0.14, 0.02]} c={palette.ink} shadow={false} />
       <Flagpole p={[-2.25, 0, 2.55]} />
-      {/* Notice board */}
-      <group position={[board.x - pl.center.x, 0, board.z - pl.center.z]} rotation={[0, -0.2, 0]}>
-        <Cyl p={[-0.38, 0.5, 0]} r={0.05} h={1.0} c={palette.woodDeep} />
-        <Cyl p={[0.38, 0.5, 0]} r={0.05} h={1.0} c={palette.woodDeep} />
-        <Box p={[0, 0.85, 0.02]} s={[0.95, 0.62, 0.08]} c={palette.wood} />
-        <Box p={[-0.2, 0.9, 0.07]} s={[0.26, 0.3, 0.01]} c={palette.cream} shadow={false} />
-        <Box p={[0.16, 0.95, 0.07]} s={[0.22, 0.2, 0.01]} c={palette.sun} shadow={false} />
-        <Box p={[0.2, 0.7, 0.07]} s={[0.26, 0.16, 0.01]} c={palette.blossom} shadow={false} />
-      </group>
     </group>
   );
 }

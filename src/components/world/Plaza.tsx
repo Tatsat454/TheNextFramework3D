@@ -6,7 +6,7 @@ import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { input } from "@/game/input";
-import { fountain, gazebo, LEVEL, nearGazebo, plazaBlossoms, plazaPathOpening, plazaRing } from "@/game/island";
+import { fountain, gazebo, LEVEL, nearGazebo, nearPlazaProp, plazaBlossoms, plazaPathOpening, plazaRing } from "@/game/island";
 import { palette, toon } from "@/game/materials";
 import { reducedMotion } from "@/game/player-state";
 import { mulberry32 } from "@/game/rng";
@@ -23,6 +23,8 @@ const BUSH = "#4DB35E";
 const ROCK = "#B8B8C0";
 
 const tmp = new THREE.Object3D();
+
+const skipPlant = (x: number, z: number, extra = 0) => plazaPathOpening(x, z, extra) || nearGazebo(x, z, extra + 0.15) || nearPlazaProp(x, z, extra);
 
 type Inst = { x: number; y: number; z: number; sx: number; sy: number; sz: number; ry: number };
 
@@ -157,7 +159,7 @@ function layout() {
     const r = spec.r + (rand() - 0.5) * 0.08;
     const x = cx + Math.cos(a) * r;
     const z = cz + Math.sin(a) * r;
-    if (plazaPathOpening(x, z, -0.12) || nearGazebo(x, z, 0.2)) return;
+    if (skipPlant(x, z, -0.12)) return;
     const s = 1.22 + rand() * 0.32;
     bushes.push({ x, y, z, sx: s, sy: 1.08 + rand() * 0.2, sz: s, ry: a + rand() });
     const nDot = 6 + Math.floor(rand() * 3);
@@ -205,8 +207,8 @@ function layout() {
       sz: 1.08 + (i % 2) * 0.14,
       ry: o.a * 0.55,
     }))
-    .filter((r) => !nearGazebo(r.x, r.z, 0.2));
-  rocks.push({
+    .filter((r) => !nearGazebo(r.x, r.z, 0.2) && !nearPlazaProp(r.x, r.z, 0.15));
+  const gazeboRock = {
     x: gazebo.x + 1.95,
     y: y + 0.18,
     z: gazebo.z + 0.72,
@@ -214,14 +216,15 @@ function layout() {
     sy: 0.95,
     sz: 1.12,
     ry: 0.4,
-  });
+  };
+  if (!nearPlazaProp(gazeboRock.x, gazeboRock.z, 0.15)) rocks.push(gazeboRock);
 
   for (let k = 0; k < 20; k++) {
     const a = k * 0.41 + 0.2;
     const r = gardenInner + 0.22 + rand() * (gardenOuter - gardenInner - 0.5);
     const x = cx + Math.cos(a) * r;
     const z = cz + Math.sin(a) * r;
-    if (plazaPathOpening(x, z, 0.04) || nearGazebo(x, z, 0.15)) continue;
+    if (skipPlant(x, z, 0.04)) continue;
     lupines.push({
       x,
       y: y + 0.04,
@@ -238,7 +241,7 @@ function layout() {
     const r = gardenInner + 0.15 + rand() * (gardenOuter - gardenInner - 0.35);
     const x = cx + Math.cos(a) * r;
     const z = cz + Math.sin(a) * r;
-    if (plazaPathOpening(x, z, 0.08) || nearGazebo(x, z, 0.15)) continue;
+    if (skipPlant(x, z, 0.08)) continue;
     tufts.push({
       x,
       y: y + 0.04,
@@ -255,7 +258,7 @@ function layout() {
     const r = gardenInner + 0.22 + rand() * 0.72;
     const x = cx + Math.cos(a) * r;
     const z = cz + Math.sin(a) * r;
-    if (plazaPathOpening(x, z, 0.04) || nearGazebo(x, z, 0.15)) continue;
+    if (skipPlant(x, z, 0.04)) continue;
     const c = bushColors[k % bushColors.length]!;
     blooms[c]!.push({
       x,
