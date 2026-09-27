@@ -48,8 +48,8 @@ export function CameraRig() {
       return;
     }
     if (debugCam.lookoutSpot) {
-      camera.position.set(lookout.x + 1.85, LEVEL + 2.85, lookout.z + 3.55);
-      camera.lookAt(lookout.x + 0.35, LEVEL + 0.72, lookout.z - 0.35);
+      camera.position.set(lookout.x + 2.45, LEVEL + 3.05, lookout.z + 4.25);
+      camera.lookAt(lookout.x + 0.05, LEVEL + 0.78, lookout.z - 0.4);
       bend.uBend.value = 0.0016;
       bend.uBendCenter.value.set(lookout.x, LEVEL, lookout.z);
       bend.uPlayer.value.set(player.x, player.y + 0.55, player.z);
@@ -91,15 +91,15 @@ export function CameraRig() {
       return;
     }
     if (debugCam.lookout) {
-      camera.position.set(lighthouse.x + 3.8, LEVEL + 3.55, lighthouse.z + 8.2);
-      camera.lookAt(lighthouse.x, LEVEL + 1.85, lighthouse.z + 0.4);
+      camera.position.set(lighthouse.x + 4.6, lighthouse.y + 5.35, lighthouse.z + 10.6);
+      camera.lookAt(lighthouse.x, lighthouse.y + 4.15, lighthouse.z + 0.15);
       const persp = camera as THREE.PerspectiveCamera;
       if (persp.isPerspectiveCamera) {
         persp.fov = 34;
         persp.updateProjectionMatrix();
       }
       bend.uBend.value = 0.001;
-      bend.uBendCenter.value.set(lighthouse.x, LEVEL, lighthouse.z);
+      bend.uBendCenter.value.set(lighthouse.x, lighthouse.y, lighthouse.z);
       bend.uPlayer.value.set(player.x, player.y + 0.55, player.z);
       return;
     }
@@ -179,8 +179,8 @@ export function CameraRig() {
         else if (elapsed < 3400) u = 1;
         else u = 1 - (elapsed - 3400) / (LOOKOUT_MS - 3400);
         const e = u * u * (3 - 2 * u);
-        lookPos.set(lighthouse.x + 3.8, LEVEL + 3.55, lighthouse.z + 8.2);
-        lookAtPt.set(lighthouse.x, LEVEL + 1.85, lighthouse.z + 0.4);
+        lookPos.set(lighthouse.x + 4.6, lighthouse.y + 5.35, lighthouse.z + 10.6);
+        lookAtPt.set(lighthouse.x, lighthouse.y + 4.15, lighthouse.z + 0.15);
         camera.position.lerp(lookPos, e);
         tmp.set(
           focus.current.x + (lookAtPt.x - focus.current.x) * e,

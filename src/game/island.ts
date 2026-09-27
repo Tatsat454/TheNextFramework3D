@@ -438,23 +438,23 @@ export const boardTile = (() => {
   return { i, j, x, z, facing: Math.atan2(fountain.x - x, fountain.z - z) };
 })();
 
-/** Northeast bluff — a toy lighthouse the lookout telescope can find. */
+/** Northeast bluff — a tall toy lighthouse the lookout telescope can find. */
 export const lighthouse = (() => {
   const c = tileCenter(47, 13);
   const t = tileAt(47, 13);
   return { x: c.x + 0.1, z: c.z - 0.15, y: (t?.h ?? 2) * LEVEL };
 })();
 
-/** Rope-fence lookout on the cliff rim just east of the pergola, aimed at the lighthouse. */
+/** Rope-fence lookout on the east lawn beside the pergola, fence running toward the bluff. */
 export const lookout = (() => {
-  const x = gazebo.x + 1.28;
-  const z = gazebo.z - 1.95;
+  const x = gazebo.x + 1.95;
+  const z = gazebo.z + 0.05;
   const facing = Math.atan2(lighthouse.x - x, lighthouse.z - z);
   const posts = [
-    { x: gazebo.x + 0.85, z: gazebo.z - 2.35 },
-    { x: gazebo.x + 1.75, z: gazebo.z - 2.85 },
-    { x: gazebo.x + 2.7, z: gazebo.z - 3.35 },
-    { x: gazebo.x + 3.65, z: gazebo.z - 3.88 },
+    { x: gazebo.x + 1.72, z: gazebo.z - 1.05 },
+    { x: gazebo.x + 2.55, z: gazebo.z - 1.85 },
+    { x: gazebo.x + 3.4, z: gazebo.z - 2.65 },
+    { x: gazebo.x + 4.25, z: gazebo.z - 3.45 },
   ];
   return {
     x,
@@ -462,7 +462,7 @@ export const lookout = (() => {
     facing,
     posts,
     lamp: posts[0]!,
-    sign: { x: x - 0.52, z: z + 0.32, facing },
+    sign: { x: x - 0.62, z: z + 0.42, facing },
   };
 })();
 

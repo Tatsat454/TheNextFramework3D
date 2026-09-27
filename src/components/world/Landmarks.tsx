@@ -351,29 +351,29 @@ function Lighthouse() {
   const { x, z, y } = lighthouse;
   return (
     <group position={[x, y, z]}>
-      <mesh position={[0, 0.12, 0]} material={toon(palette.stone)} castShadow receiveShadow>
-        <cylinderGeometry args={[0.72, 0.8, 0.24, 10]} />
+      <mesh position={[0, 0.8, 0]} material={toon(palette.stone)} castShadow receiveShadow>
+        <cylinderGeometry args={[0.88, 1.02, 1.6, 10]} />
       </mesh>
-      <mesh position={[0, 1.15, 0]} material={toon(palette.cream)} castShadow>
-        <cylinderGeometry args={[0.38, 0.5, 2.1, 10]} />
+      <mesh position={[0, 3.15, 0]} material={toon(palette.cream)} castShadow>
+        <cylinderGeometry args={[0.32, 0.54, 4.2, 10]} />
       </mesh>
-      <mesh position={[0, 0.72, 0]} material={toon(palette.coral)} castShadow>
-        <cylinderGeometry args={[0.46, 0.5, 0.28, 10]} />
+      <mesh position={[0, 1.72, 0]} material={toon(palette.coral)} castShadow>
+        <cylinderGeometry args={[0.52, 0.58, 0.34, 10]} />
       </mesh>
-      <mesh position={[0, 1.55, 0]} material={toon(palette.coral)} castShadow>
-        <cylinderGeometry args={[0.4, 0.42, 0.26, 10]} />
+      <mesh position={[0, 3.35, 0]} material={toon(palette.coral)} castShadow>
+        <cylinderGeometry args={[0.42, 0.46, 0.3, 10]} />
       </mesh>
-      <mesh position={[0, 2.28, 0]} material={toon(palette.woodDeep)} castShadow>
-        <cylinderGeometry args={[0.46, 0.46, 0.1, 10]} />
+      <mesh position={[0, 5.3, 0]} material={toon(palette.woodDeep)} castShadow>
+        <cylinderGeometry args={[0.52, 0.52, 0.12, 10]} />
       </mesh>
-      <mesh position={[0, 2.52, 0]} material={toon(palette.sun, { emissive: palette.sun, emissiveIntensity: 0.55, noOcclude: true })}>
-        <cylinderGeometry args={[0.22, 0.22, 0.38, 8]} />
+      <mesh position={[0, 5.62, 0]} material={toon(palette.sun, { emissive: palette.sun, emissiveIntensity: 0.55, noOcclude: true })}>
+        <cylinderGeometry args={[0.26, 0.26, 0.52, 8]} />
       </mesh>
-      <mesh position={[0, 2.8, 0]} material={toon(palette.coral)} castShadow>
-        <coneGeometry args={[0.4, 0.42, 8]} />
+      <mesh position={[0, 6.04, 0]} material={toon(palette.coral)} castShadow>
+        <coneGeometry args={[0.5, 0.56, 8]} />
       </mesh>
-      <mesh position={[0, 3.08, 0]} material={toon(palette.sun)}>
-        <sphereGeometry args={[0.07, 8, 8]} />
+      <mesh position={[0, 6.38, 0]} material={toon(palette.sun)}>
+        <sphereGeometry args={[0.09, 8, 8]} />
       </mesh>
     </group>
   );
