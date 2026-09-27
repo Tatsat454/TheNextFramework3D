@@ -148,7 +148,8 @@ export function CameraRig() {
     }
     if (s.card || s.dialog) z = Math.min(z, 0.9);
     if (pose.gazeboFocus && !pose.sitting) z = Math.min(z, 0.78);
-    const looking = !!(s.lookoutAt || pose.lookoutAt);
+    const holdLookout = s.dialog?.speaker === "lookout";
+    const looking = holdLookout || !!(s.lookoutAt || pose.lookoutAt);
     if (!inside && !looking) {
       target.x = THREE.MathUtils.clamp(target.x, -18, 18);
       target.z = THREE.MathUtils.clamp(target.z, -20, 18);
@@ -172,21 +173,22 @@ export function CameraRig() {
     }
     if (inside) camera.lookAt(focus.current.x, focus.current.y + 0.15, focus.current.z);
     else camera.lookAt(focus.current.x, focus.current.y + (pose.sitting ? 0.38 : 0.6), focus.current.z - 1.6);
-    const lookTokenNow = s.lookoutAt || pose.lookoutAt;
+    const lookTokenNow = holdLookout ? -1 : s.lookoutAt || pose.lookoutAt;
     if (looking) {
       if (lookToken.current !== lookTokenNow) {
         lookToken.current = lookTokenNow;
-        lookStart.current = performance.now();
+        if (!lookStart.current) lookStart.current = performance.now();
       }
       const elapsed = performance.now() - lookStart.current;
-      if (elapsed >= LOOKOUT_MS) {
+      if (!holdLookout && elapsed >= LOOKOUT_MS) {
         lookStart.current = 0;
         lookToken.current = 0;
         pose.lookoutAt = 0;
         if (s.lookoutAt) useGame.setState({ lookoutAt: 0 });
       } else {
         let u = 1;
-        if (reducedMotion.value) u = elapsed < LOOKOUT_MS - 400 ? 1 : 0;
+        if (holdLookout) u = reducedMotion.value ? 1 : Math.min(1, elapsed / 1200);
+        else if (reducedMotion.value) u = elapsed < LOOKOUT_MS - 400 ? 1 : 0;
         else if (elapsed < 1200) u = elapsed / 1200;
         else if (elapsed < 3400) u = 1;
         else u = 1 - (elapsed - 3400) / (LOOKOUT_MS - 3400);
