@@ -23,10 +23,10 @@ function Box({ p, s, c, r, glow, shadow = true }: { p: V3; s: V3; c: string; r?:
 }
 
 const CABINETS = [
-  { x: -4.5, body: "#4A2458", marquee: "#6B2430", deck: "#5A2450", neonL: "#FF5ADF", neonR: "#C8373C", stick: "#FF5F83", title: "ASH" },
-  { x: -1.5, body: "#243A52", marquee: "#1F4A3A", deck: "#2A4058", neonL: "#3DDC82", neonR: "#5AE8FF", stick: "#54CFFF", title: "SPIRE" },
-  { x: 1.5, body: "#2A4A62", marquee: "#3A5A78", deck: "#34556E", neonL: "#A8E8F4", neonR: "#FFFFFF", stick: "#8FD3E8", title: "ICE" },
-  { x: 4.5, body: "#4A2E1C", marquee: "#6B3A20", deck: "#5A3820", neonL: "#FF8A4A", neonR: "#2EC4B6", stick: "#FFC857", title: "DUSK" },
+  { x: -4.5, body: "#4A2458", marquee: "#6B2430", deck: "#5A2450", neonL: "#FF5ADF", neonR: "#C8373C", stick: "#FF5F83", title: "GOW" },
+  { x: -1.5, body: "#243A52", marquee: "#1F4A3A", deck: "#2A4058", neonL: "#3DDC82", neonR: "#5AE8FF", stick: "#54CFFF", title: "VII" },
+  { x: 1.5, body: "#2A4A62", marquee: "#3A5A78", deck: "#34556E", neonL: "#A8E8F4", neonR: "#FFFFFF", stick: "#8FD3E8", title: "XY" },
+  { x: 4.5, body: "#4A2E1C", marquee: "#6B3A20", deck: "#5A3820", neonL: "#FF8A4A", neonR: "#2EC4B6", stick: "#FFC857", title: "HZD" },
 ] as const;
 
 const artCache = new Map<string, THREE.CanvasTexture>();
@@ -157,7 +157,12 @@ const GLYPH: Record<string, string[]> = {
   T: ["11111", "00100", "00100", "00100", "00100"],
   H: ["10001", "10001", "11111", "10001", "10001"],
   U: ["10001", "10001", "10001", "10001", "01110"],
-  K: ["10001", "10010", "11100", "10010", "10001"],
+  G: ["01110", "10000", "10111", "10001", "01110"],
+  W: ["10001", "10001", "10101", "10101", "01010"],
+  V: ["10001", "10001", "10001", "01010", "00100"],
+  X: ["10001", "01010", "00100", "01010", "10001"],
+  Y: ["10001", "01010", "00100", "00100", "00100"],
+  Z: ["11111", "00010", "00100", "01000", "11111"],
 };
 
 function NeonLine({ text, color, p, cells = 0.12 }: { text: string; color: string; p: V3; cells?: number }) {

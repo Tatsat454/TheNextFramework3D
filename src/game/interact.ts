@@ -421,8 +421,8 @@ function inspectProp(id: string) {
     useGame.setState({
       dialog: {
         speaker: arcadePal.id,
-        name: arcadePal.name,
-        role: arcadePal.role,
+        name: o.name,
+        role: title,
         tagColor: arcadePal.tagColor,
         voice: arcadePal.voice,
         lines: o.lines,

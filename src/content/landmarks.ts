@@ -458,25 +458,36 @@ export const stories: Story[] = [
     slug: "arcade",
     kind: "page",
     eyebrow: "Arcade Shack · Games",
-    title: "Game teardowns & what I'm playing",
-    summary: "How I take games apart, plus the games I've built myself.",
+    title: "Games that made me want to build",
+    summary: "Four cabinets. Four games that pulled me in, and what each one taught me about product.",
     sections: [
       {
-        heading: "Teardown: PLACEHOLDER game title",
-        placeholder: true,
+        heading: "God of War Ragnarök",
         body: [
-          "PLACEHOLDER: A short teardown covering the core loop, the economy, the retention hook, and the one thing you'd change as PM, with the metric you'd move.",
+          "I love God of War. The story is truly a story: it pulls you in, shows what fantasy really is at its best, and makes it fun just to be part of that world. The camera is what makes it special. The way it's placed and the way it moves, you're not just watching a movie. In combat, it feels like you are Kratos.",
+          "One design decision can change how people experience the whole product. The camera turns players from viewers into participants, and that's what I want to build toward: products where people feel like they're part of the experience, not just watching it.",
         ],
       },
       {
-        heading: "Teardown: PLACEHOLDER game title",
-        placeholder: true,
-        body: ["PLACEHOLDER: A second teardown, ideally a different genre (for example a cozy life-sim vs. a competitive live-service game)."],
+        heading: "Final Fantasy VII Remake Series",
+        body: [
+          "This series shows how much depth every character can have, not just the main cast but the side characters too. People who only had a few lines in the original, like Jessie, Biggs, and Wedge, now have their own stories and real reasons to care about them.",
+          "You can take an existing concept and give it a new direction. Keep what's already great, add a new layer to it, and fix what isn't working. It's the simplest and most iterative process there is.",
+        ],
       },
       {
-        heading: "Currently playing",
-        placeholder: true,
-        body: ["PLACEHOLDER: 2–3 games you're playing right now and one line on why each one hooks you."],
+        heading: "Pokémon X and Y",
+        body: [
+          "Pokémon follows a simple recipe: beat eight gyms, stop the evil team, catch the legendary, defeat the Elite Four, and become Champion. It was so cool and so immersive to be part of that. The 3DS as a product kept finding new ways to play, and the battles made you feel like reality didn't exist.",
+          "I learned how Pokémon kept finding new gameplay mechanics, and how a creative risk paired with the right concept can turn into a hugely successful product. X and Y proved it: Mega Evolution and fully 3D battles took a proven formula and made it feel new again.",
+        ],
+      },
+      {
+        heading: "Horizon Zero Dawn",
+        body: [
+          "I loved how Horizon brought its machines to life through AI. They're robots, but their behavior makes them move and act like real animals: grazing, keeping watch, reacting to danger as a herd. I still wonder how they pulled it off, because it looks so real.",
+          "Execution requires sweating the details most people will never consciously notice. Players don't think about behavior systems, they just feel that the world is alive. That feeling only happens when a team gets hundreds of small things right.",
+        ],
       },
       {
         heading: "Games I've built",
@@ -581,10 +592,10 @@ export const landmarks: Landmark[] = [
   {
     id: "arcade",
     name: "Arcade Shack",
-    section: "Game teardowns",
+    section: "Games that inspired me",
     eyebrow: "Arcade Shack · Games",
     title: "Insert coin",
-    blurb: "How I take games apart (loops, economies, retention), what I'm playing right now, and the games I've built myself.",
+    blurb: "Four games that made me want to build, and the games I've built myself.",
     cta: { label: "Play the teardowns", href: "/story/arcade" },
   },
   {
@@ -858,8 +869,7 @@ export const copy = {
 };
 
 /**
- * The Inspiration Arcade: pal lines, cabinet stories, and write-up links.
- * Anything starting with PLACEHOLDER is meant to be replaced.
+ * The Inspiration Arcade: pal lines and cabinet stories.
  */
 export const arcadePal = {
   id: "blink",
@@ -960,56 +970,46 @@ export const museumInteriorCopy = {
 
 export const arcadeInteriorCopy = {
   cabinet1: {
-    name: "God of War II",
+    name: "God of War Ragnarök",
     verb: "Play",
-    title: "God of War II",
+    title: "God of War Ragnarök",
     lines: [
-      "This cabinet is God of War II — one of the games that made Tatsat want to build games.",
-      "PLACEHOLDER: why God of War II inspired Tatsat.",
+      "I love God of War. The story is truly a story: it pulls you in, shows what fantasy really is at its best, and makes it fun just to be part of that world.",
+      "The camera is what makes it special. The way it's placed and the way it moves, you're not just watching a movie. In combat, it feels like you are Kratos.",
       "What I learned as a future PM:",
-      "PLACEHOLDER: the PM lesson from God of War II.",
+      "One design decision can change how people experience the whole product. The camera turns players from viewers into participants, and that's what I want to build toward: products where people feel like they're part of the experience, not just watching it.",
     ],
-    href: "PLACEHOLDER God of War II write-up URL",
-    hrefLabel: "Read the full write-up",
   },
   cabinet2: {
-    name: "Final Fantasy VII Remake series",
+    name: "Final Fantasy VII Remake",
     verb: "Play",
-    title: "Final Fantasy VII Remake series",
+    title: "Final Fantasy VII Remake Series",
     lines: [
-      "This cabinet is the Final Fantasy VII Remake series — another game that pulled Tatsat toward making games.",
-      "PLACEHOLDER: why the Final Fantasy VII Remake series inspired Tatsat.",
+      "This series shows how much depth every character can have, not just the main cast but the side characters too. People who only had a few lines in the original, like Jessie, Biggs, and Wedge, now have their own stories and real reasons to care about them.",
       "What I learned as a future PM:",
-      "PLACEHOLDER: the PM lesson from the Final Fantasy VII Remake series.",
+      "You can take an existing concept and give it a new direction. Keep what's already great, add a new layer to it, and fix what isn't working. It's the simplest and most iterative process there is.",
     ],
-    href: "PLACEHOLDER FF7 Remake write-up URL",
-    hrefLabel: "Read the full write-up",
   },
   cabinet3: {
-    name: "Final Fantasy XV",
+    name: "Pokémon X and Y",
     verb: "Play",
-    title: "Final Fantasy XV",
+    title: "Pokémon X and Y",
     lines: [
-      "This cabinet is Final Fantasy XV — a road-trip RPG that stuck with Tatsat.",
-      "PLACEHOLDER: why Final Fantasy XV inspired Tatsat.",
+      "Pokémon follows a simple recipe: beat eight gyms, stop the evil team, catch the legendary, defeat the Elite Four, and become Champion. It was so cool and so immersive to be part of that.",
+      "The 3DS as a product kept finding new ways to play, and the battles made you feel like reality didn't exist.",
       "What I learned as a future PM:",
-      "PLACEHOLDER: the PM lesson from Final Fantasy XV.",
+      "I learned how Pokémon kept finding new gameplay mechanics, and how a creative risk paired with the right concept can turn into a hugely successful product. X and Y proved it: Mega Evolution and fully 3D battles took a proven formula and made it feel new again.",
     ],
-    href: "PLACEHOLDER Final Fantasy XV write-up URL",
-    hrefLabel: "Read the full write-up",
   },
   cabinet4: {
-    name: "Horizon",
+    name: "Horizon Zero Dawn",
     verb: "Play",
-    title: "Horizon",
+    title: "Horizon Zero Dawn",
     lines: [
-      "This cabinet is Horizon — machines, wilds, and a world Tatsat still thinks about.",
-      "PLACEHOLDER: why Horizon inspired Tatsat.",
+      "I loved how Horizon brought its machines to life through AI. They're robots, but their behavior makes them move and act like real animals: grazing, keeping watch, reacting to danger as a herd. I still wonder how they pulled it off, because it looks so real.",
       "What I learned as a future PM:",
-      "PLACEHOLDER: the PM lesson from Horizon.",
+      "Execution requires sweating the details most people will never consciously notice. Players don't think about behavior systems, they just feel that the world is alive. That feeling only happens when a team gets hundreds of small things right.",
     ],
-    href: "PLACEHOLDER Horizon write-up URL",
-    hrefLabel: "Read the full write-up",
   },
 };
 

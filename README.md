@@ -42,7 +42,7 @@ A floating oval about 40×36 tiles across. You arrive on the southern beach — 
 | Town Hall | Work experience |
 | Museum (on the plateau) | Projects: five indoor exhibits; reading one to the end "donates" it (gold star) |
 | Market Stall | Econ thesis: virtual economies (prices drift while you watch) |
-| Arcade Shack | Game teardowns + games Tatsat built |
+| Arcade Shack | Games that inspired Tatsat, plus games he built |
 | Dock | Contact |
 
 Three original residents move in as you explore: **Bramble** (Greeter), **Drizzle** (Guide), and **Pip** (Fan). Inside the Museum, **Moss** curates the collection. Shells, fruit from shaken trees and hidden items go into your 10-slot Pockets, each with a note about Tatsat. Progress is saved in `localStorage`.
@@ -51,7 +51,7 @@ Three original residents move in as you explore: **Bramble** (Greeter), **Drizzl
 
 All copy lives in [`src/content/landmarks.ts`](src/content/landmarks.ts). Components only read from it.
 
-- Text starting with `PLACEHOLDER` (and `placeholder: true`) is filler to replace: the virtual-economies thesis, game teardowns, "currently playing", one shell fact, one fruit fact and the Fan's testimonial. These show a yellow **Placeholder** chip on the site.
+- Text starting with `PLACEHOLDER` (and `placeholder: true`) is filler to replace: the virtual-economies thesis, "currently playing", one shell fact, one fruit fact and the Fan's testimonial. These show a yellow **Placeholder** chip on the site.
 - Sections marked `draft: true` were written from the resume/portfolio but go a step further ("What I'd build", "How I'd measure it", "What I learned"). They show a lilac **Draft** chip until you review them and remove the flag.
 - The player's look (skin, hair, outfit, accessory) is `profile.look`.
 

@@ -109,7 +109,7 @@ export default function WorkPage() {
               ))}
             </ul>
             <Link href="/story/arcade" className="mt-4 inline-block text-[14px] font-bold text-indigo hover:underline">
-              Game teardowns →
+              Inspiration cabinets →
             </Link>
           </section>
 
