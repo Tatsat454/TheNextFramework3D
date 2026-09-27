@@ -34,7 +34,7 @@ Add `?hq` to the URL to force full quality (shadows, higher resolution) on machi
 
 ## The island
 
-A floating oval about 40×36 tiles across. You arrive on the southern beach, pass the House on its pond islet, and come into a central Plaza with a two-tier cream stone fountain. Arcade, Town Hall and Market sit in cozy districts around the plaza; the main path runs north up the stairs to the Museum plateau. Pines ring the outer shore. A lighthouse bluff rises in the northeast and a secret grove of blossoms hides in the northwest.
+A floating oval about 40×36 tiles across. You arrive on the southern beach — sandcastles, shells, a bucket and shovel, a striped ball, an umbrella on a towel — then pass the House on its pond islet and come into a central Plaza with a two-tier cream stone fountain. Arcade, Town Hall and Market sit in cozy districts around the plaza; the main path runs north up the stairs to the Museum plateau. Pines ring the outer shore. A lighthouse bluff rises in the northeast and a secret grove of blossoms hides in the northwest.
 
 | Landmark | Section |
 |---|---|

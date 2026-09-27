@@ -8,6 +8,7 @@ import { isNightTime, presetFromSearch } from "@/game/time-of-day";
 import { useGame } from "@/game/store";
 import { Ambient } from "./Ambient";
 import { ArcadeWorld } from "./ArcadeInterior";
+import { Beach } from "./Beach";
 import { Fountain } from "./Fountain";
 import { ClearColor, InteriorWorld } from "./Interior";
 import { Landmarks } from "./Landmarks";
@@ -117,6 +118,7 @@ export default function IslandCanvas({ onReady, onNoWebGL }: { onReady: () => vo
           <Sky preset={preset} />
           <Lights preset={preset} shadows={shadows} />
           <Terrain />
+          <Beach />
           <Nature />
           <Plaza />
           <PlazaFurniture night={isNightTime(search, h)} />

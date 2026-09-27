@@ -258,6 +258,28 @@ for (let jj = dock.j0; jj <= dock.j1; jj++)
     t.blocked = false;
   }
 
+/** Sandcastles on the south crescent. Path, dock, spawn and collectible shells stay clear. */
+export type BeachCastleKind = "keep" | "triple" | "tiny";
+export const beachCastles: { i: number; j: number; kind: BeachCastleKind; rot: number }[] = [
+  { i: 26, j: 43, kind: "keep", rot: 0.22 },
+  { i: 38, j: 43, kind: "triple", rot: -0.38 },
+  { i: 20, j: 43, kind: "tiny", rot: 0.64 },
+];
+for (const c of beachCastles) {
+  const t = tileAt(c.i, c.j);
+  if (t && t.kind === "sand") t.blocked = true;
+}
+
+/** Beach umbrella pole — a small circle so you can still walk around the towel. */
+export const beachUmbrella = (() => {
+  const c = tileCenter(39, 41);
+  return { x: c.x + 0.08, z: c.z - 0.06, facing: -0.52 };
+})();
+
+export function beachPropHit(x: number, z: number) {
+  return Math.hypot(x - beachUmbrella.x, z - beachUmbrella.z) < 0.16;
+}
+
 export type LandmarkPlacement = {
   id: LandmarkId;
   rect: [number, number, number, number];
@@ -708,6 +730,7 @@ export function isWalkable(x: number, z: number): boolean {
   if (fountainHit(x, z)) return false;
   if (gazeboColumnHit(x, z)) return false;
   if (plazaPropHit(x, z)) return false;
+  if (beachPropHit(x, z)) return false;
   if (inGazeboWalk(x, z)) return true;
   const { i, j } = worldToTile(x, z);
   const t = tileAt(i, j);

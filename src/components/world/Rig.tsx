@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import type { LandmarkId } from "@/content/landmarks";
 import { MUSEUM, MUSEUM_CURATOR, MUSEUM_PEDESTALS } from "@/game/interiors";
-import { fountain, gazebo, getPlacement, LEVEL } from "@/game/island";
+import { beachUmbrella, fountain, gazebo, getPlacement, LEVEL, spawn } from "@/game/island";
 import { bend } from "@/game/materials";
 import { debugCam, player, playerScreen, pose, reducedMotion } from "@/game/player-state";
 import { useGame } from "@/game/store";
@@ -63,6 +63,19 @@ export function CameraRig() {
       }
       bend.uBend.value = 0;
       bend.uBendCenter.value.set(x, 0, z);
+      bend.uPlayer.value.set(player.x, player.y + 0.55, player.z);
+      return;
+    }
+    if (debugCam.beach) {
+      camera.position.set(4.6, LEVEL + 4.85, 23.2);
+      camera.lookAt(0.2, LEVEL + 0.38, 15.1);
+      const persp = camera as THREE.PerspectiveCamera;
+      if (persp.isPerspectiveCamera) {
+        persp.fov = 34;
+        persp.updateProjectionMatrix();
+      }
+      bend.uBend.value = 0.0016;
+      bend.uBendCenter.value.set(spawn.x, LEVEL, beachUmbrella.z);
       bend.uPlayer.value.set(player.x, player.y + 0.55, player.z);
       return;
     }
