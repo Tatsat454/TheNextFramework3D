@@ -453,12 +453,15 @@ export const lookout = (() => {
   const z = c.z + 0.1;
   const y = (t?.h ?? 2) * LEVEL;
   const facing = Math.atan2(lighthouse.x - x, lighthouse.z - z);
-  const posts = [
-    { x: tileCenter(43, 15).x, z: tileCenter(43, 15).z + 0.1 },
-    { x: tileCenter(44, 14).x + 0.05, z: tileCenter(44, 14).z + 0.2 },
-    { x: tileCenter(45, 14).x + 0.15, z: tileCenter(45, 14).z + 0.05 },
-    { x: tileCenter(46, 14).x - 0.1, z: tileCenter(46, 14).z - 0.15 },
-  ];
+  const fx = Math.sin(facing);
+  const fz = Math.cos(facing);
+  const rx = Math.cos(facing);
+  const rz = -Math.sin(facing);
+  const front = 0.92;
+  const posts = [-1.45, -0.48, 0.48, 1.45].map((s) => ({
+    x: x + fx * front + rx * s,
+    z: z + fz * front + rz * s,
+  }));
   return {
     x,
     z,
@@ -466,7 +469,7 @@ export const lookout = (() => {
     facing,
     posts,
     lamp: posts[0]!,
-    sign: { x: x - 0.08, z: z + 0.58, facing: 0 },
+    sign: { x: x - rx * 0.55 - fx * 0.12, z: z - rz * 0.55 - fz * 0.12, facing: 0 },
   };
 })();
 
