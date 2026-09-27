@@ -45,15 +45,15 @@ export function CameraRig() {
       return;
     }
     if (debugCam.cliff) {
-      camera.position.set(gazebo.x + 3.15, LEVEL + 4.05, gazebo.z + 4.35);
-      camera.lookAt(gazebo.x - 0.2, LEVEL + 0.85, gazebo.z - 3.6);
+      camera.position.set(gazebo.x + 7.1, LEVEL + 4.6, gazebo.z + 2.4);
+      camera.lookAt(gazebo.x - 0.8, LEVEL + 0.42, gazebo.z - 3.4);
       const persp = camera as THREE.PerspectiveCamera;
       if (persp.isPerspectiveCamera) {
         persp.fov = 32;
         persp.updateProjectionMatrix();
       }
       bend.uBend.value = 0.0016;
-      bend.uBendCenter.value.set(gazebo.x, LEVEL, gazebo.z);
+      bend.uBendCenter.value.set(gazebo.x + 1.2, LEVEL, gazebo.z - 2.4);
       bend.uPlayer.value.set(player.x, player.y + 0.55, player.z);
       return;
     }

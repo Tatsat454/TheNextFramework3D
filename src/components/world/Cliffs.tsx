@@ -82,10 +82,10 @@ function buildCliffs() {
       for (let k = 0; k < nLayers; k++) {
         const u = (k + 0.45 + rand() * 0.12) / nLayers;
         const stripe = k === 1 || (outer && k === 3);
-        const out = 0.14 + u * (outer ? 0.78 : 0.4);
-        const sy = (topY - lowY) / nLayers * (0.7 + rand() * 0.22);
-        const along = 0.78 + rand() * 0.2;
-        const thick = 0.2 + rand() * 0.1;
+        const out = 0.08 + u * (outer ? 0.7 : 0.28);
+        const sy = (topY - lowY) / nLayers * (0.82 + rand() * 0.18);
+        const along = 0.86 + rand() * 0.16;
+        const thick = 0.28 + rand() * 0.12;
         const y = topY - u * (topY - lowY) * 0.94;
         const ox = x + face.dx * (0.5 + out);
         const oz = z + face.dz * (0.5 + out);
@@ -119,12 +119,12 @@ function buildCliffs() {
         });
       }
 
-      if (rand() < 0.38 && n?.kind !== "path") {
+      if (rand() < (outer ? 0.72 : 0.42) && n?.kind !== "path") {
         const count = 1 + (rand() < 0.35 ? 1 : 0);
         for (let r = 0; r < count; r++) {
           const out = 0.52 + rand() * 0.34;
           const side = (rand() - 0.5) * 0.42;
-          const s = 0.38 + rand() * 0.34;
+          const s = 0.52 + rand() * 0.38;
           rocks.push({
             x: x + face.dx * (0.52 + out) + (alongX ? 0 : side),
             y: lowY + s * 0.2,
@@ -168,6 +168,7 @@ function buildCliffs() {
 export function Cliffs() {
   const data = useMemo(buildCliffs, []);
   const faceRef = useRef<THREE.InstancedMesh>(null);
+  const stripeRef = useRef<THREE.InstancedMesh>(null);
   const rockRef = useRef<THREE.InstancedMesh>(null);
   const tuftRef = useRef<THREE.InstancedMesh>(null);
   const stemRef = useRef<THREE.InstancedMesh>(null);
@@ -194,7 +195,10 @@ export function Cliffs() {
     [],
   );
 
-  useInstances(faceRef, data.faces);
+  const faces = data.faces.filter((f) => f.c === palette.cliff);
+  const stripes = data.faces.filter((f) => f.c === palette.cliffStripe);
+  useInstances(faceRef, faces);
+  useInstances(stripeRef, stripes);
   useInstances(rockRef, data.rocks);
   useInstances(tuftRef, data.tufts);
   useInstances(stemRef, data.stems);
@@ -205,7 +209,14 @@ export function Cliffs() {
     <group>
       <instancedMesh
         ref={faceRef}
-        args={[box, toon("#FFFFFF", { noOcclude: true }), data.faces.length]}
+        args={[box, toon(palette.cliff, { noOcclude: true }), faces.length]}
+        castShadow
+        receiveShadow
+        onClick={onTap}
+      />
+      <instancedMesh
+        ref={stripeRef}
+        args={[box, toon(palette.cliffStripe, { noOcclude: true }), stripes.length]}
         castShadow
         receiveShadow
         onClick={onTap}
