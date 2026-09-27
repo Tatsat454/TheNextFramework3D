@@ -298,47 +298,6 @@ export const stories: Story[] = [
       { label: "Research", href: "https://shorturl.at/epbvJ" },
     ],
   },
-  {
-    slug: "pocket-console",
-    kind: "case-study",
-    eyebrow: "Exhibit · Product build",
-    title: "Pocket Console: 15 games for road trips",
-    summary:
-      "A mobile-friendly mini-game console for solo play, pass-and-play on one phone, private rooms for friends, or local Wi-Fi when there's no internet.",
-    meta: "Personal project · 2026",
-    tags: ["TypeScript", "Socket.IO", "Multiplayer"],
-    sections: [
-      {
-        heading: "Problem",
-        body: [
-          "Group games on phones usually assume everyone has the same app, an account and good internet. None of that is true in the back seat of a car.",
-        ],
-      },
-      {
-        heading: "Insight",
-        body: [
-          "Mode flexibility is the feature. Every one of the 15 games (Solitaire, Color Clash, Tic-Tac-Toe, Road-Trip Bingo, Would You Rather and more) plugs into one game-module interface, so it can run solo, same-device, in a private online room or over local Wi-Fi.",
-        ],
-        bullets: ["15 games", "4 play modes", "Offline-capable"],
-      },
-      {
-        heading: "What I'd build",
-        draft: true,
-        body: ["Next: a 'party playlist' that picks the next game based on group size and how long the last one ran, so nobody has to decide."],
-      },
-      {
-        heading: "How I'd measure it",
-        draft: true,
-        body: ["Time from open to first game, games per session, and the share of sessions that reach a second game."],
-      },
-      {
-        heading: "What I learned",
-        draft: true,
-        body: ["The hardest part of multiplayer isn't networking. It's making the lobby so simple nobody needs instructions."],
-      },
-    ],
-    links: [{ label: "View on GitHub", href: "https://github.com/Tatsat454/pocket-console" }],
-  },
 
   // ─── Landmark pages ───
   {
@@ -581,7 +540,6 @@ export const museumExhibits = [
   "startup-failure",
   "home-robot-vlm",
   "pokemon-red-agent",
-  "pocket-console",
 ] as const;
 
 /** The five indoor gallery pedestals. Donation stars and the Curator's counter use this list. */
