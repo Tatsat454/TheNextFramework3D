@@ -897,7 +897,7 @@ export const museumInteriorCopy = {
     lines: ["{gallery}"],
   },
   exhibit1: {
-    name: "Why taxi drivers drive where they drive",
+    name: "NYC taxis",
     verb: "Read",
     title: "Why taxi drivers drive where they drive",
     lines: [
@@ -909,7 +909,7 @@ export const museumInteriorCopy = {
     hrefLabel: "Read the story",
   },
   exhibit2: {
-    name: "Geographic Concentration of AI-Driven Electricity Demand",
+    name: "The grid",
     verb: "Read",
     title: "Geographic Concentration of AI-Driven Electricity Demand",
     lines: [
@@ -921,7 +921,7 @@ export const museumInteriorCopy = {
     hrefLabel: "Read the story",
   },
   exhibit3: {
-    name: "What Actually Separates Startups That Climb from Ones That Stall",
+    name: "Startups that climb",
     verb: "Read",
     title: "What Actually Separates Startups That Climb from Ones That Stall",
     lines: [
@@ -945,7 +945,7 @@ export const museumInteriorCopy = {
     hrefLabel: "Read the story",
   },
   exhibit5: {
-    name: "The Pokémon Reinforcement Problem",
+    name: "Pokémon RL",
     verb: "Read",
     title: "The Pokémon Reinforcement Problem",
     lines: [
