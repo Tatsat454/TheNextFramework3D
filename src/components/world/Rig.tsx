@@ -38,6 +38,7 @@ export function CameraRig() {
   const init = useRef(false);
   const lastInterior = useRef<string | null>(null);
   const lookStart = useRef(0);
+  const lookToken = useRef(0);
 
   useFrame((_, rawDt) => {
     if (debugCam.gazebo) {
@@ -171,11 +172,16 @@ export function CameraRig() {
     }
     if (inside) camera.lookAt(focus.current.x, focus.current.y + 0.15, focus.current.z);
     else camera.lookAt(focus.current.x, focus.current.y + (pose.sitting ? 0.38 : 0.6), focus.current.z - 1.6);
+    const lookTokenNow = s.lookoutAt || pose.lookoutAt;
     if (looking) {
-      if (!lookStart.current) lookStart.current = performance.now();
+      if (lookToken.current !== lookTokenNow) {
+        lookToken.current = lookTokenNow;
+        lookStart.current = performance.now();
+      }
       const elapsed = performance.now() - lookStart.current;
       if (elapsed >= LOOKOUT_MS) {
         lookStart.current = 0;
+        lookToken.current = 0;
         pose.lookoutAt = 0;
         if (s.lookoutAt) useGame.setState({ lookoutAt: 0 });
       } else {
@@ -201,6 +207,7 @@ export function CameraRig() {
       }
     } else {
       lookStart.current = 0;
+      lookToken.current = 0;
     }
     bend.uBend.value = inside ? 0 : 0.0016;
     bend.uBendCenter.value.copy(focus.current);
