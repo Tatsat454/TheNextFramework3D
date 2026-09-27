@@ -129,7 +129,7 @@ function Sandcastle({ kind, rot }: { kind: (typeof beachCastles)[number]["kind"]
 
 function Scallop({ color, s = 1 }: { color: string; s?: number }) {
   return (
-    <group scale={s * 1.85} rotation={[-0.85, 0, 0.15]}>
+    <group scale={s * 2.55} rotation={[-0.85, 0, 0.15]}>
       <mesh material={toon(color)} castShadow>
         <sphereGeometry args={[0.11, 10, 8, 0, Math.PI * 2, 0, Math.PI * 0.55]} />
       </mesh>
@@ -142,7 +142,7 @@ function Scallop({ color, s = 1 }: { color: string; s?: number }) {
 
 function SpiralShell({ color, s = 1 }: { color: string; s?: number }) {
   return (
-    <group scale={s * 1.85} rotation={[-0.5, 0.4, 0.2]}>
+    <group scale={s * 2.55} rotation={[-0.5, 0.4, 0.2]}>
       <mesh material={toon(color)} castShadow>
         <coneGeometry args={[0.1, 0.18, 8]} />
       </mesh>
@@ -155,7 +155,7 @@ function SpiralShell({ color, s = 1 }: { color: string; s?: number }) {
 
 function Clam({ color, s = 1 }: { color: string; s?: number }) {
   return (
-    <group scale={s * 1.85}>
+    <group scale={s * 2.55}>
       <mesh rotation={[-1.05, 0, 0]} material={toon(color)} castShadow>
         <sphereGeometry args={[0.1, 10, 8, 0, Math.PI * 2, 0, 1.2]} />
       </mesh>
@@ -168,7 +168,7 @@ function Clam({ color, s = 1 }: { color: string; s?: number }) {
 
 function Starfish({ color, s = 1 }: { color: string; s?: number }) {
   return (
-    <group scale={s * 1.9} rotation={[-Math.PI / 2, 0, 0.3]}>
+    <group scale={s * 2.35} rotation={[-Math.PI / 2, 0, 0.3]}>
       <mesh material={toon(color)} castShadow>
         <cylinderGeometry args={[0.07, 0.07, 0.045, 8]} />
       </mesh>
