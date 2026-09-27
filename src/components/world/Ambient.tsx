@@ -218,6 +218,119 @@ function CloudShadows() {
   );
 }
 
+function Seagulls() {
+  const birds = useMemo(
+    () =>
+      [
+        { cx: 2.4, cz: 20.5, r: 4.2, y: LEVEL + 3.6, speed: 0.22, seed: 0.4 },
+        { cx: -5.2, cz: 18.8, r: 3.4, y: LEVEL + 4.2, speed: 0.18, seed: 1.7 },
+        { cx: 8.1, cz: 21.4, r: 3.8, y: LEVEL + 3.9, speed: 0.2, seed: 2.9 },
+      ],
+    [],
+  );
+  const refs = useRef<(THREE.Group | null)[]>([]);
+  useFrame((st) => {
+    const t = reducedMotion.value ? 4 : st.clock.elapsedTime;
+    birds.forEach((b, k) => {
+      const g = refs.current[k];
+      if (!g) return;
+      const a = t * b.speed + b.seed;
+      g.position.set(b.cx + Math.cos(a) * b.r, b.y + Math.sin(t * 1.4 + b.seed) * 0.18, b.cz + Math.sin(a) * b.r * 0.55);
+      g.rotation.y = -a - Math.PI / 2;
+      const flap = reducedMotion.value ? 0.2 : Math.sin(t * 8 + b.seed) * 0.35;
+      const left = g.children[1] as THREE.Object3D | undefined;
+      const right = g.children[2] as THREE.Object3D | undefined;
+      if (left) left.rotation.z = flap;
+      if (right) right.rotation.z = -flap;
+    });
+  });
+  const white = toon("#F4F1E8", { noOcclude: true });
+  const ink = toon(palette.ink, { noOcclude: true });
+  return (
+    <group>
+      {birds.map((_, k) => (
+        <group key={k} ref={(g) => { refs.current[k] = g; }}>
+          <mesh material={white} scale={[1.15, 0.55, 0.45]}>
+            <sphereGeometry args={[0.14, 8, 6]} />
+          </mesh>
+          <mesh position={[0.08, 0.02, 0]} material={white}>
+            <boxGeometry args={[0.22, 0.02, 0.1]} />
+          </mesh>
+          <mesh position={[-0.08, 0.02, 0]} material={white}>
+            <boxGeometry args={[0.22, 0.02, 0.1]} />
+          </mesh>
+          <mesh position={[0, 0.02, 0.16]} rotation={[0.4, 0, 0]} material={toon(palette.sun, { noOcclude: true })}>
+            <coneGeometry args={[0.03, 0.08, 4]} />
+          </mesh>
+          <mesh position={[0.04, 0.06, 0.08]} material={ink}>
+            <sphereGeometry args={[0.015, 5, 4]} />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  );
+}
+
+function JumpingFish() {
+  const fish = useMemo(
+    () => [
+      { x: -6.4, z: 16.2, period: 7.2, delay: 0.4 },
+      { x: 6.8, z: 17.1, period: 8.5, delay: 3.1 },
+      { x: 1.2, z: 18.4, period: 9.4, delay: 5.6 },
+    ],
+    [],
+  );
+  const refs = useRef<(THREE.Group | null)[]>([]);
+  const splash = useRef<(THREE.Mesh | null)[]>([]);
+  useFrame((st) => {
+    const t = st.clock.elapsedTime;
+    fish.forEach((f, k) => {
+      const g = refs.current[k];
+      const s = splash.current[k];
+      if (!g) return;
+      const phase = ((t + f.delay) % f.period) / 0.9;
+      const jumping = !reducedMotion.value && phase >= 0 && phase < 1;
+      if (!jumping) {
+        g.visible = false;
+        if (s) s.scale.setScalar(0);
+        return;
+      }
+      g.visible = true;
+      const u = phase;
+      const y = WATER_Y + Math.sin(u * Math.PI) * 0.85;
+      const x = f.x + u * 0.55;
+      g.position.set(x, y, f.z);
+      g.rotation.z = (0.5 - u) * 1.8;
+      g.rotation.y = 0.4;
+      if (s) {
+        const splashU = u > 0.82 ? (u - 0.82) / 0.18 : u < 0.12 ? 1 - u / 0.12 : 0;
+        s.position.set(x, WATER_Y + 0.04, f.z);
+        s.scale.setScalar(splashU * 1.4);
+        (s.material as THREE.MeshBasicMaterial).opacity = splashU * 0.45;
+      }
+    });
+  });
+  return (
+    <group>
+      {fish.map((_, k) => (
+        <group key={k}>
+          <group ref={(g) => { refs.current[k] = g; }} visible={false}>
+            <mesh material={toon("#7AA7C4")} scale={[1.3, 0.55, 0.7]}>
+              <sphereGeometry args={[0.1, 8, 6]} />
+            </mesh>
+            <mesh position={[-0.12, 0.02, 0]} material={toon("#5E8AAA")} rotation={[0, 0, 0.6]}>
+              <coneGeometry args={[0.05, 0.1, 4]} />
+            </mesh>
+          </group>
+          <mesh ref={(m) => { splash.current[k] = m; }} rotation={[-Math.PI / 2, 0, 0]} material={flat("#FFFFFF", 0.3)}>
+            <ringGeometry args={[0.08, 0.22, 12]} />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  );
+}
+
 export function Ambient() {
   return (
     <group>
@@ -226,6 +339,8 @@ export function Ambient() {
       <Bees />
       <FishShadows />
       <CloudShadows />
+      <Seagulls />
+      <JumpingFish />
     </group>
   );
 }
