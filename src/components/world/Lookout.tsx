@@ -119,7 +119,7 @@ function Telescope() {
 
 function LookoutSign() {
   const tex = useMemo(signTexture, []);
-  const mat = useMemo(() => new THREE.MeshBasicMaterial({ map: tex, toneMapped: false }), [tex]);
+  const mat = useMemo(() => new THREE.MeshBasicMaterial({ map: tex, toneMapped: false, side: THREE.DoubleSide }), [tex]);
   const { x, z, facing } = lookout.sign;
   return (
     <group position={[x, lookout.y, z]} rotation={[0, facing, 0]} onClick={onTap}>

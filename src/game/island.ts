@@ -447,15 +447,15 @@ export const lighthouse = (() => {
 
 /** Rope-fence lookout on the west lawn beside the pergola, aimed at the lighthouse. */
 export const lookout = (() => {
-  const x = gazebo.x - 2.35;
-  const z = gazebo.z + 0.65;
+  const x = gazebo.x - 3.05;
+  const z = gazebo.z + 0.35;
   const y = LEVEL;
   const facing = Math.atan2(lighthouse.x - x, lighthouse.z - z);
   const posts = [
-    { x: gazebo.x - 2.85, z: gazebo.z - 0.25 },
-    { x: gazebo.x - 2.35, z: gazebo.z - 1.2 },
-    { x: gazebo.x - 1.7, z: gazebo.z - 2.15 },
-    { x: gazebo.x - 0.9, z: gazebo.z - 3.05 },
+    { x: gazebo.x - 3.45, z: gazebo.z - 0.45 },
+    { x: gazebo.x - 2.85, z: gazebo.z - 1.4 },
+    { x: gazebo.x - 2.15, z: gazebo.z - 2.35 },
+    { x: gazebo.x - 1.35, z: gazebo.z - 3.25 },
   ];
   return {
     x,
@@ -464,7 +464,7 @@ export const lookout = (() => {
     facing,
     posts,
     lamp: posts[0]!,
-    sign: { x: x + 0.18, z: z + 0.52, facing },
+    sign: { x: x + 0.22, z: z + 0.58, facing: 0 },
   };
 })();
 
