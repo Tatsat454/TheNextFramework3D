@@ -88,41 +88,56 @@ export default async function StoryPage({ params }: PageProps<"/story/[slug]">) 
                 </ul>
               )}
               {sec.table && (
-                <div className="mt-5 overflow-x-auto rounded-[24px] border border-white bg-white/70 shadow-[0_18px_40px_rgba(123,108,246,0.12)]">
-                  <table className="w-full min-w-[520px] border-collapse text-left text-[15px] leading-[1.5] text-ink">
-                    <caption className="sr-only">{sec.heading}</caption>
-                    <thead>
-                      <tr className="border-b border-ink/10">
-                        {sec.table.headers.map((h, i) => (
-                          <th
-                            key={`${h}-${i}`}
-                            scope="col"
-                            className="px-4 py-3 font-serif text-[17px] font-normal tracking-[-0.01em] text-ink first:w-[28%]"
-                          >
-                            {h || <span className="sr-only">Topic</span>}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {sec.table.rows.map((row) => (
-                        <tr key={row[0]} className="border-b border-ink/10 last:border-0">
-                          {row.map((cell, i) =>
-                            i === 0 ? (
-                              <th key={cell} scope="row" className="px-4 py-3 font-bold text-ink">
-                                {cell}
-                              </th>
-                            ) : (
-                              <td key={`${row[0]}-${i}`} className="px-4 py-3 text-ink-soft">
-                                {cell}
-                              </td>
-                            ),
-                          )}
+                <>
+                  <div className="mt-5 hidden overflow-x-auto rounded-[24px] border border-white bg-white/70 shadow-[0_18px_40px_rgba(123,108,246,0.12)] sm:block">
+                    <table className="w-full border-collapse text-left text-[15px] leading-[1.5] text-ink">
+                      <caption className="sr-only">{sec.heading}</caption>
+                      <thead>
+                        <tr className="border-b border-ink/10">
+                          {sec.table.headers.map((h, i) => (
+                            <th
+                              key={`${h}-${i}`}
+                              scope="col"
+                              className="px-4 py-3 font-serif text-[17px] font-normal tracking-[-0.01em] text-ink first:w-[28%]"
+                            >
+                              {h || <span className="sr-only">Topic</span>}
+                            </th>
+                          ))}
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                      </thead>
+                      <tbody>
+                        {sec.table.rows.map((row) => (
+                          <tr key={row[0]} className="border-b border-ink/10 last:border-0">
+                            {row.map((cell, i) =>
+                              i === 0 ? (
+                                <th key={cell} scope="row" className="px-4 py-3 font-bold text-ink">
+                                  {cell}
+                                </th>
+                              ) : (
+                                <td key={`${row[0]}-${i}`} className="px-4 py-3 text-ink-soft">
+                                  {cell}
+                                </td>
+                              ),
+                            )}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <ul className="mt-5 space-y-3 sm:hidden">
+                    {sec.table.rows.map((row) => (
+                      <li key={row[0]} className="rounded-[22px] border border-white bg-white/70 p-4 shadow-[0_12px_28px_rgba(123,108,246,0.1)]">
+                        <p className="font-serif text-[20px] leading-tight tracking-[-0.02em] text-ink">{row[0]}</p>
+                        {sec.table!.headers.slice(1).map((h, i) => (
+                          <p key={h} className="mt-2 text-[15px] leading-[1.5] text-ink">
+                            <span className="block text-[11px] font-bold uppercase tracking-[0.12em] text-indigo">{h}</span>
+                            {row[i + 1]}
+                          </p>
+                        ))}
+                      </li>
+                    ))}
+                  </ul>
+                </>
               )}
             </section>
           ))}
