@@ -44,19 +44,6 @@ export function CameraRig() {
       bend.uPlayer.value.set(player.x, player.y + 0.55, player.z);
       return;
     }
-    if (debugCam.cliff) {
-      camera.position.set(gazebo.x + 7.1, LEVEL + 4.6, gazebo.z + 2.4);
-      camera.lookAt(gazebo.x - 0.8, LEVEL + 0.42, gazebo.z - 3.4);
-      const persp = camera as THREE.PerspectiveCamera;
-      if (persp.isPerspectiveCamera) {
-        persp.fov = 32;
-        persp.updateProjectionMatrix();
-      }
-      bend.uBend.value = 0.0016;
-      bend.uBendCenter.value.set(gazebo.x + 1.2, LEVEL, gazebo.z - 2.4);
-      bend.uPlayer.value.set(player.x, player.y + 0.55, player.z);
-      return;
-    }
     if (debugCam.close) {
       camera.position.set(fountain.x + 2.15, LEVEL + 2.35, fountain.z + 3.45);
       camera.lookAt(fountain.x, LEVEL + 0.82, fountain.z);
@@ -186,7 +173,7 @@ export function Lights({ preset, shadows }: { preset: TimePreset; shadows: boole
   });
   return (
     <>
-      <fog attach="fog" args={[preset.fog, preset.id === "afternoon" ? 36 : 62, preset.id === "afternoon" ? 78 : 125]} />
+      <fog attach="fog" args={[preset.fog, 62, 125]} />
       <hemisphereLight args={[preset.hemiSky, preset.hemiGround, preset.hemiIntensity]} />
       <ambientLight intensity={0.34} />
       <directionalLight

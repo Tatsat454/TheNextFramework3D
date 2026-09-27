@@ -9,7 +9,6 @@ import { useGame } from "@/game/store";
 import { Ambient } from "./Ambient";
 import { ArcadeWorld } from "./ArcadeInterior";
 import { Beach } from "./Beach";
-import { Cliffs } from "./Cliffs";
 import { Fountain } from "./Fountain";
 import { ClearColor, InteriorWorld } from "./Interior";
 import { Landmarks } from "./Landmarks";
@@ -119,7 +118,6 @@ export default function IslandCanvas({ onReady, onNoWebGL }: { onReady: () => vo
           <Sky preset={preset} />
           <Lights preset={preset} shadows={shadows} />
           <Terrain />
-          <Cliffs />
           <Beach />
           <Nature />
           <Plaza />
