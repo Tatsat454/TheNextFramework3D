@@ -196,7 +196,7 @@ export function currentInteractables(): Interactable[] {
     verb: plazaCopy.lookout.verb,
     x: lookout.x,
     z: lookout.z,
-    y: LEVEL + 1.45,
+    y: lookout.y + 1.45,
     r: 1.15,
     ref: "lookout",
   });
@@ -328,14 +328,15 @@ function sitOnBench(i: number) {
 
 function peekLookout() {
   pose.sitting = false;
-  pose.lookoutAt = performance.now();
+  const at = performance.now();
+  pose.lookoutAt = at;
   player.facing = lookout.facing;
   sfx.open();
   useGame.setState({
+    lookoutAt: at,
     dialog: {
       speaker: "lookout",
       name: plazaCopy.lookout.name,
-      role: "Lookout",
       tagColor: "#4B3FB5",
       voice: [260, 380],
       lines: [plazaCopy.lookout.line],

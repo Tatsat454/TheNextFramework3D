@@ -61,6 +61,8 @@ type State = Persisted & {
   interior: InteriorId | null;
   transitioning: boolean;
   wipe: Wipe | null;
+  /** When set, the island camera leans toward the lighthouse. */
+  lookoutAt: number;
   set: (p: Partial<State>) => void;
 };
 
@@ -121,6 +123,7 @@ export const useGame = create<State>((set) => ({
   interior: null,
   transitioning: false,
   wipe: null,
+  lookoutAt: 0,
   set: (p) => set(p),
 }));
 
