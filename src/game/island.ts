@@ -627,6 +627,26 @@ for (const [i, j, s] of [
   if (free(tileAt(i, j))) plant("round", i, j, s);
 }
 
+// Beach fringe: clustered trees just inside the sand, with gaps so the ocean stays in view.
+const beachFringe = [
+  ["pine", 19, 38, 1.12],
+  ["pine", 21, 39, 0.86],
+  ["pine", 22, 37, 1.02],
+  ["round", 24, 38, 0.98],
+  ["pine", 26, 39, 0.9],
+  ["blossom", 17, 39, 0.92],
+  ["pine", 37, 38, 1.08],
+  ["pine", 39, 39, 0.84],
+  ["round", 41, 38, 1.02],
+  ["pine", 43, 39, 0.94],
+  ["pine", 44, 37, 1.16],
+  ["blossom", 36, 39, 0.88],
+] as const;
+for (const [kind, i, j, s] of beachFringe) {
+  if (i >= 30 && i <= 35) continue;
+  if (free(tileAt(i, j))) plant(kind, i, j, s);
+}
+
 export type PropSpot = { x: number; z: number; y: number; s: number; r: number; c: number };
 export const tufts: PropSpot[] = [];
 export const flowers: PropSpot[] = [];
