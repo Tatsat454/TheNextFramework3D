@@ -65,10 +65,9 @@ export type Story = {
 /** Case-study sections always follow this order. */
 export const caseStudyHeadings = [
   "Problem",
-  "Players",
   "Insight",
-  "What I'd build",
-  "How I'd measure it",
+  "What I built",
+  "How I measured it",
   "What I learned",
 ] as const;
 
@@ -88,12 +87,6 @@ export const stories: Story[] = [
         heading: "Problem",
         body: [
           "Every empty taxi is making a bet: wait here, drift toward Midtown, or call it a night. Aggregate trip data shows where drivers end up, but not why they chose it. Without the why, you can't predict how drivers respond when prices, demand or rules change.",
-        ],
-      },
-      {
-        heading: "Players",
-        body: [
-          "Drivers optimizing a whole shift, not a single fare. Riders whose wait times depend on where supply drifts. Platforms and regulators who set the prices and zones that shape those choices.",
         ],
       },
       {
@@ -132,49 +125,40 @@ export const stories: Story[] = [
     slug: "pjm-ai-electricity",
     kind: "case-study",
     eyebrow: "Exhibit · Energy markets",
-    title: "The AI data-center puzzle in the power grid",
+    title: "Geographic Concentration of AI-Driven Electricity Demand",
     summary:
-      "Why AI-driven electricity demand clusters in specific corners of the PJM Interconnection, and what that clustering does to grid load forecasts.",
+      "PJM forecasts Northern Virginia's electricity use will nearly triple by 2045 while nearby zones grow much more slowly. Standard macro can't explain why, so I extended it.",
     meta: "UC Riverside · Jan–Mar 2026 · Advised by Prof. Youngeun Choi",
-    tags: ["Energy markets", "Capacity pricing", "Macro"],
+    tags: ["Energy markets", "Solow", "R", "PJM"],
     sections: [
       {
         heading: "Problem",
         body: [
-          "AI load isn't spreading out the way population or industrial demand historically has. It clusters around cheap power and fiber routes, and that lumpiness is starting to distort how utilities and regulators plan for reliability.",
-        ],
-      },
-      {
-        heading: "Players",
-        body: [
-          "Data-center developers chasing cheap megawatts and fiber. Utilities and PJM planners forecasting load. Generators and transmission builders reading price signals to decide what to invest in. Households who pay for the capacity.",
+          "Standard macro intuition says demand for a major input like electricity should grow gradually and fairly evenly across a mature economy. PJM's 2025 Long-Term Load Forecast says otherwise. The Dominion zone (Northern Virginia) is forecast to grow 5.25% a year from 2025 to 2045, going from 131,194 to 364,977 GWh, versus 3.78% for AEP and 4.14% for PL. DOM starts out smaller than AEP and ends up nearly 70,000 GWh ahead.",
         ],
       },
       {
         heading: "Insight",
         body: [
-          "I traced how PJM's energy and capacity markets turn supply-demand dynamics, transmission constraints and market structure into the price signals behind real generation and transmission investment. The puzzle is macroeconomic: a new, geographically lumpy source of demand is growing faster than the forecasting models were built to handle.",
+          "The Solow model explains why demand rises: AI is a productivity shock, capital builds up during the transition to a new steady state, and data-center capital can't run without continuous electricity. That means the grid sees the shock before GDP does. But Solow assumes technology applies evenly everywhere, so it can't explain why the growth piles up in one zone.",
         ],
       },
       {
-        heading: "What I'd build",
-        draft: true,
+        heading: "What I built",
         body: [
-          "A siting dashboard for planners: overlay announced data-center projects, transmission headroom and capacity prices, and flag zones where forecast error is likely to spike before it shows up in the auction.",
+          "An extension to the regional production function with a location-specific infrastructure and agglomeration multiplier, θᵢ. Northern Virginia's decades of grid capacity, fiber, and permitting experience make each unit of capital more productive there, and that advantage compounds. I backed it with FRED construction employment data (Virginia vs. Pennsylvania and Ohio, diverging from 2021) and industry investment figures. The analysis was done in R.",
         ],
       },
       {
-        heading: "How I'd measure it",
-        draft: true,
+        heading: "How I measured it",
         body: [
-          "Forecast error (MAPE) by zone before and after adding clustering signals, how far ahead of the auction a constraint gets flagged, and planner adoption: weekly active users among the target team.",
+          "20-year CAGRs from PJM's Table E-1, checked against the reported growth rates, compared across three zones, and cross-checked against state-level construction employment indexed to 2015.",
         ],
       },
       {
         heading: "What I learned",
-        draft: true,
         body: [
-          "Price signals are a product surface too. When a market's signals lag reality, the most valuable thing you can do is shorten that lag for the people making the bets.",
+          "DOM isn't growing faster because it's more technologically sophisticated. It's growing faster because it built the infrastructure first. Modern shocks need models with spatial frictions, or they'll keep underestimating how concentrated the adjustment gets.",
         ],
       },
     ],
@@ -184,146 +168,134 @@ export const stories: Story[] = [
     slug: "startup-failure",
     kind: "case-study",
     eyebrow: "Exhibit · Venture economics",
-    title: "What actually kills startups",
-    summary:
-      "Pulling apart aggregated post-mortem data to separate the startups that find traction from the ones that don't, then turning it into a framework founders can use.",
-    meta: "UC Riverside · Sep–Dec 2025 · Econ 106 final project",
-    tags: ["Market research", "GTM", "Capital efficiency"],
+    title: "What Actually Separates Startups That Climb from Ones That Stall",
+    summary: "Hold the idea constant. Then what decides whether a startup gets acquired or shuts down? I tested the folklore on 923 startups.",
+    meta: "UC Riverside · Econ 106 final project",
+    tags: ["Crunchbase", "R", "ggplot", "Venture"],
     sections: [
       {
         heading: "Problem",
         body: [
-          "Startup folklore says founders fail from bad luck or bad timing. The aggregated evidence says something more useful, and more avoidable.",
+          "Post-mortems say startups mostly die from things other than the idea itself: no market need, running out of cash, the wrong team. Most startup advice about \"winning factors\" is intuitive but has no data behind it.",
         ],
-      },
-      {
-        heading: "Players",
-        body: ["First-time founders deciding whether to quit a day job, and the early check-writers deciding whether to back them."],
       },
       {
         heading: "Insight",
         body: [
-          "The single largest cause of failure, by a wide margin, is no real market need, followed closely by running out of cash before finding one. Across survivors, three variables show up again and again: scalability, customer acquisition and operational efficiency.",
+          "Some of the folklore held up and some didn't. More funding rounds and more milestones went with more capital raised, and Top 500 startups raised dramatically more. But VC backing didn't mean better outcomes. Non-VC startups were acquired 414 times vs. 208 closures (about 67% acquired), while VC-backed startups were 183 vs. 118 (about 61%). Likely reasons: survivorship bias, early strategic acquisitions of leaner startups, and VC pressure to swing bigger.",
         ],
       },
       {
-        heading: "What I'd build",
-        draft: true,
+        heading: "What I built",
         body: [
-          "A 20-minute 'pressure test' tool: a founder answers structured questions about need, channel and burn, and gets a scorecard with the one riskiest assumption to test first.",
+          "A cleaned Crunchbase dataset (923 startups, 35 industries lumped into 5) and a set of R/ggplot visualizations: VC status vs. outcome, funding by status, rounds × funding × milestones, and Top 500 funding distributions by industry.",
         ],
       },
       {
-        heading: "How I'd measure it",
-        draft: true,
+        heading: "How I measured it",
         body: [
-          "Completion rate, share of founders who run the suggested test within two weeks, and a six-month follow-up comparing pivot or kill decisions against the scorecard.",
+          "Acquisition vs. closure (597 acquired, 326 closed), total funding on a log scale, funding rounds, milestones, relationships, and Top 500 status, broken out by industry.",
         ],
       },
       {
         heading: "What I learned",
         body: [
-          "Having run my own brand, the data matched the scar tissue: find the need before you scale the thing.",
+          "Once the idea is held constant, success belongs to the startups that show progress, pile up milestones, and get investor or public attention early. A lot of what the startup world assumes is shaped more by narrative than by data.",
         ],
-        draft: true,
       },
     ],
     links: [
-      { label: "Read the full paper", href: "https://docs.google.com/document/d/1p5DEkt8RaFbv2ApwcXwB4Nx1NX4POlWb5OOID0KcHL4/edit?tab=t.0" },
+      { label: "Read the full paper", href: "https://docs.google.com/document/d/1p5DEkt8RaFbv2ApwcXwB4Nx1NX4POlWb5OOID0KcHL4/edit" },
     ],
   },
   {
     slug: "home-robot-vlm",
     kind: "case-study",
     eyebrow: "Exhibit · In progress",
-    title: "A home robot for my grandparents",
+    title: "A Robot for Home",
     summary:
-      "A 3D-printed, carbon-fiber home-assistance robot with a Vision-Language Model brain that picks up clothes, recharges itself and, eventually, cleans. Built at Georgia Tech's makerspace.",
+      "I'm building a robot in Georgia Tech's makerspace that picks clothes up off the floor, goes back to charge on its own, and eventually does basic cleaning around the house.",
     meta: "Georgia Tech makerspace · Ongoing",
     tags: ["VLM", "3D printing", "Carbon fiber", "Open source"],
     sections: [
       {
         heading: "Problem",
         body: [
-          "My parents and grandparents have a genuinely hard time bending down for small, repetitive tasks, like picking clothes up off the floor. Most home robots are demos, not help.",
+          "My parents and grandparents have a hard time bending down to do small, repetitive tasks. I wanted to build something that actually helps, not another demo.",
         ],
-      },
-      {
-        heading: "Players",
-        body: ["Older adults and their families, makers with access to a 3D printer, and the open-source robotics community."],
       },
       {
         heading: "Insight",
         body: [
-          "The body is the easy part. I 3D-printed the parts and I'm learning to go from printed molds to resin-and-carbon-fiber pieces so the chassis ends up light and strong. The hard problem is the brain: a Vision-Language Model trained to recognize clothes on the floor, know when to head back and recharge, and grow into basic cleaning.",
+          "The hard part is the brain, not the body. Printing parts is doable. Connecting the electrical and mechanical pieces is the real problem. The brain is the kind of sequential decision I've already modeled — taxi drivers, a Pokémon agent.",
         ],
       },
       {
-        heading: "What I'd build",
+        heading: "What I'm building",
         body: [
-          "Once it works, I'll open-source the whole thing: models, print files and a build guide, so anyone with a 3D printer nearby can build their own.",
+          "I 3D-printed the robot's parts first. Now I'm learning to go from a 3D-printed mold to real carbon fiber using resin, so the chassis ends up light and strong instead of just plastic. For the brain, I'm using my ML background from econ coursework to build a Vision-Language Model (VLM).",
         ],
       },
       {
-        heading: "How I'd measure it",
-        draft: true,
+        heading: "How I'll measure it",
         body: [
-          "Task success rate per pickup attempt, autonomous hours between manual recharges, and, once open-sourced, the number of community builds and forks.",
+          "Three jobs, in order: pick clothes up off the floor, head back and recharge without help, then handle basic cleaning. It works when my family stops having to do those tasks themselves.",
         ],
       },
       {
-        heading: "What I learned",
-        draft: true,
-        body: ["Start from the person, not the tech. The spec got a lot simpler once the question was 'what does grandma actually struggle with?'"],
+        heading: "What I've learned so far",
+        body: [
+          "Georgia Tech's makerspace means I get to actually build the robot instead of just modeling it on paper. The build forced me to learn a whole new skill — going from printed molds to carbon fiber — before the ML part even starts.",
+        ],
       },
     ],
+    links: [{ label: "See the build", href: "https://tatsatupadhyay.netlify.app/" }],
   },
   {
     slug: "pokemon-red-agent",
     kind: "case-study",
     eyebrow: "Exhibit · Reinforcement learning",
-    title: "Teaching an agent to play a classic monster-catching RPG",
+    title: "The Pokémon Reinforcement Problem",
     summary:
-      "A PPO reinforcement-learning agent that learns to explore a 1996 handheld RPG from pixels, with reward shaping, exploration heatmaps and published checkpoints.",
+      "I spent 15 million training steps teaching an AI to play Pokémon Red. It became a brilliant explorer, a shameless cheater, and once, a total catatonic. It never won a single badge.",
     meta: "Personal project · 2026",
-    tags: ["Python", "PPO", "Stable-Baselines3", "Emulation"],
+    tags: ["Python", "PyBoy", "Gymnasium", "PPO"],
     sections: [
       {
         heading: "Problem",
         body: [
-          "Open-world games are a brutal RL environment: rewards are sparse, the map is huge, and an agent that only chases short-term reward walks in circles forever.",
+          "Pokémon Red is brutal for reinforcement learning. There's no score and no feedback, and the first badge sits behind thousands of coordinated decisions. The agent has to behave coherently for most of an hour before the game even acknowledges it exists.",
         ],
-      },
-      {
-        heading: "Players",
-        body: ["The agent, the reward function I design for it, and anyone curious about how game design choices shape learned behavior (for AI and for people)."],
       },
       {
         heading: "Insight",
         body: [
-          "Using an emulator plus Stable-Baselines3 (PPO), I ran an independent training run with shaped rewards for exploration. It learned to leave the starting town, cross the first route, reach the first city and head into the forest. Map heatmaps show exactly where curiosity paid off and where it stalled.",
+          "Every penalty in my reward function is scar tissue from an exploit: the infinite heal loop, menu camping, wall grinding. And because my novelty bonus reset every episode, re-exploring Pallet Town kept paying while the forest never did. The exploration bonus was pricing the frontier out.",
         ],
-        bullets: ["PPO agent", "Reward shaping", "Exploration heatmaps", "Published checkpoints"],
       },
       {
-        heading: "What I'd build",
-        draft: true,
+        heading: "What I built",
         body: [
-          "A playtest bot for designers: point it at a new level, and the heatmap shows where players are likely to get lost or bored before a single human playtest.",
+          "A PyBoy emulator wrapped as a Gymnasium environment, seven training runs, reward-hacking patches, and tile-visit heatmaps. Everything is released: environment, training code, logs, checkpoints, and heatmaps.",
         ],
       },
       {
-        heading: "How I'd measure it",
-        draft: true,
-        body: ["How well bot heatmaps correlate with real player heatmaps on shipped levels, and designer hours saved per playtest cycle."],
+        heading: "How I measured it",
+        body: [
+          "Actual game progress, which was zero everywhere, since reward wasn't comparable across runs. Policy entropy turned out to be the real early warning. In run 6 the reward still looked fine while entropy hit zero and the policy was already dead.",
+        ],
       },
       {
         heading: "What I learned",
-        draft: true,
-        body: ["Reward design is game design. The agent does exactly what you incentivize, which is a very PM lesson."],
+        body: [
+          "Persist novelty across episodes, put game state in the observation, watch entropy like a smoke alarm, and only then scale compute. The agent learned everything I rewarded and nothing I wanted, and that's the test working.",
+        ],
       },
     ],
-    links: [{ label: "View on GitHub", href: "https://github.com/Tatsat454/PokemonRedAgent" }],
+    links: [
+      { label: "Blog post", href: "https://thenextframework.blog/2026/07/13/the-pokemon-reinforcement-problem/" },
+      { label: "Research", href: "https://shorturl.at/epbvJ" },
+    ],
   },
   {
     slug: "pocket-console",
@@ -340,10 +312,6 @@ export const stories: Story[] = [
         body: [
           "Group games on phones usually assume everyone has the same app, an account and good internet. None of that is true in the back seat of a car.",
         ],
-      },
-      {
-        heading: "Players",
-        body: ["Friends on a road trip, families at a table with one phone, and the host who just wants it to work in 10 seconds."],
       },
       {
         heading: "Insight",
@@ -487,126 +455,6 @@ export const stories: Story[] = [
     links: [{ label: "Edge Finder on GitHub", href: "https://github.com/Tatsat454/GamblingOdds" }],
   },
   {
-    slug: "game-teardown",
-    kind: "case-study",
-    eyebrow: "Exhibit · Game teardown",
-    title: "PLACEHOLDER: game teardown title",
-    summary: "PLACEHOLDER: one-line summary of the teardown — core loop, economy, or retention hook.",
-    placeholder: true,
-    sections: [
-      {
-        heading: "Problem",
-        placeholder: true,
-        body: ["PLACEHOLDER: the design or economy problem this teardown is about."],
-      },
-      {
-        heading: "Players",
-        placeholder: true,
-        body: ["PLACEHOLDER: who the game is for, and who wins if the loop is healthy."],
-      },
-      {
-        heading: "Insight",
-        placeholder: true,
-        body: ["PLACEHOLDER: the one mechanic or economy choice that makes the game work — or the one you'd change."],
-      },
-      {
-        heading: "What I'd build",
-        placeholder: true,
-        body: ["PLACEHOLDER: the change you'd ship as PM, and why."],
-      },
-      {
-        heading: "How I'd measure it",
-        placeholder: true,
-        body: ["PLACEHOLDER: the metric you'd move, plus a guardrail."],
-      },
-      {
-        heading: "What I learned",
-        placeholder: true,
-        body: ["PLACEHOLDER: the lesson you'd take to the next game."],
-      },
-    ],
-  },
-  {
-    slug: "feature-spec",
-    kind: "case-study",
-    eyebrow: "Exhibit · Feature spec",
-    title: "PLACEHOLDER: feature spec title",
-    summary: "PLACEHOLDER: one-line summary of the feature and the player problem it solves.",
-    placeholder: true,
-    sections: [
-      {
-        heading: "Problem",
-        placeholder: true,
-        body: ["PLACEHOLDER: the player or operator problem this spec is answering."],
-      },
-      {
-        heading: "Players",
-        placeholder: true,
-        body: ["PLACEHOLDER: who uses the feature, who ships it, and who is affected if it fails."],
-      },
-      {
-        heading: "Insight",
-        placeholder: true,
-        body: ["PLACEHOLDER: the insight that shaped the spec — what you learned before writing requirements."],
-      },
-      {
-        heading: "What I'd build",
-        placeholder: true,
-        body: ["PLACEHOLDER: the feature, scoped to an MVP, with the one thing you would not cut."],
-      },
-      {
-        heading: "How I'd measure it",
-        placeholder: true,
-        body: ["PLACEHOLDER: north-star metric, guardrails, and how you'd know it shipped."],
-      },
-      {
-        heading: "What I learned",
-        placeholder: true,
-        body: ["PLACEHOLDER: what writing this spec taught you about product."],
-      },
-    ],
-  },
-  {
-    slug: "user-research",
-    kind: "case-study",
-    eyebrow: "Exhibit · User research",
-    title: "PLACEHOLDER: user-research / side-project title",
-    summary: "PLACEHOLDER: one-line summary of the research or side project and what you were trying to learn.",
-    placeholder: true,
-    sections: [
-      {
-        heading: "Problem",
-        placeholder: true,
-        body: ["PLACEHOLDER: the question you went into research with."],
-      },
-      {
-        heading: "Players",
-        placeholder: true,
-        body: ["PLACEHOLDER: who you talked to, and why they were the right people."],
-      },
-      {
-        heading: "Insight",
-        placeholder: true,
-        body: ["PLACEHOLDER: the finding that surprised you — and the one you expected."],
-      },
-      {
-        heading: "What I'd build",
-        placeholder: true,
-        body: ["PLACEHOLDER: the product or side-project change this research argues for."],
-      },
-      {
-        heading: "How I'd measure it",
-        placeholder: true,
-        body: ["PLACEHOLDER: how you'd know the next version answered the research question."],
-      },
-      {
-        heading: "What I learned",
-        placeholder: true,
-        body: ["PLACEHOLDER: the research habit you'd keep on the next project."],
-      },
-    ],
-  },
-  {
     slug: "arcade",
     kind: "page",
     eyebrow: "Arcade Shack · Games",
@@ -667,10 +515,10 @@ export const museumExhibits = [
 /** The five indoor gallery pedestals. Donation stars and the Curator's counter use this list. */
 export const galleryExhibits = [
   "nyc-taxi-ddc",
-  "virtual-economies",
-  "game-teardown",
-  "feature-spec",
-  "user-research",
+  "pjm-ai-electricity",
+  "startup-failure",
+  "home-robot-vlm",
+  "pokemon-red-agent",
 ] as const;
 
 /** Smaller builds listed in the museum's archive drawer and on /work. */
@@ -1027,7 +875,6 @@ export const arcadePal = {
 
 /**
  * The Museum: Moss the Curator and the five gallery plaques.
- * Anything starting with PLACEHOLDER is meant to be replaced.
  */
 export const museumPal = {
   id: "moss",
@@ -1039,7 +886,7 @@ export const museumPal = {
     "Welcome to the Museum! Every exhibit here is one of Tatsat's projects. The most important one is waiting at the top of the stairs!",
   ],
   progress: "You've seen {n} of 5 exhibits!",
-  thanks: "PLACEHOLDER: a thank-you for seeing every exhibit — something warm, specific, and a little proud.",
+  thanks: "You saw all five — the taxi, the grid, the startups, the robot, and the agent that never won a badge. That's the collection.",
 };
 
 export const museumInteriorCopy = {
@@ -1062,51 +909,51 @@ export const museumInteriorCopy = {
     hrefLabel: "Read the story",
   },
   exhibit2: {
-    name: "Virtual economies, priced like real ones",
+    name: "Geographic Concentration of AI-Driven Electricity Demand",
     verb: "Read",
-    title: "Virtual economies, priced like real ones",
+    title: "Geographic Concentration of AI-Driven Electricity Demand",
     lines: [
-      "Virtual economies, priced like real ones",
-      "My economics thesis direction: what game economies can learn from real markets, and vice versa.",
-      "PLACEHOLDER: one key result from the virtual-economies thesis.",
+      "Geographic Concentration of AI-Driven Electricity Demand",
+      "PJM forecasts Northern Virginia's electricity use will nearly triple by 2045 while nearby zones grow much more slowly. Standard macro can't explain why, so I extended it.",
+      "5.25% vs. 3.78%. Same technology shock, very different grids. Faculty mentor: Prof. Youngeun Choi, UCR, Jan–Mar 2026.",
     ],
-    href: "/story/virtual-economies",
+    href: "/story/pjm-ai-electricity",
     hrefLabel: "Read the story",
   },
   exhibit3: {
-    name: "PLACEHOLDER: game teardown title",
+    name: "What Actually Separates Startups That Climb from Ones That Stall",
     verb: "Read",
-    title: "PLACEHOLDER: game teardown title",
+    title: "What Actually Separates Startups That Climb from Ones That Stall",
     lines: [
-      "PLACEHOLDER: game teardown title",
-      "PLACEHOLDER: one-line summary of the teardown — core loop, economy, or retention hook.",
-      "PLACEHOLDER: one key result from the game teardown.",
+      "What Actually Separates Startups That Climb from Ones That Stall",
+      "Hold the idea constant. Then what decides whether a startup gets acquired or shuts down? I tested the folklore on 923 startups.",
+      "VC-backed isn't the same as more likely to survive. In 923 startups, non-VC firms were acquired at a higher rate.",
     ],
-    href: "/story/game-teardown",
+    href: "/story/startup-failure",
     hrefLabel: "Read the story",
   },
   exhibit4: {
-    name: "PLACEHOLDER: feature spec title",
+    name: "A Robot for Home",
     verb: "Read",
-    title: "PLACEHOLDER: feature spec title",
+    title: "A Robot for Home",
     lines: [
-      "PLACEHOLDER: feature spec title",
-      "PLACEHOLDER: one-line summary of the feature and the player problem it solves.",
-      "PLACEHOLDER: one key result from the feature spec.",
+      "A Robot for Home",
+      "I'm building a robot in Georgia Tech's makerspace that picks clothes up off the floor, goes back to charge on its own, and eventually does basic cleaning around the house.",
+      "Printed, going carbon fiber, and getting open-sourced — models, print files, and build guide — once it works.",
     ],
-    href: "/story/feature-spec",
+    href: "/story/home-robot-vlm",
     hrefLabel: "Read the story",
   },
   exhibit5: {
-    name: "PLACEHOLDER: user-research / side-project title",
+    name: "The Pokémon Reinforcement Problem",
     verb: "Read",
-    title: "PLACEHOLDER: user-research / side-project title",
+    title: "The Pokémon Reinforcement Problem",
     lines: [
-      "PLACEHOLDER: user-research / side-project title",
-      "PLACEHOLDER: one-line summary of the research or side project and what you were trying to learn.",
-      "PLACEHOLDER: one key result from the user-research project.",
+      "The Pokémon Reinforcement Problem",
+      "I spent 15 million training steps teaching an AI to play Pokémon Red. It became a brilliant explorer, a shameless cheater, and once, a total catatonic. It never won a single badge.",
+      "15M steps. Reward tripled. 0 badges.",
     ],
-    href: "/story/user-research",
+    href: "/story/pokemon-red-agent",
     hrefLabel: "Read the story",
   },
 };
