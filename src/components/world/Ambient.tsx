@@ -3,7 +3,8 @@
 import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
-import { flowers, LEVEL, pond, tileCenter, trees, WATER_Y, W } from "@/game/island";
+import { flowers, LEVEL, pond, tileCenter, trees, WATER_Y } from "@/game/island";
+import { cloudX, skyClouds } from "@/game/sky-clouds";
 import { critterSpots } from "@/game/interact";
 import { flat, palette, toon } from "@/game/materials";
 import { player, reducedMotion } from "@/game/player-state";
@@ -194,24 +195,21 @@ function CloudShadows() {
     const t = new THREE.CanvasTexture(c);
     return t;
   }, []);
-  const clouds = useMemo(() => [0, 1, 2].map((k) => ({ z: -12 + k * 12, s: 7 + k * 2, speed: 0.5 + k * 0.15, off: k * 17 })), []);
   const refs = useRef<(THREE.Mesh | null)[]>([]);
   useFrame((st) => {
-    const t = st.clock.elapsedTime;
-    clouds.forEach((c, k) => {
+    const t = reducedMotion.value ? 8 : st.clock.elapsedTime;
+    skyClouds.forEach((c, k) => {
       const m = refs.current[k];
       if (!m) return;
-      const span = W + 20;
-      const x = ((t * c.speed + c.off) % span) - span / 2;
-      m.position.set(x, 2.2 * LEVEL, c.z + Math.sin(t * 0.05 + k) * 2);
+      m.position.set(cloudX(c, t), 2.2 * LEVEL + 0.04, c.z + Math.sin(t * 0.04 + k) * 1.2);
     });
   });
   return (
     <group>
-      {clouds.map((c, k) => (
+      {skyClouds.map((c, k) => (
         <mesh key={k} ref={(m) => { refs.current[k] = m; }} rotation={[-Math.PI / 2, 0, 0]} renderOrder={2}>
-          <planeGeometry args={[c.s, c.s * 0.6]} />
-          <meshBasicMaterial map={tex} transparent opacity={0.14} depthWrite={false} />
+          <planeGeometry args={[c.s * 1.6, c.s]} />
+          <meshBasicMaterial map={tex} transparent opacity={0.12} depthWrite={false} />
         </mesh>
       ))}
     </group>

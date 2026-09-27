@@ -186,7 +186,7 @@ export function Lights({ preset, shadows }: { preset: TimePreset; shadows: boole
   });
   return (
     <>
-      <fog attach="fog" args={[preset.fog, 62, 125]} />
+      <fog attach="fog" args={[preset.fog, preset.id === "afternoon" ? 36 : 62, preset.id === "afternoon" ? 78 : 125]} />
       <hemisphereLight args={[preset.hemiSky, preset.hemiGround, preset.hemiIntensity]} />
       <ambientLight intensity={0.34} />
       <directionalLight
