@@ -524,15 +524,6 @@ export function inPlazaPathSkip(x: number, z: number) {
   block(boardTile.i, boardTile.j, boardTile.i, boardTile.j);
 }
 
-/** One outdoor exhibit, on the museum lawn where the player was standing. */
-export const pedestals = (() => {
-  const i = 30;
-  const j = 16;
-  block(i, j, i, j);
-  const c = tileCenter(i, j);
-  return [{ slug: "nyc-taxi-ddc", i, j, x: c.x, z: c.z, level: 2, interact: { x: c.x, z: c.z + 0.95 } }];
-})();
-
 export type TreeKind = "round" | "blossom" | "pine" | "fruit";
 export type TreeSpot = { kind: TreeKind; x: number; z: number; y: number; s: number; seed: number; item?: ItemId };
 
@@ -550,7 +541,6 @@ for (const l of landmarkPlacements) {
   const [i0, j0, i1, j1] = l.rect;
   for (let j = j0 - 1; j <= j1 + 2; j++) for (let i = i0 - 1; i <= i1 + 1; i++) reserve(i, j, 0);
 }
-for (const p of pedestals) reserve(p.i, p.j, 1);
 const free = (t: Tile | undefined) => !!t && t.kind === "grass" && !t.blocked && !reserved.has(t.j * W + t.i);
 
 export const trees: TreeSpot[] = [];

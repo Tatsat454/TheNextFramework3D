@@ -18,7 +18,7 @@ import {
   WIPE_OUT_MS,
   WIPE_OUT_MS_REDUCED,
 } from "./interiors";
-import { fountain, getPlacement, landmarkPlacements, LEVEL, pedestals, pickups, plazaBenches, trees } from "./island";
+import { fountain, getPlacement, landmarkPlacements, LEVEL, pickups, plazaBenches, trees } from "./island";
 import { player, playerScreen, pose, reducedMotion } from "./player-state";
 import { checkArrivals, toast, useGame } from "./store";
 
@@ -51,17 +51,6 @@ const staticList: Interactable[] = [
       r: p.radius,
       ref: p.id,
     })),
-  ...pedestals.map((p) => ({
-    id: `exhibit:${p.slug}`,
-    kind: "exhibit" as const,
-    label: "Exhibit",
-    verb: "Look",
-    x: p.interact.x,
-    z: p.interact.z,
-    y: p.level * LEVEL + 2.1,
-    r: 0.95,
-    ref: p.slug,
-  })),
   ...trees
     .map((t, k) => ({ t, k }))
     .filter(({ t }) => t.kind === "fruit")
