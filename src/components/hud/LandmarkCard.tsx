@@ -101,6 +101,7 @@ function Market() {
             <span className="block text-[12px] font-medium text-ink-soft">{g.name}</span>
             <span className="flex items-baseline gap-1.5">
               <span className="font-serif text-[22px] leading-tight text-ink tabular-nums">{price}</span>
+              <span className="text-[11px] font-medium text-ink-soft">VP</span>
               <span className={cn("text-[11px] font-bold", up ? "text-[#2F7A4B]" : "text-coral")}>{up ? "▲" : "▼"}</span>
             </span>
           </li>

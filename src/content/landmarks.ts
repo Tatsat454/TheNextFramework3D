@@ -45,6 +45,7 @@ export type StorySection = {
   heading: string;
   body: string[];
   bullets?: string[];
+  table?: { headers: string[]; rows: string[][] };
   draft?: boolean;
   placeholder?: boolean;
 };
@@ -427,22 +428,73 @@ export const stories: Story[] = [
     slug: "virtual-economies",
     kind: "page",
     eyebrow: "Market Stall · Econ thesis",
-    title: "Virtual economies, priced like real ones",
-    summary: "My economics thesis direction: what game economies can learn from real markets, and vice versa.",
-    placeholder: true,
+    title: "Open vs. closed virtual economies",
+    summary:
+      "Valorant's Night Market vs. CS2's player market: two ways to price skins, and what each one costs a live game.",
+    tags: ["Valorant", "CS2", "Night Market", "Virtual economies"],
     sections: [
       {
-        heading: "The thesis",
-        placeholder: true,
+        heading: "How the market is built",
         body: [
-          "PLACEHOLDER: One or two paragraphs on the virtual-economies thesis: the question, the game or market you're studying, and the data or model you plan to use.",
+          "You buy Valorant Points (VP) with real money and spend them in Riot's store. Skins come in tiers: Select (875 VP), Deluxe (1,275 VP), and Premium (1,775 VP), with Exclusive and Ultra editions above that. There's no trading and no resale, so a skin's price is whatever Riot says it is, and its value to you is pure utility and identity, never investment.",
         ],
       },
       {
-        heading: "Why it matters for games",
-        placeholder: true,
+        heading: "Hidden insight 1: The tiers are versioning, not just price points",
         body: [
-          "PLACEHOLDER: How the finding would change a live-ops or economy-design decision, such as sink/faucet balance, pricing of premium currency, or drop rates.",
+          "Each tier adds a specific layer. Select skins change the model but have no custom effects, finishers, or animations. Deluxe adds custom animations but no finisher or upgraded VFX. Premium adds custom models, VFX, animations, finishers, and sometimes variants. This is classic good-better-best pricing: the same weapon sold three ways, so players self-sort by willingness to pay. The cheaper tiers also make Premium look reasonable by comparison.",
+        ],
+      },
+      {
+        heading: "Hidden insight 2: The VP packs are designed to leave money behind",
+        body: [
+          "You can't buy an exact amount of VP. $9.99 gets 1,000 VP, $19.99 gets 2,050 VP, and larger packs add bonus VP, at roughly 100 VP per dollar. Skin prices don't line up with pack sizes, so a discounted Premium skin at around 1,420 VP will usually push you into the next pack and leave a leftover balance on your account. That leftover balance is a hook: it's \"money\" that only feels useful if you spend more later. Gift cards and airline miles work the same way.",
+        ],
+      },
+      {
+        heading: "Hidden insight 3: Night Market is personalized price discrimination",
+        body: [
+          "Once per Act, every player gets six random skins at a discount, from Select, Deluxe, and Premium tiers, excluding skins you already own, and they disappear after two weeks. Discounts range from 10% to 49%. The current one is live right now, running September 22 to October 6, 2026.",
+          "What looks like a fun event is actually precise economics:",
+        ],
+        bullets: [
+          "Everyone pays a different price. Your six offers aren't the same as a friend's. Riot can't see your willingness to pay, so it samples discounts and lets you reveal it.",
+          "It protects full price for new skins. Skins released within two acts of the shop's opening are excluded from the pool. That's the hardcover-then-paperback strategy: collect full price from eager buyers first, then discount for everyone else later.",
+          "It protects the top tier. Ultra Edition skins like Elderflame, Champions, and Spectrum never appear in Night Market. Never discounting the flagship keeps its price anchor intact.",
+          "It's a reactivation event, not a reward. Every account that logs in during the window gets a Night Market, whether you played 400 games that act or none. It's designed to bring lapsed players back with a reason to spend.",
+        ],
+      },
+      {
+        heading: "Hidden insight 4: Riot closed the arbitrage loophole",
+        body: [
+          "Gifting was added in April 2025, but it's a fresh purchase from the featured store, and Night Market offers are excluded. If you could gift Night Market skins, players would buy discounted skins and resell them to friends, creating an informal secondary market. Blocking that keeps the discount personal and the price wall intact.",
+        ],
+      },
+      {
+        heading: "Hidden insight 5: Scarcity comes from time, not supply",
+        body: [
+          "In CS2, scarcity is how many items exist. In Valorant, every skin is infinitely available in theory, so scarcity comes from when you can buy it: rotating daily stores, bundles that leave, and Night Market windows. Once the event ends, skins go back to full price in the featured store. It's artificial scarcity through timing, and it creates urgency without the risk of a market crash.",
+        ],
+      },
+      {
+        heading: "CS2 vs. Valorant, side by side",
+        body: [],
+        table: {
+          headers: ["", "CS2", "Valorant"],
+          rows: [
+            ["Economy type", "Open, player-driven", "Closed, publisher-priced"],
+            ["Who sets prices", "The market", "Riot"],
+            ["Scarcity from", "Supply (drop rates, trade-ups)", "Time (rotations, windows)"],
+            ["Can skins lose value?", "Yes, as the Oct 2025 crash showed", "No, because they were never assets"],
+            ["Main risk", "Supply shocks and broken trust", "Player fatigue with FOMO"],
+            ["Price discrimination", "Emerges from the market", "Designed (Night Market)"],
+          ],
+        },
+      },
+      {
+        heading: "What a game PM takes from this",
+        body: [
+          "CS2 shows what happens when you let a real market form: huge engagement and value, but your patch notes become monetary policy. Valorant shows the other path: give up the secondary market and you get total pricing control, no crash risk, and the ability to price-discriminate precisely. Neither is \"right.\" The choice between them is one of the biggest economy-design decisions a live game makes, and it's a clean frame for this Market Stall thesis: open vs. closed virtual economies, and what each one costs.",
         ],
       },
       {
@@ -585,9 +637,9 @@ export const landmarks: Landmark[] = [
     name: "Market Stall",
     section: "Econ thesis: virtual economies",
     eyebrow: "Market Stall · Econ thesis",
-    title: "Virtual economies",
-    blurb: "Prices here drift a little while you watch. That's the thesis: game economies are real economies, and they deserve real models.",
-    cta: { label: "Browse the stall", href: "/story/virtual-economies" },
+    title: "Open vs. closed",
+    blurb: "Valorant prices what CS2 lets the market decide. The stall's numbers drift while you watch — a closed economy, in a crate.",
+    cta: { label: "Read the thesis", href: "/story/virtual-economies" },
   },
   {
     id: "arcade",
@@ -845,12 +897,12 @@ export const residents: Resident[] = [
   },
 ];
 
-/** Market Stall ticker: prices drift slowly around these bases. */
+/** Market Stall ticker: Valorant skin tiers, drifting around list price. */
 export const marketGoods = [
-  { name: "Sunpeach", base: 120 },
-  { name: "Blossom bundle", base: 340 },
-  { name: "Mystery crate", base: 980 },
-  { name: "Premium seeds", base: 55 },
+  { name: "Select skin", base: 875 },
+  { name: "Deluxe skin", base: 1275 },
+  { name: "Premium skin", base: 1775 },
+  { name: "Night Market cut", base: 1420 },
 ];
 
 export const copy = {

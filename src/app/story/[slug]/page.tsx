@@ -87,6 +87,43 @@ export default async function StoryPage({ params }: PageProps<"/story/[slug]">) 
                   ))}
                 </ul>
               )}
+              {sec.table && (
+                <div className="mt-5 overflow-x-auto rounded-[24px] border border-white bg-white/70 shadow-[0_18px_40px_rgba(123,108,246,0.12)]">
+                  <table className="w-full min-w-[520px] border-collapse text-left text-[15px] leading-[1.5] text-ink">
+                    <caption className="sr-only">{sec.heading}</caption>
+                    <thead>
+                      <tr className="border-b border-ink/10">
+                        {sec.table.headers.map((h, i) => (
+                          <th
+                            key={`${h}-${i}`}
+                            scope="col"
+                            className="px-4 py-3 font-serif text-[17px] font-normal tracking-[-0.01em] text-ink first:w-[28%]"
+                          >
+                            {h || <span className="sr-only">Topic</span>}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {sec.table.rows.map((row) => (
+                        <tr key={row[0]} className="border-b border-ink/10 last:border-0">
+                          {row.map((cell, i) =>
+                            i === 0 ? (
+                              <th key={cell} scope="row" className="px-4 py-3 font-bold text-ink">
+                                {cell}
+                              </th>
+                            ) : (
+                              <td key={`${row[0]}-${i}`} className="px-4 py-3 text-ink-soft">
+                                {cell}
+                              </td>
+                            ),
+                          )}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </section>
           ))}
         </div>
