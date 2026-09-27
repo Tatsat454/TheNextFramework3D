@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import type { LandmarkId } from "@/content/landmarks";
 import { MUSEUM, MUSEUM_CURATOR, MUSEUM_PEDESTALS } from "@/game/interiors";
-import { beachUmbrella, fountain, gazebo, getPlacement, LEVEL, lighthouse, spawn } from "@/game/island";
+import { beachUmbrella, fountain, gazebo, getPlacement, LEVEL, lighthouse, lookout, spawn } from "@/game/island";
 import { bend } from "@/game/materials";
 import { debugCam, player, playerScreen, pose, reducedMotion } from "@/game/player-state";
 import { useGame } from "@/game/store";
@@ -47,6 +47,14 @@ export function CameraRig() {
       bend.uPlayer.value.set(player.x, player.y + 0.55, player.z);
       return;
     }
+    if (debugCam.lookoutSpot) {
+      camera.position.set(lookout.x + 2.55, LEVEL + 3.15, lookout.z + 4.35);
+      camera.lookAt(lookout.x - 0.15, LEVEL + 0.85, lookout.z - 0.45);
+      bend.uBend.value = 0.0016;
+      bend.uBendCenter.value.set(lookout.x, LEVEL, lookout.z);
+      bend.uPlayer.value.set(player.x, player.y + 0.55, player.z);
+      return;
+    }
     if (debugCam.close) {
       camera.position.set(fountain.x + 2.15, LEVEL + 2.35, fountain.z + 3.45);
       camera.lookAt(fountain.x, LEVEL + 0.82, fountain.z);
@@ -83,11 +91,11 @@ export function CameraRig() {
       return;
     }
     if (debugCam.lookout) {
-      camera.position.set(lighthouse.x + 7.4, LEVEL + 7.6, lighthouse.z + 9.4);
-      camera.lookAt(lighthouse.x - 0.5, LEVEL + 2.5, lighthouse.z - 5.2);
+      camera.position.set(lighthouse.x + 2.6, LEVEL + 4.35, lighthouse.z + 6.4);
+      camera.lookAt(lighthouse.x - 0.4, LEVEL + 2.15, lighthouse.z - 1.2);
       const persp = camera as THREE.PerspectiveCamera;
       if (persp.isPerspectiveCamera) {
-        persp.fov = 30;
+        persp.fov = 32;
         persp.updateProjectionMatrix();
       }
       bend.uBend.value = 0.001;
@@ -171,8 +179,8 @@ export function CameraRig() {
         else if (elapsed < 3400) u = 1;
         else u = 1 - (elapsed - 3400) / (LOOKOUT_MS - 3400);
         const e = u * u * (3 - 2 * u);
-        lookPos.set(lighthouse.x + 7.4, LEVEL + 7.6, lighthouse.z + 9.4);
-        lookAtPt.set(lighthouse.x - 0.5, LEVEL + 2.5, lighthouse.z - 5.2);
+        lookPos.set(lighthouse.x + 2.6, LEVEL + 4.35, lighthouse.z + 6.4);
+        lookAtPt.set(lighthouse.x - 0.4, LEVEL + 2.15, lighthouse.z - 1.2);
         camera.position.lerp(lookPos, e);
         tmp.set(
           focus.current.x + (lookAtPt.x - focus.current.x) * e,
