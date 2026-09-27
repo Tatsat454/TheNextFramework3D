@@ -415,10 +415,19 @@ export const stories: Story[] = [
         ],
       },
       {
-        heading: "Education",
+        heading: "What I learned at UCR",
+        body: [
+          "University of California, Riverside: B.A. Business Economics, Jan 2025 – May 2026 · GPA 3.93",
+          "UCR is where I learned to think like an economist. Studying Business Economics taught me to start with intuition: before running a single regression, ask what should happen and why. Comparative statics became my go-to habit: change one thing, hold everything else constant, and trace the effect. Game theory taught me to think about how people respond to each other, not just to prices.",
+          "It's also where I learned how to research. My PJM paper started as an econometrics assignment and turned into a real research question with a faculty mentor. My taxi model took 83,000 raw trip records and turned them into a structural model of how drivers make decisions. Along the way I picked up the tools to actually do the work: R, Python, Stata, SQL, and C++.",
+        ],
+      },
+      {
+        heading: "What I'm learning at Georgia Tech",
         body: [
           "Georgia Institute of Technology: M.S. Economics, Aug 2026 – Apr 2027 · GPA 4.0",
-          "University of California, Riverside: B.A. Business Economics, Jan 2025 – May 2026 · GPA 3.93",
+          "Georgia Tech is where intuition meets rigor. Through PhD-level Microeconomic Analysis, Econometrics, and Mathematical Economics, I'm learning quantitative research methods at a deeper level: not just how to run a model, but how to prove why it works and when it breaks.",
+          "The bigger shift is applying those methods to real decisions. In Global Enterprise, I'm studying business entry decisions: when a firm should enter a market, how it should enter, and what it's betting on when it does. Money & Capital Markets adds how prices carry information and how capital moves. Together, it's teaching me to take a messy business question and turn it into something I can actually model, test, and answer.",
         ],
       },
     ],
@@ -1133,8 +1142,8 @@ export const townHallInteriorCopy = {
     lines: [
       "B.A. Business Economics — University of California, Riverside",
       "Jan 2025 – May 2026 · GPA 3.93",
-      "PLACEHOLDER: one line on what this chapter taught him.",
-      "Result: a foundation in markets, then straight into graduate economics.",
+      "UCR is where I learned to think like an economist. Studying Business Economics taught me to start with intuition: before running a single regression, ask what should happen and why. Comparative statics became my go-to habit: change one thing, hold everything else constant, and trace the effect. Game theory taught me to think about how people respond to each other, not just to prices.",
+      "It's also where I learned how to research. My PJM paper started as an econometrics assignment and turned into a real research question with a faculty mentor. My taxi model took 83,000 raw trip records and turned them into a structural model of how drivers make decisions. Along the way I picked up the tools to actually do the work: R, Python, Stata, SQL, and C++.",
     ],
     href: "/story/experience",
     hrefLabel: "Read the full record",
@@ -1161,8 +1170,8 @@ export const townHallInteriorCopy = {
     lines: [
       "M.S. Economics — Georgia Institute of Technology",
       "Aug 2026 – Apr 2027 · GPA 4.0",
-      "PhD-level micro sequence while running student orgs and writing every week.",
-      "Result: PLACEHOLDER: the question this degree is helping him answer.",
+      "Georgia Tech is where intuition meets rigor. Through PhD-level Microeconomic Analysis, Econometrics, and Mathematical Economics, I'm learning quantitative research methods at a deeper level: not just how to run a model, but how to prove why it works and when it breaks.",
+      "The bigger shift is applying those methods to real decisions. In Global Enterprise, I'm studying business entry decisions: when a firm should enter a market, how it should enter, and what it's betting on when it does. Money & Capital Markets adds how prices carry information and how capital moves. Together, it's teaching me to take a messy business question and turn it into something I can actually model, test, and answer.",
     ],
     href: "/story/experience",
     hrefLabel: "Read the full record",
@@ -1189,7 +1198,7 @@ export const townHallInteriorCopy = {
       "Issued by the Island Records office.",
       "Georgia Institute of Technology — M.S. Economics, Aug 2026 – Apr 2027 · GPA 4.0",
       "University of California, Riverside — B.A. Business Economics, Jan 2025 – May 2026 · GPA 3.93",
-      "PLACEHOLDER: a line you'd want on a diploma wall, in your own words.",
+      "Take a messy business question and turn it into something I can actually model, test, and answer.",
     ],
   },
   notices: {
