@@ -1317,8 +1317,7 @@ export const townHallInteriorCopy = {
 };
 
 /**
- * Copy for objects inside My House. Anything starting with PLACEHOLDER is meant to be replaced.
- * The computer's href should become a real resume URL.
+ * Copy for objects inside My House.
  */
 export const houseInteriorCopy = {
   computer: {
