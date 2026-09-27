@@ -98,6 +98,14 @@ for (const t of grid) {
   t.h = 1;
 }
 
+// Keep the south apron as beach — the pond stays around the house and does not spill off the rim.
+for (const t of grid) {
+  if (t.kind !== "water" || t.j < 41) continue;
+  t.kind = "sand";
+  t.blocked = false;
+  t.h = 1;
+}
+
 const isSolid = (t: Tile | undefined) => !!t && t.kind !== "void" && t.kind !== "water";
 // Close 1-tile stair corners on the south apron so the beach isn't a stack of shelves.
 for (let pass = 0; pass < 2; pass++) {
