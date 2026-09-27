@@ -44,77 +44,77 @@ function Cyl({ p, r, h, c, rt, seg = 10, rot }: { p: V3; r: number; h: number; c
 
 function KeepCastle() {
   return (
-    <group>
-      <Cyl p={[0, 0.07, 0]} r={0.48} h={0.14} c={SAND} rt={0.44} seg={12} />
-      <Box p={[0, 0.32, 0]} s={[0.58, 0.42, 0.58]} c={SAND} />
-      <Box p={[0, 0.56, 0]} s={[0.64, 0.08, 0.64]} c={SAND_WET} />
+    <group scale={1.72}>
+      <Cyl p={[0, 0.08, 0]} r={0.56} h={0.16} c={SAND} rt={0.5} seg={12} />
+      <Box p={[0, 0.38, 0]} s={[0.7, 0.52, 0.7]} c={SAND} />
+      <Box p={[0, 0.68, 0]} s={[0.78, 0.1, 0.78]} c={SAND_WET} />
       {(
         [
-          [-0.26, -0.26],
-          [0.26, -0.26],
-          [-0.26, 0.26],
-          [0.26, 0.26],
+          [-0.3, -0.3],
+          [0.3, -0.3],
+          [-0.3, 0.3],
+          [0.3, 0.3],
         ] as const
       ).map(([x, z]) => (
         <group key={`${x}${z}`} position={[x, 0, z]}>
-          <Cyl p={[0, 0.38, 0]} r={0.12} h={0.52} c={SAND} rt={0.1} />
-          <mesh position={[0, 0.72, 0]} material={toon(SAND_DEEP)} castShadow>
-            <coneGeometry args={[0.16, 0.22, 8]} />
+          <Cyl p={[0, 0.46, 0]} r={0.15} h={0.64} c={SAND} rt={0.12} />
+          <mesh position={[0, 0.88, 0]} material={toon(SAND_DEEP)} castShadow>
+            <coneGeometry args={[0.2, 0.28, 8]} />
           </mesh>
         </group>
       ))}
-      {[-0.22, 0, 0.22].map((x) => (
-        <Box key={`n${x}`} p={[x, 0.64, -0.3]} s={[0.12, 0.12, 0.1]} c={SAND} />
+      {[-0.26, 0, 0.26].map((x) => (
+        <Box key={`n${x}`} p={[x, 0.78, -0.36]} s={[0.14, 0.16, 0.12]} c={SAND} />
       ))}
-      {[-0.22, 0, 0.22].map((x) => (
-        <Box key={`s${x}`} p={[x, 0.64, 0.3]} s={[0.12, 0.12, 0.1]} c={SAND} />
+      {[-0.26, 0, 0.26].map((x) => (
+        <Box key={`s${x}`} p={[x, 0.78, 0.36]} s={[0.14, 0.16, 0.12]} c={SAND} />
       ))}
-      <Box p={[0, 0.22, 0.3]} s={[0.16, 0.22, 0.04]} c={SAND_DEEP} shadow={false} />
-      <mesh position={[0.02, 0.86, 0.02]} material={toon(palette.woodDeep)} castShadow>
-        <cylinderGeometry args={[0.018, 0.018, 0.34, 6]} />
+      <Box p={[0, 0.26, 0.36]} s={[0.2, 0.28, 0.05]} c={SAND_DEEP} shadow={false} />
+      <mesh position={[0.02, 1.08, 0.02]} material={toon(palette.woodDeep)} castShadow>
+        <cylinderGeometry args={[0.02, 0.02, 0.4, 6]} />
       </mesh>
-      <Box p={[0.1, 0.98, 0.02]} s={[0.16, 0.1, 0.02]} c={palette.coral} shadow={false} />
+      <Box p={[0.12, 1.24, 0.02]} s={[0.2, 0.12, 0.025]} c={palette.coral} shadow={false} />
     </group>
   );
 }
 
 function TripleCastle() {
   return (
-    <group>
-      <Cyl p={[0, 0.06, 0]} r={0.5} h={0.12} c={SAND} rt={0.46} />
+    <group scale={1.58}>
+      <Cyl p={[0, 0.08, 0]} r={0.62} h={0.16} c={SAND} rt={0.56} />
       {(
         [
-          [-0.16, 0.22, 0.12],
-          [0.18, 0.34, -0.08],
-          [0.02, 0.16, 0.2],
+          [-0.2, 0.42, 0.14],
+          [0.22, 0.62, -0.1],
+          [0.02, 0.3, 0.24],
         ] as const
       ).map(([x, h, z], k) => (
         <group key={k} position={[x, 0, z]}>
-          <Cyl p={[0, h / 2 + 0.08, 0]} r={0.14 - k * 0.015} h={h} c={k === 1 ? SAND_WET : SAND} rt={0.11 - k * 0.01} />
-          <mesh position={[0, h + 0.18, 0]} material={toon(SAND_DEEP)} castShadow>
-            <coneGeometry args={[0.16 - k * 0.015, 0.2, 8]} />
+          <Cyl p={[0, h / 2 + 0.1, 0]} r={0.18 - k * 0.018} h={h} c={k === 1 ? SAND_WET : SAND} rt={0.14 - k * 0.012} />
+          <mesh position={[0, h + 0.26, 0]} material={toon(SAND_DEEP)} castShadow>
+            <coneGeometry args={[0.22 - k * 0.018, 0.28, 8]} />
           </mesh>
         </group>
       ))}
-      <Box p={[0.02, 0.2, 0.04]} s={[0.38, 0.16, 0.12]} c={SAND} />
+      <Box p={[0.02, 0.26, 0.04]} s={[0.5, 0.22, 0.16]} c={SAND} />
     </group>
   );
 }
 
 function TinyCastle() {
   return (
-    <group>
-      <Cyl p={[0, 0.05, 0]} r={0.28} h={0.1} c={SAND} rt={0.24} />
-      <mesh position={[0, 0.22, 0]} material={toon(SAND)} castShadow>
-        <coneGeometry args={[0.22, 0.28, 8]} />
+    <group scale={1.48}>
+      <Cyl p={[0, 0.07, 0]} r={0.36} h={0.14} c={SAND} rt={0.3} />
+      <mesh position={[0, 0.3, 0]} material={toon(SAND)} castShadow>
+        <coneGeometry args={[0.3, 0.4, 8]} />
       </mesh>
-      <mesh position={[0, 0.4, 0]} material={toon(SAND_WET)} castShadow>
-        <coneGeometry args={[0.14, 0.2, 8]} />
+      <mesh position={[0, 0.56, 0]} material={toon(SAND_WET)} castShadow>
+        <coneGeometry args={[0.2, 0.28, 8]} />
       </mesh>
-      <mesh position={[0.01, 0.58, 0]} material={toon(palette.woodDeep)} castShadow>
-        <cylinderGeometry args={[0.014, 0.014, 0.22, 6]} />
+      <mesh position={[0.01, 0.8, 0]} material={toon(palette.woodDeep)} castShadow>
+        <cylinderGeometry args={[0.018, 0.018, 0.28, 6]} />
       </mesh>
-      <Box p={[0.08, 0.66, 0]} s={[0.12, 0.08, 0.018]} c={palette.sun} shadow={false} />
+      <Box p={[0.1, 0.9, 0]} s={[0.16, 0.1, 0.022]} c={palette.sun} shadow={false} />
     </group>
   );
 }
@@ -129,12 +129,12 @@ function Sandcastle({ kind, rot }: { kind: (typeof beachCastles)[number]["kind"]
 
 function Scallop({ color, s = 1 }: { color: string; s?: number }) {
   return (
-    <group scale={s} rotation={[-0.85, 0, 0.15]}>
+    <group scale={s * 1.85} rotation={[-0.85, 0, 0.15]}>
       <mesh material={toon(color)} castShadow>
-        <sphereGeometry args={[0.09, 10, 8, 0, Math.PI * 2, 0, Math.PI * 0.55]} />
+        <sphereGeometry args={[0.11, 10, 8, 0, Math.PI * 2, 0, Math.PI * 0.55]} />
       </mesh>
       <mesh position={[0, 0.01, 0.01]} scale={[0.72, 0.35, 0.72]} material={toon(palette.cream)}>
-        <sphereGeometry args={[0.07, 8, 6]} />
+        <sphereGeometry args={[0.08, 8, 6]} />
       </mesh>
     </group>
   );
@@ -142,12 +142,12 @@ function Scallop({ color, s = 1 }: { color: string; s?: number }) {
 
 function SpiralShell({ color, s = 1 }: { color: string; s?: number }) {
   return (
-    <group scale={s} rotation={[-0.5, 0.4, 0.2]}>
+    <group scale={s * 1.85} rotation={[-0.5, 0.4, 0.2]}>
       <mesh material={toon(color)} castShadow>
-        <coneGeometry args={[0.08, 0.14, 8]} />
+        <coneGeometry args={[0.1, 0.18, 8]} />
       </mesh>
-      <mesh position={[0, -0.03, -0.03]} scale={[1, 0.55, 1]} material={toon(palette.cream)}>
-        <sphereGeometry args={[0.045, 8, 6]} />
+      <mesh position={[0, -0.04, -0.04]} scale={[1, 0.55, 1]} material={toon(palette.cream)}>
+        <sphereGeometry args={[0.055, 8, 6]} />
       </mesh>
     </group>
   );
@@ -155,12 +155,12 @@ function SpiralShell({ color, s = 1 }: { color: string; s?: number }) {
 
 function Clam({ color, s = 1 }: { color: string; s?: number }) {
   return (
-    <group scale={s}>
+    <group scale={s * 1.85}>
       <mesh rotation={[-1.05, 0, 0]} material={toon(color)} castShadow>
-        <sphereGeometry args={[0.08, 10, 8, 0, Math.PI * 2, 0, 1.2]} />
+        <sphereGeometry args={[0.1, 10, 8, 0, Math.PI * 2, 0, 1.2]} />
       </mesh>
-      <mesh position={[0, 0.03, 0.02]} rotation={[-2.15, 0, 0]} material={toon(palette.peach)} castShadow>
-        <sphereGeometry args={[0.07, 10, 8, 0, Math.PI * 2, 0, 1.1]} />
+      <mesh position={[0, 0.04, 0.03]} rotation={[-2.15, 0, 0]} material={toon(palette.peach)} castShadow>
+        <sphereGeometry args={[0.085, 10, 8, 0, Math.PI * 2, 0, 1.1]} />
       </mesh>
     </group>
   );
@@ -168,13 +168,13 @@ function Clam({ color, s = 1 }: { color: string; s?: number }) {
 
 function Starfish({ color, s = 1 }: { color: string; s?: number }) {
   return (
-    <group scale={s} rotation={[-Math.PI / 2, 0, 0.3]}>
+    <group scale={s * 1.9} rotation={[-Math.PI / 2, 0, 0.3]}>
       <mesh material={toon(color)} castShadow>
-        <cylinderGeometry args={[0.055, 0.055, 0.035, 8]} />
+        <cylinderGeometry args={[0.07, 0.07, 0.045, 8]} />
       </mesh>
       {[0, 1, 2, 3, 4].map((k) => (
-        <mesh key={k} position={[Math.sin((k * Math.PI * 2) / 5) * 0.08, 0, Math.cos((k * Math.PI * 2) / 5) * 0.08]} rotation={[0, (k * Math.PI * 2) / 5, 0]} material={toon(color)} castShadow>
-          <boxGeometry args={[0.045, 0.03, 0.1]} />
+        <mesh key={k} position={[Math.sin((k * Math.PI * 2) / 5) * 0.1, 0, Math.cos((k * Math.PI * 2) / 5) * 0.1]} rotation={[0, (k * Math.PI * 2) / 5, 0]} material={toon(color)} castShadow>
+          <boxGeometry args={[0.055, 0.038, 0.14]} />
         </mesh>
       ))}
     </group>
@@ -183,17 +183,17 @@ function Starfish({ color, s = 1 }: { color: string; s?: number }) {
 
 function BucketAndShovel() {
   return (
-    <group onClick={onTap}>
-      <Cyl p={[0, 0.16, 0]} r={0.16} h={0.28} c={BUCKET} rt={0.13} />
-      <Cyl p={[0, 0.3, 0]} r={0.175} h={0.05} c={BUCKET_LIP} />
-      <Cyl p={[0, 0.22, 0]} r={0.12} h={0.08} c={SAND} />
-      <mesh position={[0, 0.38, 0]} rotation={[Math.PI / 2, 0, 0]} material={toon(BUCKET_LIP)} castShadow>
-        <torusGeometry args={[0.15, 0.018, 6, 12, Math.PI]} />
+    <group scale={1.35} onClick={onTap}>
+      <Cyl p={[0, 0.18, 0]} r={0.2} h={0.34} c={BUCKET} rt={0.16} />
+      <Cyl p={[0, 0.36, 0]} r={0.22} h={0.06} c={BUCKET_LIP} />
+      <Cyl p={[0, 0.26, 0]} r={0.14} h={0.1} c={SAND} />
+      <mesh position={[0, 0.46, 0]} rotation={[Math.PI / 2, 0, 0]} material={toon(BUCKET_LIP)} castShadow>
+        <torusGeometry args={[0.18, 0.022, 6, 12, Math.PI]} />
       </mesh>
-      <group position={[0.28, 0, 0.08]} rotation={[0, 0.4, 0.35]}>
-        <Box p={[0, 0.22, 0]} s={[0.045, 0.36, 0.045]} c={palette.wood} />
-        <Box p={[0, 0.42, 0]} s={[0.07, 0.05, 0.05]} c={SHOVEL} />
-        <Box p={[0, 0.04, 0]} s={[0.14, 0.03, 0.16]} c={BLADE} />
+      <group position={[0.34, 0, 0.1]} rotation={[0, 0.4, 0.35]}>
+        <Box p={[0, 0.26, 0]} s={[0.055, 0.44, 0.055]} c={palette.wood} />
+        <Box p={[0, 0.5, 0]} s={[0.08, 0.06, 0.06]} c={SHOVEL} />
+        <Box p={[0, 0.05, 0]} s={[0.18, 0.04, 0.2]} c={BLADE} />
       </group>
     </group>
   );
@@ -201,15 +201,15 @@ function BucketAndShovel() {
 
 function BeachBall() {
   return (
-    <group onClick={onTap}>
-      <mesh position={[0, 0.18, 0]} material={toon(palette.cream)} castShadow>
-        <sphereGeometry args={[0.18, 14, 12]} />
+    <group scale={1.25} onClick={onTap}>
+      <mesh position={[0, 0.2, 0]} material={toon(palette.cream)} castShadow>
+        <sphereGeometry args={[0.2, 14, 12]} />
       </mesh>
-      <mesh position={[0, 0.18, 0]} rotation={[0.4, 0.2, 0]} material={toon(palette.coral)} castShadow>
-        <torusGeometry args={[0.155, 0.035, 8, 16]} />
+      <mesh position={[0, 0.2, 0]} rotation={[0.4, 0.2, 0]} material={toon(palette.coral)} castShadow>
+        <torusGeometry args={[0.175, 0.04, 8, 16]} />
       </mesh>
-      <mesh position={[0, 0.18, 0]} rotation={[1.2, 0.8, 0.3]} material={toon(palette.sun)} castShadow>
-        <torusGeometry args={[0.155, 0.03, 8, 16]} />
+      <mesh position={[0, 0.2, 0]} rotation={[1.2, 0.8, 0.3]} material={toon(palette.sun)} castShadow>
+        <torusGeometry args={[0.175, 0.035, 8, 16]} />
       </mesh>
     </group>
   );
@@ -218,23 +218,23 @@ function BeachBall() {
 function UmbrellaAndTowel({ facing }: { facing: number }) {
   return (
     <group rotation={[0, facing, 0]} onClick={onTap}>
-      <Box p={[0.42, 0.025, 0.55]} s={[0.72, 0.03, 1.05]} c={TOWEL_A} />
-      {[-0.28, 0, 0.28].map((z) => (
-        <Box key={z} p={[0.42, 0.032, 0.55 + z]} s={[0.72, 0.012, 0.12]} c={TOWEL_B} shadow={false} />
+      <Box p={[0.55, 0.03, 0.7]} s={[0.95, 0.04, 1.35]} c={TOWEL_A} />
+      {[-0.38, 0, 0.38].map((z) => (
+        <Box key={z} p={[0.55, 0.04, 0.7 + z]} s={[0.95, 0.016, 0.16]} c={TOWEL_B} shadow={false} />
       ))}
-      <Cyl p={[0, 0.62, 0]} r={0.03} h={1.24} c={palette.woodDeep} rt={0.025} />
-      <mesh position={[0, 1.18, 0]} material={toon(palette.coral)} castShadow>
-        <coneGeometry args={[0.72, 0.28, 8]} />
+      <Cyl p={[0, 0.78, 0]} r={0.038} h={1.56} c={palette.woodDeep} rt={0.03} />
+      <mesh position={[0, 1.48, 0]} material={toon(palette.coral)} castShadow>
+        <coneGeometry args={[0.95, 0.52, 8]} />
       </mesh>
-      <mesh position={[0, 1.12, 0]} material={toon(palette.cream)} castShadow={false}>
-        <coneGeometry args={[0.58, 0.08, 8]} />
+      <mesh position={[0, 1.38, 0]} material={toon(palette.cream)} castShadow={false}>
+        <coneGeometry args={[0.72, 0.14, 8]} />
       </mesh>
-      <mesh position={[0, 1.34, 0]} material={toon(palette.sun)} castShadow>
-        <sphereGeometry args={[0.06, 8, 8]} />
+      <mesh position={[0, 1.78, 0]} material={toon(palette.sun)} castShadow>
+        <sphereGeometry args={[0.08, 8, 8]} />
       </mesh>
-      <group position={[0.58, 0.02, 0.18]} rotation={[0, 0.3, 0]}>
-        <Box p={[0, 0.02, 0]} s={[0.16, 0.04, 0.28]} c={palette.indigo} />
-        <Box p={[0.2, 0.02, 0]} s={[0.16, 0.04, 0.28]} c={palette.cream} />
+      <group position={[0.78, 0.03, 0.22]} rotation={[0, 0.3, 0]}>
+        <Box p={[0, 0.025, 0]} s={[0.2, 0.05, 0.36]} c={palette.indigo} />
+        <Box p={[0.24, 0.025, 0]} s={[0.2, 0.05, 0.36]} c={palette.cream} />
       </group>
     </group>
   );
@@ -242,12 +242,12 @@ function UmbrellaAndTowel({ facing }: { facing: number }) {
 
 function Driftwood() {
   return (
-    <group onClick={onTap}>
-      <mesh position={[0, 0.07, 0]} rotation={[0.15, 0.4, 0.35]} material={toon(palette.woodDeep)} castShadow>
-        <cylinderGeometry args={[0.05, 0.07, 0.85, 7]} />
+    <group scale={1.35} onClick={onTap}>
+      <mesh position={[0, 0.08, 0]} rotation={[0.15, 0.4, 0.35]} material={toon(palette.woodDeep)} castShadow>
+        <cylinderGeometry args={[0.06, 0.085, 1.05, 7]} />
       </mesh>
-      <mesh position={[0.18, 0.1, 0.12]} rotation={[-0.4, 0.2, 1.1]} material={toon(palette.wood)} castShadow>
-        <cylinderGeometry args={[0.03, 0.045, 0.38, 6]} />
+      <mesh position={[0.22, 0.12, 0.14]} rotation={[-0.4, 0.2, 1.1]} material={toon(palette.wood)} castShadow>
+        <cylinderGeometry args={[0.035, 0.055, 0.48, 6]} />
       </mesh>
     </group>
   );
@@ -255,18 +255,18 @@ function Driftwood() {
 
 function RubberDuck() {
   return (
-    <group onClick={onTap}>
-      <mesh position={[0, 0.1, 0]} material={toon(DUCK)} castShadow>
-        <sphereGeometry args={[0.1, 10, 8]} />
+    <group scale={1.55} onClick={onTap}>
+      <mesh position={[0, 0.12, 0]} material={toon(DUCK)} castShadow>
+        <sphereGeometry args={[0.12, 10, 8]} />
       </mesh>
-      <mesh position={[0.02, 0.2, 0.04]} material={toon(DUCK)} castShadow>
-        <sphereGeometry args={[0.065, 8, 8]} />
+      <mesh position={[0.03, 0.24, 0.05]} material={toon(DUCK)} castShadow>
+        <sphereGeometry args={[0.08, 8, 8]} />
       </mesh>
-      <mesh position={[0.08, 0.19, 0.05]} rotation={[0, 0.3, 0.2]} material={toon(DUCK_BEAK)} castShadow>
-        <boxGeometry args={[0.07, 0.03, 0.05]} />
+      <mesh position={[0.1, 0.23, 0.06]} rotation={[0, 0.3, 0.2]} material={toon(DUCK_BEAK)} castShadow>
+        <boxGeometry args={[0.085, 0.036, 0.06]} />
       </mesh>
-      <mesh position={[0.04, 0.23, 0.08]} material={toon(palette.ink)}>
-        <sphereGeometry args={[0.012, 6, 6]} />
+      <mesh position={[0.05, 0.28, 0.1]} material={toon(palette.ink)}>
+        <sphereGeometry args={[0.014, 6, 6]} />
       </mesh>
     </group>
   );

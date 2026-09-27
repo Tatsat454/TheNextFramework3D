@@ -260,10 +260,11 @@ for (let jj = dock.j0; jj <= dock.j1; jj++)
 
 /** Sandcastles on the south crescent. Path, dock, spawn and collectible shells stay clear. */
 export type BeachCastleKind = "keep" | "triple" | "tiny";
-export const beachCastles: { i: number; j: number; kind: BeachCastleKind; rot: number }[] = [
-  { i: 26, j: 43, kind: "keep", rot: 0.22 },
-  { i: 38, j: 43, kind: "triple", rot: -0.38 },
-  { i: 20, j: 43, kind: "tiny", rot: 0.64 },
+export const beachCastles: { i: number; j: number; kind: BeachCastleKind; rot: number; hit: number }[] = [
+  { i: 26, j: 43, kind: "keep", rot: 0.22, hit: 0.58 },
+  { i: 38, j: 43, kind: "triple", rot: -0.38, hit: 0.52 },
+  { i: 20, j: 43, kind: "tiny", rot: 0.64, hit: 0.34 },
+  { i: 30, j: 44, kind: "tiny", rot: -0.28, hit: 0.32 },
 ];
 for (const c of beachCastles) {
   const t = tileAt(c.i, c.j);
@@ -277,7 +278,12 @@ export const beachUmbrella = (() => {
 })();
 
 export function beachPropHit(x: number, z: number) {
-  return Math.hypot(x - beachUmbrella.x, z - beachUmbrella.z) < 0.16;
+  if (Math.hypot(x - beachUmbrella.x, z - beachUmbrella.z) < 0.18) return true;
+  for (const c of beachCastles) {
+    const p = tileCenter(c.i, c.j);
+    if (Math.hypot(x - p.x, z - p.z) < c.hit) return true;
+  }
+  return false;
 }
 
 export type LandmarkPlacement = {
