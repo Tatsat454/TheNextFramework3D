@@ -447,17 +447,17 @@ export const lighthouse = (() => {
 
 /** Rope-fence lookout on the northeast bluff, just west of the lighthouse. */
 export const lookout = (() => {
-  const c = tileCenter(43, 15);
-  const t = tileAt(43, 15);
-  const x = c.x + 0.2;
-  const z = c.z - 0.12;
+  const c = tileCenter(42, 16);
+  const t = tileAt(42, 16);
+  const x = c.x + 0.15;
+  const z = c.z + 0.1;
   const y = (t?.h ?? 2) * LEVEL;
   const facing = Math.atan2(lighthouse.x - x, lighthouse.z - z);
   const posts = [
-    { x: tileCenter(44, 14).x - 0.2, z: tileCenter(44, 14).z + 0.15 },
-    { x: tileCenter(45, 13).x - 0.15, z: tileCenter(45, 13).z + 0.25 },
-    { x: tileCenter(46, 13).x - 0.2, z: tileCenter(46, 13).z + 0.2 },
-    { x: tileCenter(46, 13).x + 0.55, z: tileCenter(46, 13).z - 0.1 },
+    { x: tileCenter(43, 15).x, z: tileCenter(43, 15).z + 0.1 },
+    { x: tileCenter(44, 14).x + 0.05, z: tileCenter(44, 14).z + 0.2 },
+    { x: tileCenter(45, 14).x + 0.15, z: tileCenter(45, 14).z + 0.05 },
+    { x: tileCenter(46, 14).x - 0.1, z: tileCenter(46, 14).z - 0.15 },
   ];
   return {
     x,
@@ -466,7 +466,7 @@ export const lookout = (() => {
     facing,
     posts,
     lamp: posts[0]!,
-    sign: { x: x - 0.12, z: z + 0.62, facing: 0 },
+    sign: { x: x - 0.08, z: z + 0.58, facing: 0 },
   };
 })();
 
@@ -573,7 +573,7 @@ for (const t of grid) {
   const c = tileCenter(t.i, t.j);
   if (Math.hypot(c.x - fountain.x, c.z - fountain.z) < plazaRing.gardenOuter + 0.2) reserve(t.i, t.j, 0);
   if (nearGazebo(c.x, c.z, 0.35)) reserve(t.i, t.j, 0);
-  if (Math.hypot(c.x - lookout.x, c.z - lookout.z) < 1.1) reserve(t.i, t.j, 0);
+  if (Math.hypot(c.x - lookout.x, c.z - lookout.z) < 2.0) reserve(t.i, t.j, 0);
 }
 {
   const { i, j } = worldToTile(lighthouse.x, lighthouse.z);
@@ -641,13 +641,11 @@ plantPlazaBlossom(37, 32, 1.36, 0.74);
 plantPlazaBlossom(29, 24, 1.5, 0.43);
 plantPlazaBlossom(38, 22, 1.38, 0.58);
 
-// Lighthouse bluff (northeast): a tight pine stand on the high ground.
+// Lighthouse bluff (northeast): a tight pine stand on the high ground, kept off the lookout.
 for (const [i, j, s] of [
-  [45, 14, 1.15],
   [48, 15, 1.05],
   [46, 18, 1],
   [49, 17, 0.95],
-  [44, 16, 1.1],
 ] as const) {
   if (free(tileAt(i, j))) plant("pine", i, j, s);
 }
