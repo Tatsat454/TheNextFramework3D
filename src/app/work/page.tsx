@@ -103,7 +103,7 @@ export default function WorkPage() {
             </h2>
             <ul className="mt-4 space-y-2">
               {copy.currentlyPlaying.games.map((g, k) => (
-                <li key={k} className="rounded-2xl bg-white/70 px-4 py-3 text-[15px] font-medium text-ink-soft">
+                <li key={k} className="rounded-2xl bg-white/70 px-4 py-3 text-[15px] font-medium text-ink">
                   {g}
                 </li>
               ))}

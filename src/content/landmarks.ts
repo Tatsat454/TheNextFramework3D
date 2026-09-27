@@ -776,8 +776,7 @@ export const items: Item[] = [
     name: "Moon snail shell",
     kind: "shell",
     color: "#C7B9FF",
-    flavor: "PLACEHOLDER: a fun fact only his friends know.",
-    placeholder: true,
+    flavor: "Tatsat is a huge nerd. He grew up playing Beyblade. His favorite is L-Drago.",
   },
   {
     id: "sunpeach",
@@ -798,8 +797,7 @@ export const items: Item[] = [
     name: "Cloudberry",
     kind: "fruit",
     color: "#7B6CF6",
-    flavor: "PLACEHOLDER: his all-time favorite game, and the one mechanic he'd steal from it.",
-    placeholder: true,
+    flavor: "His all-time favorite is Final Fantasy XV. He'd steal Warp: Prince Noctis throws his weapon and instantly teleports to it. Fueled by the magic of the Lucian kings, that move is the backbone of the game's combat and exploration.",
   },
   {
     id: "taxi-token",
@@ -924,8 +922,8 @@ export const copy = {
   pocketsFull: "Your pockets are full",
   insidePrefix: "Inside",
   currentlyPlaying: {
-    placeholder: true,
-    games: ["PLACEHOLDER game", "PLACEHOLDER game", "PLACEHOLDER game"],
+    placeholder: false,
+    games: ["Wolverine", "Pokémon Brilliant Diamond", "Cyberpunk 2077"],
   },
 };
 
@@ -1095,7 +1093,7 @@ export const townHallPal = {
   resumeHrefLabel: "Open resume",
   lookingFor: [
     "Tatsat is looking for product roles in games and entertainment — live ops, economy, and systems that make a world feel alive.",
-    "PLACEHOLDER: one more sentence on the kind of team, studio, or problem he wants next.",
+    "He wants the next one to be a very special project: a real challenge, or something he has always dreamed of becoming.",
   ],
 };
 
@@ -1185,7 +1183,7 @@ export const townHallInteriorCopy = {
       "President — M.S. Economics Organization, Georgia Tech",
       "2026 – present",
       "Leading and representing the graduate economics community.",
-      "Result: PLACEHOLDER: one concrete thing the org shipped under his watch.",
+      "Result: event attendance went from 15 people to 62 of 71.",
     ],
     href: "/story/experience",
     hrefLabel: "Read the full record",
@@ -1207,7 +1205,7 @@ export const townHallInteriorCopy = {
     title: "Announcements",
     lines: [
       "Town Hall announcements — pin a note, leave a note.",
-      "PLACEHOLDER: a recent award, publication, or talk.",
+      "Graduated magna cum laude.",
       "PLACEHOLDER: a club, org, or community win.",
       "PLACEHOLDER: news you'd put on a fridge: shipping, a launch, a yes.",
     ],
@@ -1292,8 +1290,8 @@ export const plazaCopy = {
     name: "Fountain",
     verb: "Toss a coin?",
     wishes: [
-      PLACEHOLDER("A quiet wish about the next paper, the next game, or the next yes."),
-      PLACEHOLDER("Something you'd only tell a fountain — small, specific, and a little greedy."),
+      "The God of War trailer drops, and the Laufey trailer too — as soon as possible!",
+      "I hope I get to make new friends at your company.",
       PLACEHOLDER("A wish for the team you haven't met yet."),
       PLACEHOLDER("One true launch, and someone who notices."),
     ],

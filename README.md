@@ -51,7 +51,7 @@ Three original residents move in as you explore: **Bramble** (Greeter), **Drizzl
 
 All copy lives in [`src/content/landmarks.ts`](src/content/landmarks.ts). Components only read from it.
 
-- Text starting with `PLACEHOLDER` (and `placeholder: true`) is filler to replace: "currently playing", one shell fact, one fruit fact and the Fan's testimonial. These show a yellow **Placeholder** chip on the site.
+- Text starting with `PLACEHOLDER` (and `placeholder: true`) is filler to replace: Pip's testimonial, two Town Hall notice-board notes, and two fountain wishes. These show a yellow **Placeholder** chip on the site.
 - Sections marked `draft: true` were written from the resume/portfolio but go a step further ("What I'd build", "How I'd measure it", "What I learned"). They show a lilac **Draft** chip until you review them and remove the flag.
 - The player's look (skin, hair, outfit, accessory) is `profile.look`.
 
