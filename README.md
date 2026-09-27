@@ -40,7 +40,7 @@ A floating oval about 40×36 tiles across. You arrive on the southern beach — 
 |---|---|
 | My House | About me |
 | Town Hall | Work experience |
-| Museum (on the plateau) | Projects: five indoor exhibits; reading one to the end "donates" it (gold star) |
+| Museum (on the plateau) | Projects: four indoor exhibits; reading one to the end "donates" it (gold star) |
 | Market Stall | Econ thesis: Valorant vs. CS2, open vs. closed virtual economies (prices drift while you watch) |
 | Arcade Shack | Games that inspired Tatsat, plus games he built |
 | Dock | Contact |

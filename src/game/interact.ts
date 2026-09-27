@@ -284,7 +284,7 @@ export function galleryDonatedCount(donated: Record<string, true> = useGame.getS
   return galleryExhibits.filter((slug) => donated[slug]).length;
 }
 
-/** Confetti + thank-you the first time all five indoor exhibits are donated. */
+/** Confetti + thank-you the first time all indoor exhibits are donated. */
 export function celebrateGalleryIfComplete() {
   const s = useGame.getState();
   if (s.galleryCelebrated) return false;
