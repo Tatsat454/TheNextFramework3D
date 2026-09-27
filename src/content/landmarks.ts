@@ -1183,7 +1183,7 @@ export const townHallPal = {
   resumeLines: [
     "The full resume is on file. I'll stamp the envelope — you can open it from here.",
   ],
-  resumeHref: "PLACEHOLDER resume URL",
+  resumeHref: "https://thenextframework.blog/496-2/",
   resumeHrefLabel: "Open resume",
   lookingFor: [
     "Tatsat is looking for product roles in games and entertainment — live ops, economy, and systems that make a world feel alive.",
@@ -1327,9 +1327,9 @@ export const houseInteriorCopy = {
     title: "My resume",
     lines: [
       "The chunky beige box still boots. Resume's on the desktop — the short version of how I got here.",
-      "PLACEHOLDER: one sentence on what you want a hiring manager to notice first.",
+      "Aspiring product manager: 4.0 in Georgia Tech's M.S. Economics, president of the graduate econ org, and I take work from the data all the way through the writing.",
     ],
-    href: "PLACEHOLDER resume URL",
+    href: "https://thenextframework.blog/496-2/",
     hrefLabel: "Open resume",
   },
   tv: {
@@ -1338,24 +1338,24 @@ export const houseInteriorCopy = {
     title: "What I'm watching right now",
     lines: [
       "The queue is a mix of prestige, comfort, and legal-drama popcorn.",
-      "Lanterns, on HBO Max. PLACEHOLDER: why you're watching it / where you are in it.",
-      "Jane the Virgin. PLACEHOLDER: a favorite thing about it.",
-      "Suits. PLACEHOLDER: a favorite thing about it.",
+      "Lanterns, on HBO Max. Super suspenseful mystery — DC is stepping up their game.",
+      "Jane the Virgin. I can't believe I hadn't watched this until now. Almost done with season 2!",
+      "Suits. This would never happen in real life, but it is pure entertainment.",
     ],
     shows: [
-      { title: "Lanterns", detail: "HBO Max", color: "#1F6B4A" },
-      { title: "Jane the Virgin", detail: "Comfort rewatch", color: "#E8513F" },
+      { title: "Lanterns", detail: "DC mystery", color: "#1F6B4A" },
+      { title: "Jane the Virgin", detail: "Season 2", color: "#E8513F" },
       { title: "Suits", detail: "Legal popcorn", color: "#2C3A6B" },
     ],
   },
   bookshelf: {
     name: "Bookshelf",
     verb: "Browse",
-    title: "The shelf",
+    title: "Three I've read",
     lines: [
-      "PLACEHOLDER: a book that shaped how you think, and one sentence on why.",
-      "PLACEHOLDER: another title — econ, games, or something unexpected.",
-      "PLACEHOLDER: what you're reading this month.",
+      "Nudge — Richard Thaler and Cass Sunstein. I love this one: it shows how behavioral economics actually works, and how you can trick your own mind.",
+      "Think and Grow Rich — Napoleon Hill. A really good book, and the ideals haven't aged.",
+      "Persuasion — Robert Cialdini. An interesting take on how you sell things — and, more importantly, how you persuade.",
     ],
   },
   picture: {
@@ -1365,7 +1365,7 @@ export const houseInteriorCopy = {
     lines: [
       "Hi — I'm Tatsat. M.S. Economics at Georgia Tech, former founder, weekly writer, lifelong gamer.",
       "I want to build the economies and systems that make games feel alive.",
-      "PLACEHOLDER: one personal detail you'd tell someone standing in your living room.",
+      "I love cars. Shang-Chi is my favorite Marvel hero. I grew up on Pokémon, Bakugan, and Vanguard.",
     ],
   },
   bed: {
