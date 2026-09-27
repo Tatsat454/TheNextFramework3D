@@ -44,6 +44,19 @@ export function CameraRig() {
       bend.uPlayer.value.set(player.x, player.y + 0.55, player.z);
       return;
     }
+    if (debugCam.cliff) {
+      camera.position.set(gazebo.x + 3.15, LEVEL + 4.05, gazebo.z + 4.35);
+      camera.lookAt(gazebo.x - 0.2, LEVEL + 0.85, gazebo.z - 3.6);
+      const persp = camera as THREE.PerspectiveCamera;
+      if (persp.isPerspectiveCamera) {
+        persp.fov = 32;
+        persp.updateProjectionMatrix();
+      }
+      bend.uBend.value = 0.0016;
+      bend.uBendCenter.value.set(gazebo.x, LEVEL, gazebo.z);
+      bend.uPlayer.value.set(player.x, player.y + 0.55, player.z);
+      return;
+    }
     if (debugCam.close) {
       camera.position.set(fountain.x + 2.15, LEVEL + 2.35, fountain.z + 3.45);
       camera.lookAt(fountain.x, LEVEL + 0.82, fountain.z);

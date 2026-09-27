@@ -18,7 +18,7 @@ export const playerScreen = { x: 0.5, y: 0.55 };
 export const reducedMotion = { value: false };
 
 /** Dev-only camera override for screenshots (`window.__pocket.debugCam`). */
-export const debugCam = { close: false, gazebo: false, museumPedestal: false, museumCurator: false, beach: false };
+export const debugCam = { close: false, gazebo: false, museumPedestal: false, museumCurator: false, beach: false, cliff: false };
 
 /** Plaza pose: sitting, gazebo photo-spot, coin toss. */
 export const pose = {
