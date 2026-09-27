@@ -48,10 +48,10 @@ export function CameraRig() {
       return;
     }
     if (debugCam.lookoutSpot) {
-      camera.position.set(lookout.x + 2.45, LEVEL + 3.05, lookout.z + 4.25);
-      camera.lookAt(lookout.x + 0.05, LEVEL + 0.78, lookout.z - 0.4);
+      camera.position.set(lookout.x - 1.85, lookout.y + 3.05, lookout.z + 4.35);
+      camera.lookAt(lookout.x + 0.55, lookout.y + 0.82, lookout.z - 0.65);
       bend.uBend.value = 0.0016;
-      bend.uBendCenter.value.set(lookout.x, LEVEL, lookout.z);
+      bend.uBendCenter.value.set(lookout.x, lookout.y, lookout.z);
       bend.uPlayer.value.set(player.x, player.y + 0.55, player.z);
       return;
     }
@@ -91,8 +91,8 @@ export function CameraRig() {
       return;
     }
     if (debugCam.lookout) {
-      camera.position.set(lighthouse.x + 4.6, lighthouse.y + 5.35, lighthouse.z + 10.6);
-      camera.lookAt(lighthouse.x, lighthouse.y + 4.15, lighthouse.z + 0.15);
+      camera.position.set(lighthouse.x + 5.2, lighthouse.y + 4.15, lighthouse.z + 11.8);
+      camera.lookAt(lighthouse.x, lighthouse.y + 3.15, lighthouse.z);
       const persp = camera as THREE.PerspectiveCamera;
       if (persp.isPerspectiveCamera) {
         persp.fov = 34;
@@ -179,8 +179,8 @@ export function CameraRig() {
         else if (elapsed < 3400) u = 1;
         else u = 1 - (elapsed - 3400) / (LOOKOUT_MS - 3400);
         const e = u * u * (3 - 2 * u);
-        lookPos.set(lighthouse.x + 4.6, lighthouse.y + 5.35, lighthouse.z + 10.6);
-        lookAtPt.set(lighthouse.x, lighthouse.y + 4.15, lighthouse.z + 0.15);
+        lookPos.set(lighthouse.x + 5.2, lighthouse.y + 4.15, lighthouse.z + 11.8);
+        lookAtPt.set(lighthouse.x, lighthouse.y + 3.15, lighthouse.z);
         camera.position.lerp(lookPos, e);
         tmp.set(
           focus.current.x + (lookAtPt.x - focus.current.x) * e,

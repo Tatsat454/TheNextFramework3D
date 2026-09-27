@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import * as THREE from "three";
 import type { ThreeEvent } from "@react-three/fiber";
 import { input } from "@/game/input";
-import { LEVEL, lookout } from "@/game/island";
+import { lookout } from "@/game/island";
 import { palette, toon } from "@/game/materials";
 import { isPaused, useGame } from "@/game/store";
 
@@ -45,7 +45,7 @@ function RopeFence() {
   return (
     <group>
       {posts.map((p, k) => (
-        <mesh key={k} position={[p.x, LEVEL + 0.42, p.z]} material={toon(POST)} castShadow>
+        <mesh key={k} position={[p.x, lookout.y + 0.42, p.z]} material={toon(POST)} castShadow>
           <cylinderGeometry args={[0.06, 0.07, 0.84, 8]} />
         </mesh>
       ))}
@@ -56,7 +56,7 @@ function RopeFence() {
         const len = Math.hypot(dx, dz);
         const a = Math.atan2(dx, dz);
         return (
-          <group key={`r${k}`} position={[(p.x + n.x) / 2, LEVEL, (p.z + n.z) / 2]} rotation={[0, a, 0]}>
+          <group key={`r${k}`} position={[(p.x + n.x) / 2, lookout.y, (p.z + n.z) / 2]} rotation={[0, a, 0]}>
             {[0.52, 0.28].map((y) => (
               <mesh key={y} position={[0, y, 0]} rotation={[Math.PI / 2, 0, 0]} material={toon(ROPE)}>
                 <cylinderGeometry args={[0.028, 0.028, len, 6]} />
@@ -72,7 +72,7 @@ function RopeFence() {
 function Lamp() {
   const { x, z } = lookout.lamp;
   return (
-    <group position={[x, LEVEL, z]} onClick={onTap}>
+    <group position={[x, lookout.y, z]} onClick={onTap}>
       <mesh position={[0, 0.06, 0]} material={toon(palette.cream)} castShadow>
         <boxGeometry args={[0.34, 0.12, 0.34]} />
       </mesh>
@@ -94,7 +94,7 @@ function Lamp() {
 
 function Telescope() {
   return (
-    <group position={[lookout.x, LEVEL, lookout.z]} rotation={[0, lookout.facing, 0]} onClick={onTap}>
+    <group position={[lookout.x, lookout.y, lookout.z]} rotation={[0, lookout.facing, 0]} onClick={onTap}>
       <mesh position={[0, 0.1, 0]} material={toon(STONE)} castShadow receiveShadow>
         <cylinderGeometry args={[0.32, 0.36, 0.2, 10]} />
       </mesh>
@@ -122,7 +122,7 @@ function LookoutSign() {
   const mat = useMemo(() => new THREE.MeshBasicMaterial({ map: tex, toneMapped: false }), [tex]);
   const { x, z, facing } = lookout.sign;
   return (
-    <group position={[x, LEVEL, z]} rotation={[0, facing, 0]} onClick={onTap}>
+    <group position={[x, lookout.y, z]} rotation={[0, facing, 0]} onClick={onTap}>
       <mesh position={[0, 0.42, 0]} material={toon(palette.woodDeep)} castShadow>
         <cylinderGeometry args={[0.04, 0.05, 0.84, 8]} />
       </mesh>
