@@ -18,11 +18,11 @@ import {
   WIPE_OUT_MS,
   WIPE_OUT_MS_REDUCED,
 } from "./interiors";
-import { fountain, getPlacement, landmarkPlacements, LEVEL, pickups, plazaBenches, trees } from "./island";
+import { fountain, getPlacement, landmarkPlacements, LEVEL, pedestals, pickups, plazaBenches, trees } from "./island";
 import { player, playerScreen, pose, reducedMotion } from "./player-state";
 import { checkArrivals, toast, useGame } from "./store";
 
-export type InteractKind = "landmark" | "tree" | "pickup" | "resident" | "critter" | "door" | "prop" | "plaza";
+export type InteractKind = "landmark" | "exhibit" | "tree" | "pickup" | "resident" | "critter" | "door" | "prop" | "plaza";
 
 export type Interactable = {
   id: string;
@@ -51,6 +51,17 @@ const staticList: Interactable[] = [
       r: p.radius,
       ref: p.id,
     })),
+  ...pedestals.map((p) => ({
+    id: `exhibit:${p.slug}`,
+    kind: "exhibit" as const,
+    label: "Exhibit",
+    verb: "Look",
+    x: p.interact.x,
+    z: p.interact.z,
+    y: p.level * LEVEL + 2.1,
+    r: 0.95,
+    ref: p.slug,
+  })),
   ...trees
     .map((t, k) => ({ t, k }))
     .filter(({ t }) => t.kind === "fruit")
@@ -325,6 +336,11 @@ export function interact(it: Interactable, player: { x: number; z: number }) {
       useGame.setState({ card: { type: "landmark", id } });
       break;
     }
+    case "exhibit":
+      sfx.open();
+      visit("museum");
+      useGame.setState({ card: { type: "exhibit", slug: it.ref } });
+      break;
     case "tree": {
       const k = Number(it.ref);
       const tree = trees[k];

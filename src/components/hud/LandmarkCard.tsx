@@ -148,7 +148,33 @@ function LandmarkBody({ lm }: { lm: Landmark }) {
 }
 
 function CardBody({ card }: { card: Card }) {
+  const donated = useGame((s) => s.donated);
   if (card.type === "landmark") return <LandmarkBody lm={getLandmark(card.id)} />;
+  if (card.type === "exhibit") {
+    const st = getStory(card.slug)!;
+    return (
+      <>
+        <p className="eyebrow">Exhibit · Museum lawn</p>
+        <h2 className="mt-1.5 font-serif text-[32px] leading-[1.05] text-ink">{st.title}</h2>
+        <p className="mt-3 text-[15px] leading-relaxed text-ink-soft">{st.summary}</p>
+        {st.tags && (
+          <ul className="mt-3 flex flex-wrap gap-1.5">
+            {st.tags.map((t) => (
+              <li key={t} className="rounded-full bg-violet/10 px-2.5 py-1 text-[12px] font-medium text-indigo">
+                {t}
+              </li>
+            ))}
+          </ul>
+        )}
+        {donated[card.slug] && (
+          <p className="mt-3 flex items-center gap-1.5 text-[13px] font-bold text-ink">
+            <Star className="size-4 fill-sun text-[#E0A21B]" /> Donated to the museum
+          </p>
+        )}
+        <PrimaryLink href={`/story/${card.slug}`}>Read the exhibit</PrimaryLink>
+      </>
+    );
+  }
   return null;
 }
 
@@ -165,7 +191,7 @@ export function LandmarkCard() {
     if (card) setTimeout(() => panel.current?.querySelector<HTMLElement>("[data-autofocus]")?.focus(), 50);
   }, [card]);
 
-  const key = card ? `${card.type}:${card.id}` : "none";
+  const key = card ? `${card.type}:${"id" in card ? card.id : card.slug}` : "none";
   return (
     <AnimatePresence>
       {card && (

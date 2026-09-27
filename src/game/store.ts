@@ -9,6 +9,7 @@ export type Emote = "wave" | "cheer" | "thinking" | "clap" | "stretch";
 
 export type Card =
   | { type: "landmark"; id: LandmarkId }
+  | { type: "exhibit"; slug: string }
   | { type: "item"; id: ItemId };
 
 export type DialogState = {

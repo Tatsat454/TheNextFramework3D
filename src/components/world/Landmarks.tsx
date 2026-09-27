@@ -3,9 +3,11 @@
 import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
-import { getPlacement, LEVEL, mailboxTile, tileCenter } from "@/game/island";
+import { getPlacement, LEVEL, mailboxTile, pedestals, tileCenter } from "@/game/island";
 import { palette, toon } from "@/game/materials";
 import { reducedMotion } from "@/game/player-state";
+import { useGame } from "@/game/store";
+import { ExhibitObject } from "./ExhibitObject";
 
 type V3 = [number, number, number];
 
@@ -347,12 +349,35 @@ function Dock() {
   );
 }
 
+function Pedestals() {
+  const donated = useGame((s) => s.donated);
+  return (
+    <group>
+      {pedestals.map((p) => (
+        <group key={p.slug} position={[p.x, p.level * LEVEL, p.z]}>
+          <Cyl p={[0, 0.35, 0]} r={0.3} rt={0.26} h={0.7} c={palette.cream} seg={14} />
+          <Cyl p={[0, 0.72, 0]} r={0.36} h={0.08} c={palette.earth} seg={14} />
+          <group position={[0, 0.76, 0]}>
+            <ExhibitObject slug={p.slug} />
+          </group>
+          {donated[p.slug] && (
+            <mesh position={[0, 1.55, 0]} material={toon(palette.sun, { emissive: "#FFB800" })} castShadow>
+              <octahedronGeometry args={[0.16, 0]} />
+            </mesh>
+          )}
+        </group>
+      ))}
+    </group>
+  );
+}
+
 export function Landmarks() {
   return (
     <group>
       <House />
       <TownHall />
       <Museum />
+      <Pedestals />
       <MarketStall />
       <ArcadeShack />
       <Dock />
