@@ -48,8 +48,8 @@ export function CameraRig() {
       return;
     }
     if (debugCam.lookoutSpot) {
-      camera.position.set(lookout.x - 1.85, lookout.y + 3.05, lookout.z + 4.35);
-      camera.lookAt(lookout.x + 0.55, lookout.y + 0.82, lookout.z - 0.65);
+      camera.position.set(lookout.x + 0.85, lookout.y + 3.55, lookout.z + 5.4);
+      camera.lookAt(lookout.x + 1.55, lookout.y + 0.85, lookout.z - 0.95);
       bend.uBend.value = 0.0016;
       bend.uBendCenter.value.set(lookout.x, lookout.y, lookout.z);
       bend.uPlayer.value.set(player.x, player.y + 0.55, player.z);
