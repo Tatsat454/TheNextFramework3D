@@ -1261,7 +1261,7 @@ export const plazaCopy = {
   lookout: {
     name: "Lookout",
     verb: "Look",
-    line: PLACEHOLDER("a line about where Tatsat is headed next"),
+    line: "I will be applying to and looking for APM roles and hopefully be working with you! I will also be making some cool new video games using AI!",
   },
 };
 
