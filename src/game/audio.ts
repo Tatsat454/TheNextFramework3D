@@ -2,7 +2,7 @@
 
 import { useGame } from "./store";
 
-/** Every sound is synthesized in the browser; there are no audio files. */
+/** Sound effects are synthesized. The ambient bed is public/audio/ambient.mp3. */
 let ctx: AudioContext | null = null;
 let master: GainNode | null = null;
 let ambient: { stop: () => void } | null = null;
@@ -94,7 +94,9 @@ export const sfx = {
   },
 };
 
-/** A quiet breeze plus the odd bird chirp. Starts when sound is turned on. */
+const AMBIENT_SRC = "/audio/ambient.mp3";
+
+/** Looping theme. Starts when sound is turned on. */
 export function setAmbient(on: boolean) {
   if (!on) {
     ambient?.stop();
@@ -103,33 +105,20 @@ export function setAmbient(on: boolean) {
   }
   const c = ac();
   if (!c || !master || ambient) return;
-  const buffer = c.createBuffer(1, c.sampleRate * 2, c.sampleRate);
-  const data = buffer.getChannelData(0);
-  let last = 0;
-  for (let k = 0; k < data.length; k++) {
-    last = (last + 0.02 * (Math.random() * 2 - 1)) / 1.02;
-    data[k] = last * 3.5;
-  }
-  const src = c.createBufferSource();
-  src.buffer = buffer;
-  src.loop = true;
-  const filter = c.createBiquadFilter();
-  filter.type = "lowpass";
-  filter.frequency.value = 520;
+  const audio = new Audio(AMBIENT_SRC);
+  audio.loop = true;
+  audio.preload = "auto";
+  const element = c.createMediaElementSource(audio);
   const g = c.createGain();
-  g.gain.value = 0.05;
-  src.connect(filter).connect(g).connect(master);
-  src.start();
-  const chirp = window.setInterval(() => {
-    if (Math.random() < 0.5) return;
-    const base = 1800 + Math.random() * 900;
-    tone(base, 0.08, { type: "sine", gain: 0.025, slide: 1.3 });
-    tone(base * 1.1, 0.08, { type: "sine", gain: 0.02, at: 0.12, slide: 1.25 });
-  }, 3800);
+  g.gain.value = 0.4;
+  element.connect(g).connect(master);
+  const play = audio.play();
+  if (play) void play.catch(() => {});
   ambient = {
     stop: () => {
-      src.stop();
-      window.clearInterval(chirp);
+      audio.pause();
+      element.disconnect();
+      g.disconnect();
     },
   };
 }

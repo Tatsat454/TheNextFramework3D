@@ -35,10 +35,8 @@ export function Hud() {
   const toggleSound = () => {
     const next = !sound;
     set({ sound: next });
-    setTimeout(() => {
-      setAmbient(next);
-      if (next) sfx.click();
-    }, 0);
+    setAmbient(next);
+    if (next) sfx.click();
   };
 
   return (
