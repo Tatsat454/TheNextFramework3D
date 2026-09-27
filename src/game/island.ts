@@ -438,11 +438,41 @@ export const boardTile = (() => {
   return { i, j, x, z, facing: Math.atan2(fountain.x - x, fountain.z - z) };
 })();
 
+/** Northeast bluff — a toy lighthouse the lookout telescope can find. */
+export const lighthouse = (() => {
+  const c = tileCenter(47, 13);
+  const t = tileAt(47, 13);
+  return { x: c.x + 0.1, z: c.z - 0.15, y: (t?.h ?? 2) * LEVEL };
+})();
+
+/** Rope-fence lookout on the cliff rim just east of the pergola, aimed at the lighthouse. */
+export const lookout = (() => {
+  const x = gazebo.x + 2.42;
+  const z = gazebo.z - 1.72;
+  const facing = Math.atan2(lighthouse.x - x, lighthouse.z - z);
+  const posts = [
+    { x: gazebo.x + 1.55, z: gazebo.z - 2.35 },
+    { x: gazebo.x + 2.65, z: gazebo.z - 2.82 },
+    { x: gazebo.x + 3.75, z: gazebo.z - 3.28 },
+    { x: gazebo.x + 4.85, z: gazebo.z - 3.82 },
+  ];
+  return {
+    x,
+    z,
+    facing,
+    posts,
+    lamp: posts[0]!,
+    sign: { x: x - 0.62, z: z + 0.22, facing },
+  };
+})();
+
 export function nearPlazaProp(x: number, z: number, extra = 0) {
   if (plazaLanterns.some((p) => Math.hypot(x - p.x, z - p.z) < 0.42 + extra)) return true;
   if (plazaBenches.some((p) => Math.hypot(x - p.x, z - p.z) < 0.72 + extra)) return true;
   if (Math.hypot(x - plazaSign.x, z - plazaSign.z) < 0.45 + extra) return true;
   if (Math.hypot(x - boardTile.x, z - boardTile.z) < 0.7 + extra) return true;
+  if (Math.hypot(x - lookout.x, z - lookout.z) < 0.7 + extra) return true;
+  if (lookout.posts.some((p) => Math.hypot(x - p.x, z - p.z) < 0.28 + extra)) return true;
   return false;
 }
 
@@ -465,6 +495,9 @@ export function plazaPropHit(x: number, z: number) {
   const blx = bdx * bc - bdz * bs;
   const blz = bdx * bs + bdz * bc;
   if (Math.abs(blx) < 0.52 && Math.abs(blz) < 0.18) return true;
+  if (Math.hypot(x - lookout.x, z - lookout.z) < 0.22) return true;
+  if (lookout.posts.some((p) => Math.hypot(x - p.x, z - p.z) < 0.12)) return true;
+  if (Math.hypot(x - lookout.lamp.x, z - lookout.lamp.z) < 0.16) return true;
   return false;
 }
 
@@ -536,6 +569,13 @@ for (const t of grid) {
   const c = tileCenter(t.i, t.j);
   if (Math.hypot(c.x - fountain.x, c.z - fountain.z) < plazaRing.gardenOuter + 0.2) reserve(t.i, t.j, 0);
   if (nearGazebo(c.x, c.z, 0.35)) reserve(t.i, t.j, 0);
+  if (Math.hypot(c.x - lookout.x, c.z - lookout.z) < 1.1) reserve(t.i, t.j, 0);
+}
+{
+  const { i, j } = worldToTile(lighthouse.x, lighthouse.z);
+  reserve(i, j, 1);
+  const t = tileAt(i, j);
+  if (t) t.blocked = true;
 }
 for (const l of landmarkPlacements) {
   const [i0, j0, i1, j1] = l.rect;

@@ -14,6 +14,7 @@ import { ClearColor, InteriorWorld } from "./Interior";
 import { Landmarks } from "./Landmarks";
 import { Nature } from "./Nature";
 import { Gazebo } from "./Gazebo";
+import { Lookout } from "./Lookout";
 import { Plaza, PlazaPetals } from "./Plaza";
 import { PlazaFurniture } from "./PlazaFurniture";
 import { Pickups } from "./Pickups";
@@ -124,6 +125,7 @@ export default function IslandCanvas({ onReady, onNoWebGL }: { onReady: () => vo
           <PlazaFurniture night={isNightTime(search, h)} />
           <Fountain />
           <Gazebo />
+          <Lookout />
           <PlazaPetals />
           <Landmarks />
           <Pickups />

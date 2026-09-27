@@ -1258,6 +1258,11 @@ export const plazaCopy = {
     name: "Bench",
     verb: "Sit",
   },
+  lookout: {
+    name: "Lookout",
+    verb: "Look",
+    line: PLACEHOLDER("a line about where Tatsat is headed next"),
+  },
 };
 
 export const getStory = (slug: string) => stories.find((s) => s.slug === slug);

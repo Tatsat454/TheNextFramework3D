@@ -18,7 +18,7 @@ import {
   WIPE_OUT_MS,
   WIPE_OUT_MS_REDUCED,
 } from "./interiors";
-import { fountain, getPlacement, landmarkPlacements, LEVEL, pickups, plazaBenches, trees } from "./island";
+import { fountain, getPlacement, landmarkPlacements, LEVEL, lookout, pickups, plazaBenches, trees } from "./island";
 import { player, playerScreen, pose, reducedMotion } from "./player-state";
 import { checkArrivals, toast, useGame } from "./store";
 
@@ -189,6 +189,17 @@ export function currentInteractables(): Interactable[] {
       ref: `bench-${i}`,
     });
   });
+  list.push({
+    id: "plaza:lookout",
+    kind: "plaza",
+    label: plazaCopy.lookout.name,
+    verb: plazaCopy.lookout.verb,
+    x: lookout.x,
+    z: lookout.z,
+    y: LEVEL + 1.45,
+    r: 1.15,
+    ref: "lookout",
+  });
   return list;
 }
 
@@ -315,6 +326,24 @@ function sitOnBench(i: number) {
   sfx.sigh();
 }
 
+function peekLookout() {
+  pose.sitting = false;
+  pose.lookoutAt = performance.now();
+  player.facing = lookout.facing;
+  sfx.open();
+  useGame.setState({
+    dialog: {
+      speaker: "lookout",
+      name: plazaCopy.lookout.name,
+      role: "Lookout",
+      tagColor: "#4B3FB5",
+      voice: [260, 380],
+      lines: [plazaCopy.lookout.line],
+      index: 0,
+    },
+  });
+}
+
 export function interact(it: Interactable, player: { x: number; z: number }) {
   const s = useGame.getState();
   switch (it.kind) {
@@ -383,6 +412,7 @@ export function interact(it: Interactable, player: { x: number; z: number }) {
     case "plaza": {
       if (it.ref === "fountain") tossCoin(player);
       else if (it.ref.startsWith("bench-")) sitOnBench(Number(it.ref.slice(6)));
+      else if (it.ref === "lookout") peekLookout();
       break;
     }
     case "prop": {

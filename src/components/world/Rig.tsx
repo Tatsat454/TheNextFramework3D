@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import type { LandmarkId } from "@/content/landmarks";
 import { MUSEUM, MUSEUM_CURATOR, MUSEUM_PEDESTALS } from "@/game/interiors";
-import { beachUmbrella, fountain, gazebo, getPlacement, LEVEL, spawn } from "@/game/island";
+import { beachUmbrella, fountain, gazebo, getPlacement, LEVEL, lighthouse, spawn } from "@/game/island";
 import { bend } from "@/game/materials";
 import { debugCam, player, playerScreen, pose, reducedMotion } from "@/game/player-state";
 import { useGame } from "@/game/store";
@@ -24,6 +24,9 @@ const MUSEUM_LOOK = new THREE.Vector3(0, 0.55, -0.35);
 const ARCADE_LOOK = new THREE.Vector3(0, 0.22, 0.15);
 const TOWN_LOOK = new THREE.Vector3(0, 0.35, -0.35);
 const tmp = new THREE.Vector3();
+const lookPos = new THREE.Vector3();
+const lookAtPt = new THREE.Vector3();
+const LOOKOUT_MS = 5200;
 
 export function CameraRig() {
   const { camera, size } = useThree();
@@ -79,6 +82,19 @@ export function CameraRig() {
       bend.uPlayer.value.set(player.x, player.y + 0.55, player.z);
       return;
     }
+    if (debugCam.lookout) {
+      camera.position.set(lighthouse.x + 7.4, LEVEL + 7.6, lighthouse.z + 9.4);
+      camera.lookAt(lighthouse.x - 0.5, LEVEL + 2.5, lighthouse.z - 5.2);
+      const persp = camera as THREE.PerspectiveCamera;
+      if (persp.isPerspectiveCamera) {
+        persp.fov = 30;
+        persp.updateProjectionMatrix();
+      }
+      bend.uBend.value = 0.001;
+      bend.uBendCenter.value.set(lighthouse.x, LEVEL, lighthouse.z);
+      bend.uPlayer.value.set(player.x, player.y + 0.55, player.z);
+      return;
+    }
     if (debugCam.museumPedestal) {
       const ex = MUSEUM_PEDESTALS[0];
       const y = MUSEUM.deckH;
@@ -122,7 +138,7 @@ export function CameraRig() {
     }
     if (s.card || s.dialog) z = Math.min(z, 0.9);
     if (pose.gazeboFocus && !pose.sitting) z = Math.min(z, 0.78);
-    if (!inside) {
+    if (!inside && !pose.lookoutAt) {
       target.x = THREE.MathUtils.clamp(target.x, -18, 18);
       target.z = THREE.MathUtils.clamp(target.z, -20, 18);
     }
@@ -145,6 +161,31 @@ export function CameraRig() {
     }
     if (inside) camera.lookAt(focus.current.x, focus.current.y + 0.15, focus.current.z);
     else camera.lookAt(focus.current.x, focus.current.y + (pose.sitting ? 0.38 : 0.6), focus.current.z - 1.6);
+    if (pose.lookoutAt) {
+      const elapsed = performance.now() - pose.lookoutAt;
+      if (elapsed >= LOOKOUT_MS) pose.lookoutAt = 0;
+      else {
+        let u = 1;
+        if (reducedMotion.value) u = elapsed < LOOKOUT_MS - 400 ? 1 : 0;
+        else if (elapsed < 1200) u = elapsed / 1200;
+        else if (elapsed < 3400) u = 1;
+        else u = 1 - (elapsed - 3400) / (LOOKOUT_MS - 3400);
+        const e = u * u * (3 - 2 * u);
+        lookPos.set(lighthouse.x + 7.4, LEVEL + 7.6, lighthouse.z + 9.4);
+        lookAtPt.set(lighthouse.x - 0.5, LEVEL + 2.5, lighthouse.z - 5.2);
+        camera.position.lerp(lookPos, e);
+        tmp.set(
+          focus.current.x + (lookAtPt.x - focus.current.x) * e,
+          focus.current.y + 0.6 + (lookAtPt.y - (focus.current.y + 0.6)) * e,
+          focus.current.z - 1.6 + (lookAtPt.z - (focus.current.z - 1.6)) * e,
+        );
+        camera.lookAt(tmp);
+        if (persp.isPerspectiveCamera) {
+          persp.fov = 32 - e * 4;
+          persp.updateProjectionMatrix();
+        }
+      }
+    }
     bend.uBend.value = inside ? 0 : 0.0016;
     bend.uBendCenter.value.copy(focus.current);
     bend.uPlayer.value.set(player.x, player.y + 0.55, player.z);
