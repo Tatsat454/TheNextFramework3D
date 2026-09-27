@@ -542,8 +542,9 @@ export const museumExhibits = [
   "pokemon-red-agent",
 ] as const;
 
-/** The indoor gallery pedestals. Donation stars and the Curator's counter use this list. */
+/** The five indoor gallery pedestals. Donation stars and the Curator's counter use this list. */
 export const galleryExhibits = [
+  "nyc-taxi-ddc",
   "pjm-ai-electricity",
   "startup-failure",
   "home-robot-vlm",
@@ -595,7 +596,7 @@ export const landmarks: Landmark[] = [
     section: "Projects",
     eyebrow: "Museum · Projects",
     title: "The collection",
-    blurb: "Four exhibits inside, each one a project. Walk in — Moss will show you around. Read a story to the end to donate it.",
+    blurb: "Five exhibits inside, each one a project. Walk in — Moss will show you around. Read a story to the end to donate it.",
     cta: null,
   },
   {
@@ -900,7 +901,7 @@ export const arcadePal = {
 };
 
 /**
- * The Museum: Moss the Curator and the gallery plaques.
+ * The Museum: Moss the Curator and the five gallery plaques.
  */
 export const museumPal = {
   id: "moss",
@@ -909,10 +910,10 @@ export const museumPal = {
   tagColor: "#D4A13A",
   voice: [340, 500] as [number, number],
   welcome: [
-    "Welcome to the Museum! Every exhibit here is one of Tatsat's projects. Walk up to a plaque to hear its story!",
+    "Welcome to the Museum! Every exhibit here is one of Tatsat's projects. The most important one is waiting at the top of the stairs!",
   ],
-  progress: "You've seen {n} of 4 exhibits!",
-  thanks: "You saw all four — the grid, the startups, the robot, and the agent that never won a badge. That's the collection.",
+  progress: "You've seen {n} of 5 exhibits!",
+  thanks: "You saw all five — the taxi, the grid, the startups, the robot, and the agent that never won a badge. That's the collection.",
 };
 
 export const museumInteriorCopy = {
@@ -923,6 +924,18 @@ export const museumInteriorCopy = {
     lines: ["{gallery}"],
   },
   exhibit1: {
+    name: "NYC taxis",
+    verb: "Read",
+    title: "Why taxi drivers drive where they drive",
+    lines: [
+      "Why taxi drivers drive where they drive",
+      "A Dynamic Discrete Choice model of NYC taxi drivers, estimated from 83,000+ trips, to recover the preferences behind every 'where next?' decision.",
+      "Key result: 83K+ trips, 265 zones folded into 15, a full NFXP model of where drivers search next.",
+    ],
+    href: "/story/nyc-taxi-ddc",
+    hrefLabel: "Read the story",
+  },
+  exhibit2: {
     name: "The grid",
     verb: "Read",
     title: "Geographic Concentration of AI-Driven Electricity Demand",
@@ -934,7 +947,7 @@ export const museumInteriorCopy = {
     href: "/story/pjm-ai-electricity",
     hrefLabel: "Read the story",
   },
-  exhibit2: {
+  exhibit3: {
     name: "Startups that climb",
     verb: "Read",
     title: "What Actually Separates Startups That Climb from Ones That Stall",
@@ -946,7 +959,7 @@ export const museumInteriorCopy = {
     href: "/story/startup-failure",
     hrefLabel: "Read the story",
   },
-  exhibit3: {
+  exhibit4: {
     name: "A Robot for Home",
     verb: "Read",
     title: "A Robot for Home",
@@ -958,7 +971,7 @@ export const museumInteriorCopy = {
     href: "/story/home-robot-vlm",
     hrefLabel: "Read the story",
   },
-  exhibit4: {
+  exhibit5: {
     name: "Pokémon RL",
     verb: "Read",
     title: "The Pokémon Reinforcement Problem",

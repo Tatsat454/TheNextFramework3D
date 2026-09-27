@@ -99,12 +99,13 @@ export function museumStairSouth() {
   return MUSEUM.deckZ + MUSEUM.steps * MUSEUM.stepD;
 }
 
-/** Four gallery pedestals. +z is south (plaque faces the door). */
+/** Five gallery pedestals. +z is south (plaque faces the door). */
 export const MUSEUM_PEDESTALS = [
-  { id: "exhibit1", n: 1, x: -3.42, z: -2.38, tier: "top" as const, slug: galleryExhibits[0], toy: "pjm-ai-electricity" },
-  { id: "exhibit2", n: 2, x: 3.42, z: -2.38, tier: "top" as const, slug: galleryExhibits[1], toy: "startup-failure" },
-  { id: "exhibit3", n: 3, x: -3.22, z: 2.22, tier: "low" as const, slug: galleryExhibits[2], toy: "home-robot-vlm" },
-  { id: "exhibit4", n: 4, x: 3.22, z: 2.22, tier: "low" as const, slug: galleryExhibits[3], toy: "pokemon-red-agent" },
+  { id: "exhibit1", n: 1, x: 0, z: -3.55, tier: "top" as const, slug: galleryExhibits[0], toy: "nyc-taxi-ddc" },
+  { id: "exhibit2", n: 2, x: -3.42, z: -2.38, tier: "top" as const, slug: galleryExhibits[1], toy: "pjm-ai-electricity" },
+  { id: "exhibit3", n: 3, x: 3.42, z: -2.38, tier: "top" as const, slug: galleryExhibits[2], toy: "startup-failure" },
+  { id: "exhibit4", n: 4, x: -3.22, z: 2.22, tier: "low" as const, slug: galleryExhibits[3], toy: "home-robot-vlm" },
+  { id: "exhibit5", n: 5, x: 3.22, z: 2.22, tier: "low" as const, slug: galleryExhibits[4], toy: "pokemon-red-agent" },
 ] as const;
 
 export const MUSEUM_CURATOR = { x: 1.18, z: 4.28 };
