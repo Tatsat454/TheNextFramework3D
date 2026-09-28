@@ -83,13 +83,13 @@ export function DialogBox() {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 30, opacity: 0 }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          className="absolute inset-x-0 bottom-0 z-50 flex justify-center px-3 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-6 sm:pb-8"
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-50 flex justify-center px-3 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-6 sm:pb-8"
         >
           <div
             role="dialog"
             aria-label={`${speaker.name} says`}
             onClick={advance}
-            className="relative w-full max-w-[720px] cursor-pointer select-none rounded-[32px] border border-white bg-cream px-7 pb-7 pt-8 text-ink shadow-[0_24px_60px_rgba(123,108,246,0.3)] sm:px-9"
+            className="pointer-events-auto relative w-full max-w-[720px] cursor-pointer select-none rounded-[32px] border border-white bg-cream px-7 pb-7 pt-8 text-ink shadow-[0_24px_60px_rgba(123,108,246,0.3)] sm:px-9"
           >
             <span
               className="absolute -top-4 left-7 rounded-full px-4 py-1.5 text-[14px] font-bold text-ink shadow-[0_8px_18px_rgba(30,27,58,0.15)]"
