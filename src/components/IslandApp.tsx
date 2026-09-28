@@ -147,7 +147,7 @@ export default function IslandApp() {
       <main className="sky fixed inset-0 overflow-hidden" aria-label="Pocket Island, an explorable portfolio">
         <h1 className="sr-only">Tatsat Upadhyay&apos;s portfolio: Pocket Island</h1>
         <div
-          className={cn("absolute inset-0 transition-[filter,transform] duration-300 ease-out", blurred && "scale-[1.01] blur-[6px]")}
+          className={cn("absolute inset-0 touch-none transition-[filter,transform] duration-300 ease-out", blurred && "scale-[1.01] blur-[6px]")}
           aria-hidden={blurred || !!dialog}
         >
           <IslandCanvas onReady={onReady} onNoWebGL={noWebGL} />

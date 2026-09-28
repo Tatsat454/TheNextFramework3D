@@ -54,7 +54,7 @@ export function CircleWipe() {
   const r = hole(k);
   return (
     <div
-      className="pointer-events-auto absolute inset-0 z-[80]"
+      className="pointer-events-none absolute inset-0 z-[80]"
       style={
         reducedMotion.value
           ? { background: "#120e22", opacity: fade }

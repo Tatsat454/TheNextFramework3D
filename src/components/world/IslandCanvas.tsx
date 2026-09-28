@@ -1,11 +1,12 @@
 "use client";
 
 import { PerformanceMonitor } from "@react-three/drei";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
+import { input, onWorldTap } from "@/game/input";
 import { isNightTime, presetFromSearch } from "@/game/time-of-day";
-import { useGame } from "@/game/store";
+import { isPaused, useGame } from "@/game/store";
 import { Ambient } from "./Ambient";
 import { ArcadeWorld } from "./ArcadeInterior";
 import { Beach } from "./Beach";
@@ -34,6 +35,42 @@ function FirstFrame({ onReady }: { onReady: () => void }) {
     if (frames.current === 3) onReady();
   });
   return null;
+}
+
+const floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+const tapNdc = new THREE.Vector2();
+const tapHit = new THREE.Vector3();
+const tapRay = new THREE.Raycaster();
+
+/** Indoor floors have no outdoor Terrain onClick. Project every canvas tap onto y=0. */
+function IndoorGroundTap() {
+  const { camera, gl } = useThree();
+  const interior = useGame((s) => s.interior);
+  useEffect(() => {
+    if (!interior) return;
+    const el = gl.domElement;
+    const onDown = (ev: PointerEvent) => {
+      if (ev.button !== 0) return;
+      if (isPaused(useGame.getState())) return;
+      const rect = el.getBoundingClientRect();
+      tapNdc.set(((ev.clientX - rect.left) / rect.width) * 2 - 1, -((ev.clientY - rect.top) / rect.height) * 2 + 1);
+      tapRay.setFromCamera(tapNdc, camera);
+      if (tapRay.ray.intersectPlane(floorPlane, tapHit)) {
+        input.tapTarget = { x: tapHit.x, z: tapHit.z };
+      }
+    };
+    el.addEventListener("pointerdown", onDown, { passive: true });
+    return () => el.removeEventListener("pointerdown", onDown);
+  }, [camera, gl, interior]);
+  return null;
+}
+
+function Indoor({ children }: { children: React.ReactNode }) {
+  return (
+    <group onPointerDown={onWorldTap} onClick={onWorldTap}>
+      {children}
+    </group>
+  );
 }
 
 function hasWebGL() {
@@ -93,6 +130,7 @@ export default function IslandCanvas({ onReady, onNoWebGL }: { onReady: () => vo
       shadows={{ type: THREE.PCFSoftShadowMap, enabled: true }}
       dpr={[1, dpr]}
       gl={{ alpha: false, antialias: true, powerPreference: "high-performance" }}
+      style={{ touchAction: "none" }}
       camera={{ fov: 32, near: 0.5, far: 180, position: [0, 18, 22] }}
       onCreated={({ gl }) => {
         gl.setClearColor(preset.fog, 1);
@@ -106,13 +144,21 @@ export default function IslandCanvas({ onReady, onNoWebGL }: { onReady: () => vo
         }}
       />
       {interior === "arcade" ? (
-        <ArcadeWorld />
+        <Indoor>
+          <ArcadeWorld />
+        </Indoor>
       ) : interior === "townhall" ? (
-        <TownHallWorld />
+        <Indoor>
+          <TownHallWorld />
+        </Indoor>
       ) : interior === "museum" ? (
-        <MuseumWorld />
+        <Indoor>
+          <MuseumWorld />
+        </Indoor>
       ) : interior ? (
-        <InteriorWorld />
+        <Indoor>
+          <InteriorWorld />
+        </Indoor>
       ) : (
         <>
           <ClearColor color={preset.fog} />
@@ -133,6 +179,7 @@ export default function IslandCanvas({ onReady, onNoWebGL }: { onReady: () => vo
           <Ambient />
         </>
       )}
+      <IndoorGroundTap />
       <CameraRig />
       <Player />
       <Prompt />

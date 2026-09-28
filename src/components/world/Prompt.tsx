@@ -30,7 +30,7 @@ export function Prompt() {
   if (!it || paused || pose.sitting) return null;
   return (
     <group ref={group} position={[it.x, it.y, it.z]}>
-      <Html center zIndexRange={[20, 10]} style={{ pointerEvents: "none" }}>
+      <Html center zIndexRange={[40, 30]} style={{ pointerEvents: "none", touchAction: "none" }}>
         <button
           key={it.id}
           type="button"
@@ -39,9 +39,14 @@ export function Prompt() {
             e.stopPropagation();
             input.interactQueued = true;
           }}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            input.interactQueued = true;
+          }}
           onMouseDown={(e) => e.preventDefault()}
           tabIndex={-1}
-          className="prompt-pop glass-soft pointer-events-auto flex items-center gap-2 whitespace-nowrap rounded-full py-1.5 pl-3.5 pr-1.5 text-[14px] font-medium text-ink"
+          className="prompt-pop glass-soft pointer-events-auto flex items-center gap-2 whitespace-nowrap rounded-full py-1.5 pl-3.5 pr-1.5 text-[14px] font-medium text-ink [touch-action:manipulation]"
           aria-label={`${it.verb} ${it.label}`}
         >
           <span className="font-bold">{it.label}</span>

@@ -65,7 +65,7 @@ export function Hud() {
       </div>
 
       <div className={cn("pointer-events-none absolute inset-x-0 bottom-0 z-30 flex items-end justify-center gap-2 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] transition-all duration-300 sm:p-6", busy && "translate-y-4 opacity-0")}>
-        <div className="glass pointer-events-auto flex max-w-full items-center gap-3 rounded-full px-4 py-2.5 text-[13px] sm:text-[14px]">
+        <div className="glass pointer-events-none flex max-w-full items-center gap-3 rounded-full px-4 py-2.5 text-[13px] sm:text-[14px]">
           <span className="hidden font-medium text-ink-soft sm:inline">{touch ? copy.hudHint.mobile : copy.hudHint.desktop}</span>
           <span className="hidden text-ink-soft/50 sm:inline" aria-hidden>·</span>
           {inside ? (
